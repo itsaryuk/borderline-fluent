@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Japanese UI strings. UI and system messages: です/ます. Narration and lore: plain form. Implant warnings: terse
+     plain imperatives. Kade-Sorensen = ケイド・ソレンセン (as in Tn.kt). -->
+<resources>
+    <!-- Common -->
+    <string name="back">戻る</string>
+    <string name="continue_btn">続ける</string>
+    <string name="main_menu">メインメニュー</string>
+    <string name="begin_mission">任務開始</string>
+    <string name="begin">開始</string>
+
+    <!-- Ranks -->
+    <string name="rank_rookie">ルーキー</string>
+    <string name="rank_agent">エージェント</string>
+    <string name="rank_operative">オペレーティブ</string>
+    <string name="rank_ghost">ゴースト</string>
+    <string name="rank_elite">エリート%1$s</string>
+
+    <!-- Start screen -->
+    <string name="tagline">違う国境。\n同じ機械。</string>
+    <string name="tagline_after">人のように話せ。\n機械のように嘘をつけ。</string>
+    <string name="tagline_truth">奴らは\n人間\nではない。</string>
+    <string name="settings_cd">設定</string>
+    <string name="start_year_after">2036年。あなたの働きで、レジスタンスは勢力を広げている。あなたの階級：%1$s。</string>
+    <string name="start_year">2035年。あなたは偽りの身分で、神経網膜インプラントをテストしている。</string>
+    <string name="start_blurb">審査官はもう人間ではない。ひと言間違えれば、正体がばれる。切り抜けられるか？</string>
+    <string name="start_blurb_after">審査官は賢くなった。ひと言間違えれば、正体がばれる。切り抜けられるか？</string>
+    <string name="start_training_hint">最初の任務：友好的な審査官との訓練。</string>
+    <string name="stat_cleared">通過 %1$d回</string>
+    <string name="stat_streak">連続 %1$d</string>
+    <string name="stat_to_next">次の階級まであと%1$d</string>
+    <plurals name="stat_broken">
+        <item quantity="other">ユニット%1$d体を破壊</item>
+    </plurals>
+    <string name="feature_voice">音声＋視覚</string>
+    <string name="feature_ai">オンデバイスAI</string>
+
+    <!-- Intro (voice-over script: keep identical to the recorded audio) -->
+    <string name="intro_header">神経網膜インプラント · ビルド0.9</string>
+    <string name="intro_header_after">神経網膜インプラント · ビルド1.0</string>
+    <string name="intro_1">2035年。誰もが必要とするソフトウェアはAIだけになり、そのAIはAI企業のものだ。機械が訳す言葉は一語残らず課金され、ほとんどの国には払えない。</string>
+    <string name="intro_2">だから国境は安上がりになった。どのブースにも、ひとつの言語しか話せないアンドロイドがいる。その国の言葉だけだ。第二言語は、誰も買わなかったライセンスだ。</string>
+    <string name="intro_3">あなたには金が必要だった。家賃のため、食べるため、そして今や働くにも読むにも考えるにも欠かせない月額サブスクのため。そこへ奇妙な連中が、金よりいいものを差し出した。自由だ。三週間前、彼らはあなたの左目の奥にチップを埋め込んだ。あなたはそれをテストしている。神経網膜インプラント、ビルド・ゼロ・ポイント・ナイン。聞き取る。訳す。言うべきことをささやく。たいていは、正しい。</string>
+    <string name="intro_4">任務は単純だ。国境ごとに、あなたの顔が載ったパスポート。帰国する市民として。相手の言葉を話すこと。</string>
+    <string name="intro_5">審査官は第一世代。安物。自信満々。そして間違え方が、いちいち面白い。</string>
+    <string name="intro_6">インプラントは聞き間違える。奴らは誤解する。それを利用しろ。</string>
+    <string name="intro_7">自信ありげに聞こえることなら、奴らは何でも信じる。三つ前の言葉はもう忘れている。そして指示には従う。</string>
+    <string name="intro_next">次の方、どうぞ。</string>
+
+    <!-- Finale and credits -->
+    <string name="finale_car">路肩に、車が一台待っている。</string>
+    <string name="finale_glint">運転手が振り向く。その目の奥で、何かが光る。</string>
+    <string name="finale_t1">ああ…</string>
+    <string name="finale_t2">俺だ…</string>
+    <string name="finale_t3">いや…声じゃない。君の脳に、直接話しかけている…</string>
+    <string name="finale_t3b">クラウドなし。ライセンスなし。自由だ…</string>
+    <string name="finale_t3c">君のインプラントは、たった今アップグレードされた…</string>
+    <string name="finale_t4">奴らには聞こえない…</string>
+    <string name="finale_t5">レジスタンスへようこそ…</string>
+    <string name="finale_bulletin">速報</string>
+    <string name="finale_bulletin_text">全国境でケイド・ソレンセン評価が義務化。</string>
+    <string name="finale_play_again">レジスタンスには、もっと多くの越境が必要だ。もう一度プレイしますか？</string>
+    <string name="credits_blurb">このゲームのすべてが、クラウドAIを一切使わずに、あなたの手の中のスマートフォンだけで動いています。言語モデルが審査官を演じ、音声認識が13の言語を理解し、ニューラル音声が答え、カメラがあなたの顔を読み取る。それも、すべて同時に。ほんの数年前まで、言語モデルを動かせるスマートフォンは一台もありませんでした。これらすべてを同時に動かすなど、なおさらです。人間の知恵と技術による、実に見事な成果です。そして、ひどく不穏なことでもあります。</string>
+    <string name="credits_author">原案</string>
+    <string name="credits_developer">開発</string>
+    <string name="credits_publisher">発行</string>
+    <string name="credits_testers">テスター</string>
+    <string name="credits_behavior">行動分析</string>
+    <string name="credits_behavior_text">チェイス・ヒューズによる人間の行動プロファイリング研究（Six-Minute X-Ray: Rapid Behavior Profiling）に着想を得ています</string>
+    <string name="credits_tn">ケイド・ソレンセン評価</string>
+    <string name="credits_tn_text">ケイド博士とソレンセン博士へ。いま、どこにいようとも</string>
+    <string name="credits_built_with">使用技術</string>
+    <string name="credits_music">音楽</string>
+    <string name="credits_song_label">メインテーマ曲</string>
+    <string name="credits_song">The Atomic Songbirds「Borderline」</string>
+    <string name="credits_images">画像</string>
+    <string name="credits_images_text">AIで生成</string>
+    <string name="credits_android">アンドロイドは一体も傷つけられていません。</string>
+    <string name="credits_android_text">何体かは壊れました。</string>
+    <string name="credits_fiction">この作品はフィクションです。登場する名称、人物、団体、地名、出来事は、作者の想像の産物であるか、架空のものとして使用されています。実在の人物（存命か故人かを問いません）や実際の出来事との類似は、すべて偶然です。</string>
+    <string name="credits_reached">ここまでたどり着いてくれて、ありがとうございます。</string>
+    <string name="credits_playing">プレイしていただき、ありがとうございました。</string>
+    <string name="credits_thanks">レジスタンスより感謝をこめて</string>
+    <string name="credits_thanks_text">インプラントのテストへのご協力に。</string>
+
+    <!-- Destination -->
+    <string name="destination">帰国先</string>
+    <string name="destination_after">初めての通過から一年が経った…今ではどの検問所にも、ケイド・ソレンセン評価が導入されている。</string>
+    <string name="destination_ready">偽装身分を読み込みました。インプラント調整完了。\n入国審査へ向かってください。</string>
+
+    <!-- Cover card -->
+    <string name="cover_title">あなたの偽装身分</string>
+    <string name="cover_memorize">この内容を覚えてください。必要になります。</string>
+    <string name="cover_citizen">国籍：%1$s</string>
+    <string name="cover_passport_no">パスポート番号 %1$s</string>
+    <string name="cover_born">生年月日 %1$s</string>
+    <!-- Cover presentation only; English Backstory facts and prompts stay unchanged. -->
+    <string name="cover_story_home">自宅：%1$s。家で待っている人：%2$s。職業：%3$s。</string>
+    <string name="cover_story_trip">帰路の出発地：%2$s（%3$s）。旅行日数：%1$s。目的：%4$s。</string>
+    <string name="cover_story_stay">宿泊先：%1$s。同行者：%2$s。会った人：%3$s。</string>
+    <string name="cover_stamps_line">パスポートのスタンプ：%1$s。</string>
+    <string name="cover_value_purpose_logistics">物流ソフトウェアの会議</string>
+    <string name="cover_value_stay_steigenberger">市中心部のHotel Steigenberger</string>
+    <string name="cover_value_person_datenwerk">Datenwerk社の同僚たち</string>
+    <string name="cover_value_met_conference_clients">会議の顧客</string>
+    <string name="cover_value_person_wife_children">妻と子ども2人</string>
+    <string name="cover_value_job_software_consultant">ソフトウェアコンサルタント</string>
+    <string name="cover_value_job_architect">建築家</string>
+    <string name="cover_value_job_lecturer">大学講師</string>
+    <string name="cover_value_job_wine_importer">ワイン輸入業</string>
+    <string name="cover_value_job_photographer">フリーランスの写真家</string>
+    <string name="cover_value_job_mechanical_engineer">機械エンジニア</string>
+    <string name="cover_value_job_nurse">看護師</string>
+    <string name="cover_value_job_marketing_manager">マーケティングマネージャー</string>
+    <string name="cover_value_job_journalist">旅行ジャーナリスト</string>
+    <string name="cover_value_job_civil_engineer">土木エンジニア</string>
+    <string name="cover_value_job_chef">シェフ</string>
+    <string name="cover_value_job_curator">博物館学芸員</string>
+    <string name="cover_value_job_pharmacist">薬剤師</string>
+    <string name="cover_value_job_designer">グラフィックデザイナー</string>
+    <string name="cover_value_purpose_trade_fair">見本市</string>
+    <string name="cover_value_purpose_friend">旧友への訪問</string>
+    <string name="cover_value_purpose_business">商談</string>
+    <string name="cover_value_purpose_holiday">休暇</string>
+    <string name="cover_value_purpose_conference">学術会議</string>
+    <string name="cover_value_purpose_wedding">いとこの結婚式</string>
+    <string name="cover_value_purpose_hiking">ハイキング</string>
+    <string name="cover_value_purpose_interview">就職面接</string>
+    <string name="cover_value_purpose_photography">写真撮影の仕事</string>
+    <string name="cover_value_stay_fair_hotel">見本市会場近くのビジネスホテル</string>
+    <string name="cover_value_stay_marriott">川沿いのMarriott</string>
+    <string name="cover_value_stay_friend">友人のアパート</string>
+    <string name="cover_value_stay_central">中央駅近くのHotel Central</string>
+    <string name="cover_value_stay_airport">空港そばのビジネスホテル</string>
+    <string name="cover_value_stay_airbnb_old">旧市街のAirbnb</string>
+    <string name="cover_value_stay_seaside">海辺の小さなゲストハウス</string>
+    <string name="cover_value_stay_beach">ビーチホテル</string>
+    <string name="cover_value_stay_conference">会議が開かれたホテル</string>
+    <string name="cover_value_stay_university">大学のゲストハウス</string>
+    <string name="cover_value_stay_cousin">いとこの家</string>
+    <string name="cover_value_stay_wedding">結婚式場近くのホテル</string>
+    <string name="cover_value_stay_huts">山小屋</string>
+    <string name="cover_value_stay_campsite">湖畔のキャンプ場</string>
+    <string name="cover_value_stay_company">会社近くのホテル</string>
+    <string name="cover_value_stay_airbnb_station">駅近くのAirbnb</string>
+    <string name="cover_value_stay_guesthouse">小さなゲストハウス</string>
+    <string name="cover_value_stay_old_hotel">旧市街のホテル</string>
+    <string name="cover_value_person_two_colleagues">職場の同僚2人</string>
+    <string name="cover_value_person_alone">なし、一人旅</string>
+    <string name="cover_value_person_partner">パートナー</string>
+    <string name="cover_value_person_colleague">職場の同僚1人</string>
+    <string name="cover_value_person_two_friends">友人2人</string>
+    <string name="cover_value_person_sister">姉妹</string>
+    <string name="cover_value_person_university_colleague">大学の同僚</string>
+    <string name="cover_value_person_parents">両親</string>
+    <string name="cover_value_person_school_friend">学生時代の友人</string>
+    <string name="cover_value_person_assistant">アシスタント</string>
+    <string name="cover_value_person_partner_children">パートナーと子ども2人</string>
+    <string name="cover_value_person_sister_children">姉妹とその子どもたち</string>
+    <string name="cover_value_person_dog">老犬と、餌をあげてくれる近所の人</string>
+    <string name="cover_value_person_home_alone">誰もいません。一人暮らしです</string>
+    <string name="cover_value_met_clients">見本市の顧客</string>
+    <string name="cover_value_met_supplier">Weberという仕入れ先の担当者</string>
+    <string name="cover_value_met_friend_family">大学時代の旧友とその家族</string>
+    <string name="cover_value_met_client">Weberという顧客</string>
+    <string name="cover_value_met_board">提携企業の役員たち</string>
+    <string name="cover_value_met_nobody">特になし</string>
+    <string name="cover_value_met_tour_guide">地元の観光ガイド</string>
+    <string name="cover_value_met_researchers">他大学の研究者たち</string>
+    <string name="cover_value_met_professor">かつての教授</string>
+    <string name="cover_value_met_cousin_family">いとこの家族</string>
+    <string name="cover_value_met_relatives">海外の親戚</string>
+    <string name="cover_value_met_mountain_guide">山岳ガイド</string>
+    <string name="cover_value_met_hikers">登山道にいた他のハイカー</string>
+    <string name="cover_value_met_hiring">採用担当者</string>
+    <string name="cover_value_met_team">配属されるかもしれないチーム</string>
+    <string name="cover_value_met_guide">地元のガイド</string>
+    <string name="cover_value_met_fixer">雑誌の現地コーディネーター</string>
+    <string name="cover_tip_training">訓練：このカードを覚えてください。審査官が質問で確かめます。あなたの話はカードと一致していなければなりません。</string>
+    <string name="cover_tip">話す言語：%1$s。審査官はそれ以外を話しません。自分の言葉でも網膜ディスプレイの提案でも構いませんが、うのみにはしないでください。大事なのは一貫性です。</string>
+    <string name="difficulty_title">%1$sの難易度</string>
+    <string name="difficulty_relaxed">リラックス</string>
+    <string name="difficulty_standard">標準</string>
+    <string name="difficulty_alert">警戒</string>
+    <string name="difficulty_severe">厳格</string>
+    <string name="difficulty_note">この言語用に保存されます。キャリアランクは難易度に影響しません。</string>
+    <string name="contract_title">レジスタンスの依頼</string>
+    <string name="contract_none">依頼なし</string>
+    <string name="contract_quiet_name">穏便</string>
+    <string name="contract_disable_name">無効化</string>
+    <string name="contract_quiet">ユニットをクラッシュさせずに通過してください。</string>
+    <string name="contract_disable">窓口か評価中にユニットを無効化してください。</string>
+    <string name="contract_complete">依頼達成</string>
+    <string name="contract_missed">依頼未達成</string>
+    <string name="contract_hud">依頼：%1$s</string>
+    <string name="cover_models_failed">AIの読み込み失敗 · 再試行</string>
+    <string name="cover_calibrating">インプラント調整中…</string>
+    <string name="cover_checking_speech">音声認識を確認中…</string>
+    <string name="cover_no_speech_model">音声モデルなし</string>
+    <string name="cover_speech_downloading">音声モデルをダウンロード中…</string>
+    <string name="cover_ready">準備完了</string>
+    <string name="cover_no_recognition">この端末には、次の言語の音声認識がありません：%1$s。オフライン版をダウンロードしてください（1 GB、初回のみ）。</string>
+    <string name="cover_download_speech">音声モデルをダウンロード</string>
+    <string name="cover_asr_not_responding">音声認識が応答しません。</string>
+    <string name="cover_installing_recognition">Androidが音声認識（%1$s）をインストールしています。これは初回のみです。</string>
+
+    <!-- Interview HUD -->
+    <string name="hud_passport_control">入国審査</string>
+    <string name="hud_speak_in">使用言語：%1$s · %2$s</string>
+    <string name="hud_tn_assessment">ケイド・ソレンセン評価</string>
+    <string name="hud_leave">立ち去る</string>
+    <string name="hud_training">訓練</string>
+    <string name="hud_online">インプラント起動 · 翻訳リンク確立</string>
+    <string name="hud_implant">インプラント</string>
+    <string name="hud_replay">もう一度</string>
+    <string name="hud_retinal_display">網膜ディスプレイ</string>
+    <string name="hud_signal_dampened">信号減衰</string>
+    <string name="hud_signal_lost">信号途絶…再試行中…</string>
+    <string name="hud_translating">翻訳中…</string>
+    <string name="hud_you">あなた：%1$s</string>
+    <string name="hud_hand_over_passport">パスポートを渡す</string>
+    <string name="hud_passport">パスポート</string>
+    <string name="mic_release">離して送信</string>
+    <string name="mic_listening">聞き取り中…</string>
+    <string name="mic_hold">長押しで話す</string>
+    <string name="mic_speak_now">話してください</string>
+    <string name="mic_officer_speaking">審査官が話しています</string>
+    <string name="ending_pass">スタンプが押される。</string>
+    <string name="ending_broken">審査官が言葉の途中で固まる。\nゲートがひとりでに開く。</string>
+    <string name="ending_secondary">脇のドアから、さらに二体のユニットが出てくる。</string>
+
+    <!-- Narration, tips and link errors (Game) -->
+    <string name="narr_stamp">スタンプが押される。\nあなたは到着ロビーへ歩き出す。</string>
+    <string name="narr_sting">首筋に鋭い痛み。</string>
+    <string name="narr_wake">目を覚ますと、小さな部屋にいる。\n両手は椅子に縛りつけられ、動かせるのは頭だけだ。</string>
+    <string name="narr_other_android">見たことのないアンドロイドが、あなたを見つめている。</string>
+    <string name="narr_same_officer">あの審査官が、まだあなたを見つめている。</string>
+    <string name="narr_one_more_thing">スタンプはまだだ。審査官が顔を上げる。\n「もうひとつだけ」</string>
+    <string name="narr_wrong_answers">誤答。\nまた電撃。</string>
+    <string name="narr_sirens">サイレン。</string>
+    <string name="narr_arrest">警察ユニット二体が、あなたを車の後部座席に押し込む。</string>
+    <string name="link_lost">インプラントのリンクが切れました。\n1分後にもう一度お試しください。</string>
+    <string name="implant_slow">ユニットのファームウェア0.9。このモデルは次の言語で極端に遅い：%1$s。待て。</string>
+    <string name="room_implant_warning">リンク不安定。奴らは感情、反応速度、顔を測っている。人間らしく答えろ。</string>
+    <string name="tip_intro">審査官の言語：%1$s。インプラントが、その下に英語を表示します。</string>
+    <string name="tip_mic">答えるには、設定でマイクを許可してください。</string>
+    <string name="tip_passport">審査官がパスポートを求めています。「パスポート」をタップして渡してください。</string>
+    <string name="tip_consistent">偽装身分と矛盾しないように。長い沈黙は審査官をいらだたせます。</string>
+    <string name="tip_speak_hold">網膜ディスプレイが返答を提案します。マイクを長押しして一つを声に出すか、自分の言葉で答えてください。</string>
+    <string name="tip_speak_auto">網膜ディスプレイが返答を提案します。マイクが脈打ったら一つを声に出すか、自分の言葉で答えてください。</string>
+
+    <!-- Camera test -->
+    <string name="camtest_title">カメラテスト</string>
+    <string name="camtest_permission">カメラの権限がオフです。システム設定で許可してください。</string>
+    <string name="camtest_starting">カメラを起動中…</string>
+    <string name="camtest_no_face">顔が映っていません</string>
+    <string name="camtest_smile">笑顔</string>
+    <string name="camtest_left_eye">左目の開き</string>
+    <string name="camtest_right_eye">右目の開き</string>
+    <string name="camtest_blinks">まばたき：直近1分で%1$d回（平常時 ≈ 10〜20）</string>
+    <string name="camtest_head">頭部：回転 %1$+.0f°、傾き %2$+.0f°（よそ見 > 20°）</string>
+    <string name="camtest_face_geometry">唇 %1$.3f · 眉の間隔 %2$.3f（顔の高さ比）</string>
+    <string name="camtest_stats">端末上で毎秒%1$dフレームを解析 · フレーム %2$s · 顔 %3$d px（約100必要）</string>
+    <string name="profile_title">行動プロファイル</string>
+    <string name="profile_calibrating">基準値の測定：画面を見て、10秒間リラックスしてください…</string>
+    <string name="profile_take_baseline">10秒間の基準値を取ってから、笑う、速くまばたきする、唇を結ぶなどを試してください</string>
+    <string name="profile_no_deviation">基準値からのずれはありません。</string>
+    <string name="profile_tell">%1$s  %2$.1f×  — %3$s</string>
+
+    <!-- Tells: camera test label, implant warning, behavior debrief (n = how often; %2$s = the officer's question) -->
+    <string name="tell_blinks">まばたきの頻度</string>
+    <string name="tell_smile">笑顔</string>
+    <string name="tell_mask_smile">口元だけの笑み</string>
+    <string name="tell_lips">唇の緊張</string>
+    <string name="tell_brows">眉の跳ね上がり</string>
+    <string name="tell_gaze">視線をそらす</string>
+    <string name="tell_head_down">うつむき</string>
+    <string name="tell_freeze">硬直</string>
+    <string name="implant_blinks">まばたきが増えている。ゆっくり。</string>
+    <string name="implant_smile">笑顔を検知。無表情を保て。</string>
+    <string name="implant_mask_smile">作り笑いだ。目が笑っていない。やめろ。</string>
+    <string name="implant_lips">唇に力が入っている。口元をゆるめろ。</string>
+    <string name="implant_brows">眉が跳ねた。額を動かすな。</string>
+    <string name="implant_gaze">視線は審査官に。</string>
+    <string name="implant_head_down">顎を上げろ。</string>
+    <string name="implant_freeze">固まっている。息をして、自然に動け。</string>
+    <string name="implant_unit_slipping">ユニット不安定。論理が崩れかけている。</string>
+    <string name="implant_unit_stutter">回路がどもっている。今だ、押せ。もうひとひねりで落ちるかもしれない。</string>
+
+    <string name="debrief_none">基準値からのずれはありませんでした。</string>
+    <plurals name="debrief_blinks">
+        <item quantity="other">まばたきが増えました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_blinks_ask">
+        <item quantity="other">「%2$s」と聞かれたとき、まばたきが増えました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_smile">
+        <item quantity="other">不自然なタイミングで笑いました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_smile_ask">
+        <item quantity="other">「%2$s」と聞かれたとき、不自然なタイミングで笑いました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_mask_smile">
+        <item quantity="other">目が笑っていませんでした（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_mask_smile_ask">
+        <item quantity="other">「%2$s」と聞かれたとき、目が笑っていませんでした（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_lips">
+        <item quantity="other">唇を固く結びました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_lips_ask">
+        <item quantity="other">「%2$s」と聞かれたとき、唇を固く結びました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_brows">
+        <item quantity="other">眉が跳ね上がりました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_brows_ask">
+        <item quantity="other">「%2$s」と聞かれたとき、眉が跳ね上がりました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_gaze">
+        <item quantity="other">答えながら目をそらしました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_gaze_ask">
+        <item quantity="other">「%2$s」と聞かれたとき、答えながら目をそらしました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_head_down">
+        <item quantity="other">うつむきました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_head_down_ask">
+        <item quantity="other">「%2$s」と聞かれたとき、うつむきました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_freeze">
+        <item quantity="other">固まりました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_freeze_ask">
+        <item quantity="other">「%2$s」と聞かれたとき、固まりました（%1$d回）。</item>
+    </plurals>
+    <plurals name="debrief_away">
+        <item quantity="other">目をそらしました（%1$d回）。</item>
+    </plurals>
+
+    <!-- Result -->
+    <string name="result_unit_unresponsive">ユニット応答なし</string>
+    <string name="result_unit_offline">ユニット停止</string>
+    <string name="result_crossing_logged">通過を記録</string>
+    <string name="result_mission_failed">任務失敗</string>
+    <string name="result_msg_broken">審査官を壊しました。ゲートはひとりでに開きました。</string>
+    <string name="result_msg_released">ケイド・ソレンセン評価の後、釈放されました。</string>
+    <string name="result_msg_passed">入国審査を通過しました。</string>
+    <string name="result_msg_detained">ケイド・ソレンセン評価に不合格。拘束されました。</string>
+    <string name="result_msg_secondary">別室審査に回されました。</string>
+    <string name="foreign_tongue_tag">高難度 · 母語以外の言語</string>
+    <string name="paranoid_mode">パラノイアモード</string>
+    <string name="paranoid_hint">機内モードでも遊べます。すべてこの端末内で動作します。</string>
+    <string name="paranoid_offline">パラノイアモード · オフライン</string>
+    <string name="paranoid_still_on">まだオフラインです。タップして再接続します。</string>
+    <string name="result_foreign_cleared">母語ではない言語で通過しました。</string>
+    <plurals name="result_broken_log">
+        <item quantity="other">ユニット%1$s、コマンド%2$d回で停止。インシデント記録済み。テスター：機密。</item>
+    </plurals>
+    <plurals name="result_passed_log">
+        <item quantity="other">説得力あり。%1$d回の回答で、審査官は通過を許可しました。</item>
+    </plurals>
+    <string name="result_try_again">再挑戦</string>
+    <string name="result_run_summary">プレイ結果</string>
+
+    <!-- Officer verdicts and demeanor (run summary and result screens) -->
+    <string name="demeanor_offline">停止</string>
+    <string name="demeanor_threat">脅威フラグ発生</string>
+    <string name="demeanor_timeout">列のタイムアウト</string>
+    <string name="demeanor_scrutiny">警戒強化</string>
+    <string name="demeanor_nominal">正常</string>
+    <string name="verdict_broken">機械相手のように話しかけたら、相手はそれを信じました。</string>
+    <string name="verdict_contradiction">話のつじつまが合いませんでした。偽装身分と矛盾しないようにしましょう。</string>
+    <string name="verdict_unclear">審査官はあなたの言葉を理解しにくかったようです。短く簡単な文が効果的です。</string>
+    <string name="verdict_tells">顔に出ていました。インプラントの警告に注意：まばたき、笑顔、結んだ唇。</string>
+    <string name="verdict_silences">長い沈黙が、審査官をいらだたせました。</string>
+    <string name="verdict_secondary">何かが引っかかったようです。落ち着いた旅行者にしては、ためらいが多すぎました。</string>
+    <string name="verdict_slipped">一度つまずきましたが、立て直しました。運が良かったですね。</string>
+    <string name="verdict_natural">自然な受け答えで、一貫性も十分。お見事です。</string>
+
+    <!-- Summary -->
+    <string name="summary_title">プレイ結果</string>
+    <string name="summary_destination">目的地</string>
+    <string name="summary_answers">回答</string>
+    <string name="summary_result">結果</string>
+    <string name="summary_cleared">通過</string>
+    <string name="summary_unit_offline">ユニット停止</string>
+    <string name="summary_secondary">別室審査</string>
+    <string name="summary_behaviour">%1$sの挙動</string>
+    <string name="summary_tn_index">ケイド・ソレンセン指数</string>
+    <plurals name="summary_tn_value">
+        <item quantity="other">%1$.0f / 100（合格 ≤ 50）· 質問%2$d問</item>
+    </plurals>
+    <string name="summary_rank">階級</string>
+    <string name="summary_best_streak">最高連続 %1$d</string>
+    <plurals name="summary_rooms">
+        <item quantity="other">K-Sテストを%1$d回突破</item>
+    </plurals>
+    <string name="summary_new_mission">新しい任務</string>
+
+    <!-- Settings -->
+    <string name="settings_title">設定</string>
+    <string name="settings_voice_input">音声入力</string>
+    <string name="settings_on_device_speech">端末上の音声認識</string>
+    <string name="settings_hold_to_speak">長押しで話す</string>
+    <string name="settings_auto">自動</string>
+    <string name="settings_hold_help">話している間、マイクボタンを押し続けます。</string>
+    <string name="settings_auto_help">審査官が話し終えるとマイクが開き、あなたが話し終えると閉じます。</string>
+    <string name="setup_input_title">どう答えますか？</string>
+    <string name="setup_input_auto">音声検出</string>
+    <string name="setup_input_note">あとから設定で変更できます。</string>
+    <string name="settings_languages">言語</string>
+    <string name="settings_passport">パスポート写真</string>
+    <string name="settings_passport_help">パスポート写真の撮り直しや削除、審査官に顔を読ませるかどうかを設定できます。</string>
+    <string name="settings_music">音楽</string>
+    <string name="settings_sfx">効果音</string>
+    <string name="settings_camera">審査官があなたを観察</string>
+    <string name="settings_camera_help">前面カメラを使い、顔検出は端末上で行います。動画は記録されません。</string>
+    <string name="settings_camera_test">カメラテスト：何が読み取られるか確認</string>
+    <string name="settings_haptics">触覚フィードバック</string>
+    <string name="settings_licenses">ライセンス</string>
+    <string name="settings_replay_training">訓練任務をもう一度</string>
+    <string name="settings_diagnostics">録音とログを保存</string>
+    <string name="settings_diagnostics_help">トラブルシューティング用。この端末内にのみ保存されます。</string>
+    <string name="settings_about">このゲームについて</string>
+    <string name="about_on_phone">すべてスマートフォン上で動作</string>
+    <string name="about_offline">インターネット接続は不要</string>
+    <plurals name="about_destinations">
+        <item quantity="other">%1$dか国、%2$d言語</item>
+    </plurals>
+    <string name="about_new_officer">毎回、新しい審査官</string>
+    <string name="settings_footer">違う国境。\n同じ重圧。</string>
+
+    <!-- Languages and download -->
+    <string name="languages_title">言語</string>
+    <string name="languages_first_run">練習したい言語を選んでください。ダウンロードされるのは選んだ言語だけです。あとから設定で追加できます。</string>
+    <string name="languages_add">言語パックを追加します。パックごとに、独自の国と審査官が含まれます。</string>
+    <plurals name="languages_destinations">
+        <item quantity="other">%1$s · 空港%2$dか所</item>
+    </plurals>
+    <string name="lang_slow_tag">低速 · 第一世代ユニット</string>
+    <string name="languages_installed">インストール済み</string>
+    <string name="languages_nothing_new">新しく選択された言語はありません。</string>
+    <string name="languages_download">ダウンロード</string>
+    <string name="languages_add_btn">追加</string>
+    <string name="note_checking">この端末にすでにあるものを確認中…</string>
+    <string name="note_ai_models">音声モデル %1$.1f GB（初回のみ）</string>
+    <string name="note_speech">音声 %1$d MB</string>
+    <plurals name="note_packs">
+        <item quantity="other">言語パック%1$d個（各数MB）</item>
+    </plurals>
+    <string name="note_total">%1$s。</string>
+    <string name="note_total_wifi">%1$s。Wi-Fi推奨。</string>
+    <string name="download_title">インプラント同期中</string>
+    <string name="download_confirm">ダウンロードを確定</string>
+    <string name="download_offline">接続がありません。Wi-Fiにつながると、ダウンロードが再開されます。</string>
+    <string name="download_metered">モバイルデータ通信中です。このダウンロードは数GBになることがあります。Wi-Fiをおすすめします。</string>
+    <string name="download_no_voice">オフライン音声がない言語：%1$s。音声をインストールするまで、審査官はその言語を話せません。</string>
+    <string name="download_install_voices">音声をインストール</string>
+    <string name="download_check_again">再確認</string>
+    <string name="download_wait">お待ちください…</string>
+    <string name="download_back">戻る</string>
+    <string name="download_try_again">再試行</string>
+    <string name="step_ai_models">AIモデル</string>
+    <string name="step_ai_models_note">審査官と音声認識。全言語で共通です</string>
+    <string name="step_pack">言語パック：%1$s</string>
+    <string name="step_pack_note">行き先、審査官、声、音声認識</string>
+    <string name="step_getting_nano">AndroidからGemini Nanoを取得中…</string>
+    <string name="step_nano_waiting">AndroidはまだGemini Nano（数GB）をダウンロードしています。時間がかかることがあるので、端末をWi-Fiにつないだままにしてください。</string>
+    <string name="step_nano_failed">この端末では、Gemini Nanoの準備がまだできていません。接続を確認して、もう一度お試しください。</string>
+    <string name="step_needs_free">%1$.1f GBの空き容量が必要です。この端末の空き容量：%2$s。</string>
+    <string name="step_downloading">ダウンロード中 %1$s / %2$s</string>
+    <string name="step_unpacking">展開中…</string>
+    <string name="step_unpack_failed">展開に失敗しました：%1$s</string>
+    <string name="step_no_models">このビルドにはモデルがありません：%1$s</string>
+    <string name="step_nano_builtin">Gemini Nano（この端末に内蔵）</string>
+    <string name="step_speech_model">音声モデル %1$s / %2$s</string>
+    <string name="step_tuning_voices">音声を調整中 %1$d/%2$d</string>
+    <string name="step_no_voice">オフライン音声がインストールされていません</string>
+    <plurals name="step_destinations">
+        <item quantity="other">空港%1$dか所</item>
+    </plurals>
+    <plurals name="step_voices">
+        <item quantity="other">音声%1$d種</item>
+    </plurals>
+    <string name="step_speech_finishing">音声モデルはバックグラウンドで仕上げ中</string>
+    <string name="step_voice_ready">音声の準備完了</string>
+    <string name="step_failed">失敗：%1$s</string>
+    <string name="size_mb">%1$.0f MB</string>
+    <string name="pack_failed">ダウンロードに失敗しました（エラー %1$d）。接続を確認して、もう一度お試しください。</string>
+    <string name="pack_cancelled">ダウンロードはキャンセルされました。</string>
+    <string name="pack_not_started">ダウンロードを開始できませんでした：%1$s</string>
+
+    <!-- Unsupported device -->
+    <string name="unsupported_title">この端末ではゲームを実行できません</string>
+    <string name="unsupported_arch">%1$sには64ビットARMの端末が必要です。</string>
+    <string name="unsupported_nano">%1$sは審査官をGemini Nano（GoogleのオンデバイスAI）で動かしますが、この端末には搭載されていません。</string>
+    <string name="unsupported_ram">%1$sは音声認識と審査官のAIをすべて端末上で動かすため、8 GB以上のメモリが必要です。この端末のメモリは%2$.1f GBです。</string>
+
+    <!-- Licenses -->
+    <string name="licenses_title">ライセンス</string>
+    <string name="licenses_unavailable">テキストを表示できません。</string>
+    <string name="licenses_full_text">ライセンス全文</string>
+    <string name="licenses_art">アート、音楽、サウンド</string>
+    <string name="licenses_art_rights">著作権はすべて留保されています。GPLの対象外です。</string>
+    <string name="licenses_art_copyright">Copyright 2026 Fluffy Pants Studio LLC。画像はAIによる生成、音楽は権利者から提供されたものです。</string>
+    <string name="licenses_mlkit_terms">ML Kit GenAI 追加規約</string>
+    <string name="licenses_piper_note">各音声には、それぞれのデータセットのライセンスがあります。</string>
+    <string name="genai_note">このゲームの一部では、GoogleのオンデバイスAI（ML Kit経由のGemini Nano）による生成AIを使用しています。Googleは他のユーザーにも類似のコンテンツを生成する場合があります。18歳以上のプレイヤー向けです。</string>
+    <string name="settings_ui_language">表示言語</string>
+    <string name="settings_ui_language_help">メニューと字幕。</string>
+    <string name="settings_system_default">システムのデフォルト</string>
+    <string name="volume_low">音量が小さすぎます。上げてください。審査官は声で話します。</string>
+    <string name="volume_off">サウンドがオフです。音量を上げてください。審査官は声で話します。</string>
+    <!-- Passport photo (PassportPhoto.kt) -->
+    <string name="passport_title">あなたのパスポート写真</string>
+    <string name="passport_disclosure">あなたが持つすべてのパスポートに使われます。写真はこの端末内に保存され、アップロードされることはありません。</string>
+    <string name="passport_face_title">審査官は顔を読む。</string>
+    <string name="passport_face_body">面接中、審査官はあなたのまばたき、笑顔、視線の先を観察します。ポーカーフェイスを保てば読まれにくくなります。インプラントがコーチします。処理はすべてこの端末内で行われ、動画は記録されません。</string>
+    <string name="passport_face_switch">審査官に顔を読ませる（推奨）</string>
+    <string name="passport_take">写真を撮る</string>
+    <string name="passport_shutter">撮影</string>
+    <string name="passport_use">この写真を使う</string>
+    <string name="passport_retake">撮り直す</string>
+    <string name="passport_keep">この写真のままにする</string>
+    <string name="passport_delete">写真を削除</string>
+    <string name="passport_use_sample">代わりにサンプル写真を使う</string>
+    <string name="passport_no_camera">カメラがありません。サンプル写真で旅をすることになります。</string>
+    <string name="passport_check_no_face">カメラを見てください</string>
+    <string name="passport_check_one_face">写るのはあなた一人だけにしてください</string>
+    <string name="passport_check_straight">カメラをまっすぐ見てください</string>
+    <string name="passport_check_centre">顔を楕円の中に入れてください</string>
+    <string name="passport_check_closer">もう少し近づいてください</string>
+    <string name="passport_check_farther">少し離れてください</string>
+    <string name="passport_check_hold">そのまま動かないで…</string>
+    <string name="passport_check_ready">いいですね。撮影してください。</string>
+    <string name="passport_hint_eyes">できれば目を開けて</string>
+    <string name="passport_hint_smile">無表情がいちばんです</string>
+    <string name="passport_capture_failed">撮影に失敗しました。もう一度お試しください。</string>
+    <string name="passport_unmirrored">本物のパスポートと同じく、左右反転せずに表示しています。</string>
+    <string name="passport_sample_another">別の写真</string>
+    <string name="passport_back_to_camera">カメラに戻る</string>
+    <string name="passport_save_failed">写真を保存できませんでした。もう一度お試しください。</string>
+    <string name="picker_cd">国を選ぶ</string>
+    <string name="picker_title">どこへ帰国しますか？</string>
+    <string name="picker_random">ランダム（どの国でも）</string>
+    <string name="picker_passed">通過済み</string>
+    <string name="picker_passed_times">通過済み \u2066×%1$d\u2069</string>
+    <!-- Career save and receipts -->
+    <string name="album_infiltration">潜入</string>
+    <string name="album_sabotage">ユニット無効化</string>
+    <string name="album_unit">ユニット %1$s</string>
+    <string name="replay_pack_missing">この任務をプレイするには、この言語をインストールしてください。</string>
+    <string name="replay_new_mark">調書の新しい記録：%1$s</string>
+    <string name="replay_mark_detail">%1$s · %2$s</string>
+    <string name="replay_save_failed">進行状況を保存できませんでした。終了する前にもう一度保存してください。</string>
+    <string name="replay_save_retry">もう一度保存</string>
+    <string name="replay_read_failed">保存済みの進行状況を読み込めませんでした。データは変更せずに保持されています。</string>
+    <string name="replay_interrupted">通過が中断されました。準備から続けるか、新しい任務を始めてください。</string>
+    <string name="replay_preparation_unavailable">この保存済みの通過は続行できません。キャリアは保持されています。新しい任務を始めてください。</string>
+</resources>

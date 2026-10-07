@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Dev-only benchmarks (scripts/bench.sh), never in a release. Own task, so opening the game while a
+             benchmark runs doesn't tear the benchmark down. -->
+        <activity android:name=".BenchActivity" android:exported="true" android:screenOrientation="portrait"
+            android:taskAffinity=".bench" android:excludeFromRecents="true" />
+    </application>
+</manifest>

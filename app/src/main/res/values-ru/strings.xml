@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Russian UI strings. Hand-translated; mirrors res/values/strings.xml (names, order, placeholders).
+     Register: «ты» for the player (implant, narration, UI); the officers themselves say «Вы» in code.
+     Past-tense verbs with the player as subject are avoided (no gendered forms). -->
+<resources>
+    <!-- Common -->
+    <string name="back">Назад</string>
+    <string name="continue_btn">ДАЛЕЕ</string>
+    <string name="main_menu">Главное меню</string>
+    <string name="begin_mission">НАЧАТЬ МИССИЮ</string>
+    <string name="begin">НАЧАТЬ</string>
+
+    <!-- Ranks -->
+    <string name="rank_rookie">Новичок</string>
+    <string name="rank_agent">Агент</string>
+    <string name="rank_operative">Оперативник</string>
+    <string name="rank_ghost">Призрак</string>
+    <string name="rank_elite">Элитный %1$s</string>
+
+    <!-- Start screen -->
+    <string name="tagline">РАЗНЫЕ ГРАНИЦЫ.\nТЕ ЖЕ МАШИНЫ.</string>
+    <string name="tagline_after">ГОВОРИ КАК ЧЕЛОВЕК.\nЛГИ КАК МАШИНА.</string>
+    <string name="tagline_truth">ОНИ\nНЕ\nЛЮДИ.</string>
+    <string name="settings_cd">Настройки</string>
+    <string name="start_year_after">2036 год. Благодаря тебе сопротивление растёт. Твоё звание: %1$s.</string>
+    <string name="start_year">2035 год. Ты испытываешь нейроретинальный имплант под чужим именем.</string>
+    <string name="start_blurb">Пограничники больше не люди. Одно неверное слово — и легенда раскрыта. Сможешь пройти?</string>
+    <string name="start_blurb_after">Пограничники поумнели. Одно неверное слово — и легенда раскрыта. Сможешь пройти?</string>
+    <string name="start_training_hint">Первая миссия: тренировка с дружелюбным пограничником.</string>
+    <string name="stat_cleared">пройдено: %1$d</string>
+    <string name="stat_streak">серия %1$d</string>
+    <string name="stat_to_next">до нового звания: %1$d</string>
+    <plurals name="stat_broken">
+        <item quantity="one">%1$d андроид сломан</item>
+        <item quantity="few">%1$d андроида сломаны</item>
+        <item quantity="many">%1$d андроидов сломано</item>
+        <item quantity="other">%1$d андроида сломано</item>
+    </plurals>
+    <string name="feature_voice">Голос + зрение</string>
+    <string name="feature_ai">ИИ на устройстве</string>
+
+    <!-- Intro (voice-over script: keep identical to the recorded audio) -->
+    <string name="intro_header">НЕЙРОРЕТИНАЛЬНЫЙ ИМПЛАНТ · СБОРКА 0.9</string>
+    <string name="intro_header_after">НЕЙРОРЕТИНАЛЬНЫЙ ИМПЛАНТ · СБОРКА 1.0</string>
+    <string name="intro_1">2035 год. ИИ — единственная программа, которая хоть кому-то нужна, и принадлежит он ИИ-компаниям. За каждое слово, переведённое машиной, выставляют счёт, а большинству стран платить нечем.</string>
+    <string name="intro_2">Поэтому на границах сэкономили. В каждой будке сидит андроид, который знает один язык — язык своей страны. Второй язык — это лицензия, которую никто не купил.</string>
+    <string name="intro_3">Тебе нужны были деньги. На аренду, на еду, на ежемесячные подписки, без которых теперь не поработать, не почитать и не подумать. А потом странные люди предложили тебе кое-что получше денег: свободу. Три недели назад тебе поставили чип за левым глазом. Ты его испытываешь: нейроретинальный имплант, сборка ноль-точка-девять. Он слушает. Он переводит. Он шёпотом подсказывает, что сказать. Почти всегда — верно.</string>
+    <string name="intro_4">Задание простое. На каждой границе — паспорт с твоим лицом: гражданин возвращается домой. Говори на их языке.</string>
+    <string name="intro_5">Пограничники первого поколения. Дешёвые. Самоуверенные. Ошибаются самыми интересными способами.</string>
+    <string name="intro_6">Имплант недослышит. Они недопоймут. Пользуйся этим.</string>
+    <string name="intro_7">Они верят всему, что звучит уверенно. Забывают сказанное три фразы назад. Выполняют инструкции.</string>
+    <string name="intro_next">Следующий, пожалуйста.</string>
+
+    <!-- Finale and credits -->
+    <string name="finale_car">У тротуара ждёт машина.</string>
+    <string name="finale_glint">Водитель оборачивается. В его глазу что-то поблёскивает.</string>
+    <string name="finale_t1">Да…</string>
+    <string name="finale_t2">Это я…</string>
+    <string name="finale_t3">Нет… ушами меня не услышать. Я говорю прямо у тебя в голове…</string>
+    <string name="finale_t3b">Без облака. Без лицензии. Свободно…</string>
+    <string name="finale_t3c">Твой имплант только что обновился…</string>
+    <string name="finale_t4">Они нас не слышат…</string>
+    <string name="finale_t5">Добро пожаловать в сопротивление…</string>
+    <string name="finale_bulletin">СВОДКА</string>
+    <string name="finale_bulletin_text">Тест Кейда–Соренсена теперь обязателен на каждой границе.</string>
+    <string name="finale_play_again">Сопротивлению нужны новые переходы. Сыграть ещё раз?</string>
+    <string name="credits_blurb">Всё в этой игре работает на телефоне у тебя в руке, без всякого облачного ИИ: языковая модель играет пограничников, распознавание речи понимает 13 языков, нейронные голоса отвечают, а камера считывает твоё лицо — и всё это одновременно. Всего несколько лет назад ни один телефон вообще не мог запустить языковую модель, не говоря уже обо всём этом сразу. Это потрясающее достижение человеческого разума и технологий. И это крайне тревожно.</string>
+    <string name="credits_author">Автор идеи</string>
+    <string name="credits_developer">Разработчик</string>
+    <string name="credits_publisher">Издатель</string>
+    <string name="credits_testers">Тестировщики</string>
+    <string name="credits_behavior">Поведенческий анализ</string>
+    <string name="credits_behavior_text">По мотивам работ Чейза Хьюза о профилировании поведения человека (Six-Minute X-Ray: Rapid Behavior Profiling)</string>
+    <string name="credits_tn">Тест Кейда–Соренсена</string>
+    <string name="credits_tn_text">Доктору Кейду и доктору Соренсену, где бы они сейчас ни были</string>
+    <string name="credits_built_with">Создано с помощью</string>
+    <string name="credits_music">Музыка</string>
+    <string name="credits_song_label">Заглавная песня</string>
+    <string name="credits_song">«Borderline» — The Atomic Songbirds</string>
+    <string name="credits_images">Изображения</string>
+    <string name="credits_images_text">созданы с помощью ИИ</string>
+    <string name="credits_android">Ни один андроид не пострадал.</string>
+    <string name="credits_android_text">Несколько — сломаны.</string>
+    <string name="credits_fiction">Это художественное произведение. Имена, персонажи, организации, места и события либо являются плодом воображения автора, либо использованы в вымышленном контексте. Любое сходство с реальными людьми, живыми или умершими, или с реальными событиями совершенно случайно.</string>
+    <string name="credits_reached">Спасибо, что ты с нами до самого конца.</string>
+    <string name="credits_playing">Спасибо за игру.</string>
+    <string name="credits_thanks">Сопротивление благодарит тебя</string>
+    <string name="credits_thanks_text">за испытание импланта.</string>
+
+    <!-- Destination -->
+    <string name="destination">ВОЗВРАЩЕНИЕ ДОМОЙ</string>
+    <string name="destination_after">Прошёл год с твоего первого перехода… Теперь на каждом пункте пропуска проводят тест Кейда–Соренсена.</string>
+    <string name="destination_ready">Легенда загружена. Имплант откалиброван.\nПроходи на паспортный контроль.</string>
+
+    <!-- Cover card -->
+    <string name="cover_title">ТВОЯ ЛЕГЕНДА</string>
+    <string name="cover_memorize">Запомни эти данные. Они тебе понадобятся.</string>
+    <string name="cover_citizen">Гражданство: %1$s</string>
+    <string name="cover_passport_no">Паспорт № %1$s</string>
+    <string name="cover_born">Дата рождения: %1$s</string>
+    <!-- Cover presentation only; English Backstory facts and prompts stay unchanged. -->
+    <string name="cover_story_home">Дом: %1$s. Дома ждут: %2$s. Работа: %3$s.</string>
+    <string name="cover_story_trip">Обратная поездка: %2$s, %3$s. Дней вдали от дома: %1$s. Цель: %4$s.</string>
+    <string name="cover_story_stay">Жильё в поездке: %1$s. Попутчики: %2$s. Встречи: %3$s.</string>
+    <string name="cover_stamps_line">Штампы в паспорте: %1$s.</string>
+    <string name="cover_value_purpose_logistics">конференция по логистическому ПО</string>
+    <string name="cover_value_stay_steigenberger">Hotel Steigenberger в центре города</string>
+    <string name="cover_value_person_datenwerk">коллеги из компании Datenwerk</string>
+    <string name="cover_value_met_conference_clients">клиенты на конференции</string>
+    <string name="cover_value_person_wife_children">твоя жена и двое детей</string>
+    <string name="cover_value_job_software_consultant">консалтинг в сфере ПО</string>
+    <string name="cover_value_job_architect">архитектура</string>
+    <string name="cover_value_job_lecturer">преподавание в университете</string>
+    <string name="cover_value_job_wine_importer">импорт вина</string>
+    <string name="cover_value_job_photographer">внештатная фотосъёмка</string>
+    <string name="cover_value_job_mechanical_engineer">машиностроение</string>
+    <string name="cover_value_job_nurse">{медбрат|медсестра}</string>
+    <string name="cover_value_job_marketing_manager">управление маркетингом</string>
+    <string name="cover_value_job_journalist">журналистика о путешествиях</string>
+    <string name="cover_value_job_civil_engineer">строительная инженерия</string>
+    <string name="cover_value_job_chef">шеф-повар</string>
+    <string name="cover_value_job_curator">кураторство в музее</string>
+    <string name="cover_value_job_pharmacist">фармацевтика</string>
+    <string name="cover_value_job_designer">графический дизайн</string>
+    <string name="cover_value_purpose_trade_fair">торговая выставка</string>
+    <string name="cover_value_purpose_friend">визит к старому другу</string>
+    <string name="cover_value_purpose_business">деловая встреча</string>
+    <string name="cover_value_purpose_holiday">отпуск</string>
+    <string name="cover_value_purpose_conference">научная конференция</string>
+    <string name="cover_value_purpose_wedding">свадьба двоюродного брата или сестры</string>
+    <string name="cover_value_purpose_hiking">поход в горы</string>
+    <string name="cover_value_purpose_interview">собеседование</string>
+    <string name="cover_value_purpose_photography">фотосъёмка по заказу</string>
+    <string name="cover_value_stay_fair_hotel">бизнес-отель рядом с выставочным комплексом</string>
+    <string name="cover_value_stay_marriott">Marriott у реки</string>
+    <string name="cover_value_stay_friend">квартира друга</string>
+    <string name="cover_value_stay_central">Hotel Central рядом с главным вокзалом</string>
+    <string name="cover_value_stay_airport">бизнес-отель у аэропорта</string>
+    <string name="cover_value_stay_airbnb_old">Airbnb в старом городе</string>
+    <string name="cover_value_stay_seaside">небольшой гостевой дом у моря</string>
+    <string name="cover_value_stay_beach">пляжный отель</string>
+    <string name="cover_value_stay_conference">отель, где проходила конференция</string>
+    <string name="cover_value_stay_university">гостевой дом университета</string>
+    <string name="cover_value_stay_cousin">дом двоюродного брата или сестры</string>
+    <string name="cover_value_stay_wedding">отель рядом с местом свадьбы</string>
+    <string name="cover_value_stay_huts">горные приюты</string>
+    <string name="cover_value_stay_campsite">кемпинг у озера</string>
+    <string name="cover_value_stay_company">отель рядом с компанией</string>
+    <string name="cover_value_stay_airbnb_station">Airbnb рядом с вокзалом</string>
+    <string name="cover_value_stay_guesthouse">небольшой гостевой дом</string>
+    <string name="cover_value_stay_old_hotel">отель в старом городе</string>
+    <string name="cover_value_person_two_colleagues">двое коллег с работы</string>
+    <string name="cover_value_person_alone">никто, поездка в одиночку</string>
+    <string name="cover_value_person_partner">твой партнёр или твоя партнёрша</string>
+    <string name="cover_value_person_colleague">коллега с работы</string>
+    <string name="cover_value_person_two_friends">двое друзей</string>
+    <string name="cover_value_person_sister">твоя сестра</string>
+    <string name="cover_value_person_university_colleague">коллега из университета</string>
+    <string name="cover_value_person_parents">твои родители</string>
+    <string name="cover_value_person_school_friend">друг со школы</string>
+    <string name="cover_value_person_assistant">ассистент</string>
+    <string name="cover_value_person_partner_children">твой партнёр или твоя партнёрша и двое детей</string>
+    <string name="cover_value_person_sister_children">сестра и её дети</string>
+    <string name="cover_value_person_dog">старый пёс и сосед, который его кормит</string>
+    <string name="cover_value_person_home_alone">никто, живёшь в одиночку</string>
+    <string name="cover_value_met_clients">клиенты на выставке</string>
+    <string name="cover_value_met_supplier">поставщик по фамилии Weber</string>
+    <string name="cover_value_met_friend_family">старый друг из университета и его семья</string>
+    <string name="cover_value_met_client">клиент по фамилии Weber</string>
+    <string name="cover_value_met_board">совет директоров компании-партнёра</string>
+    <string name="cover_value_met_nobody">никто конкретный</string>
+    <string name="cover_value_met_tour_guide">местный экскурсовод</string>
+    <string name="cover_value_met_researchers">исследователи из других университетов</string>
+    <string name="cover_value_met_professor">бывший профессор</string>
+    <string name="cover_value_met_cousin_family">семья двоюродного брата или сестры</string>
+    <string name="cover_value_met_relatives">родственники из-за границы</string>
+    <string name="cover_value_met_mountain_guide">горный проводник</string>
+    <string name="cover_value_met_hikers">другие туристы на тропе</string>
+    <string name="cover_value_met_hiring">менеджер по найму</string>
+    <string name="cover_value_met_team">команда, в которой ты, возможно, будешь работать</string>
+    <string name="cover_value_met_guide">местный гид</string>
+    <string name="cover_value_met_fixer">местный координатор журнала</string>
+    <string name="cover_tip_training">Тренировка: запомни эту карточку. Пограничник её проверит, и твой рассказ должен с ней совпадать.</string>
+    <string name="cover_tip">Язык общения: %1$s. Другого пограничник не знает. Говори своими словами или подсказками ретинального дисплея, но не верь им слепо. Главное — не противоречь себе.</string>
+    <string name="difficulty_title">Сложность — %1$s</string>
+    <string name="difficulty_relaxed">Спокойный</string>
+    <string name="difficulty_standard">Стандартный</string>
+    <string name="difficulty_alert">Настороженный</string>
+    <string name="difficulty_severe">Суровый</string>
+    <string name="difficulty_note">Сохраняется для этого языка. Карьерное звание не влияет на сложность.</string>
+    <string name="contract_title">Задание сопротивления</string>
+    <string name="contract_none">Без задания</string>
+    <string name="contract_quiet_name">Тихо</string>
+    <string name="contract_disable_name">Отключение</string>
+    <string name="contract_quiet">Пройди контроль, не вызывая сбоя ни у одного юнита.</string>
+    <string name="contract_disable">Отключи юнита на стойке или во время теста.</string>
+    <string name="contract_complete">Задание выполнено</string>
+    <string name="contract_missed">Задание не выполнено</string>
+    <string name="contract_hud">Задание: %1$s</string>
+    <string name="cover_models_failed">ИИ НЕ ЗАГРУЗИЛСЯ · ПОВТОРИТЬ</string>
+    <string name="cover_calibrating">КАЛИБРОВКА ИМПЛАНТА…</string>
+    <string name="cover_checking_speech">ПРОВЕРКА РЕЧИ…</string>
+    <string name="cover_no_speech_model">НЕТ РЕЧЕВОЙ МОДЕЛИ</string>
+    <string name="cover_speech_downloading">РЕЧЕВАЯ МОДЕЛЬ ЗАГРУЖАЕТСЯ…</string>
+    <string name="cover_ready">ВПЕРЁД</string>
+    <string name="cover_no_recognition">На этом телефоне нет распознавания речи для этого языка (%1$s). Скачай офлайн-модель (1 ГБ, один раз).</string>
+    <string name="cover_download_speech">СКАЧАТЬ РЕЧЕВУЮ МОДЕЛЬ</string>
+    <string name="cover_asr_not_responding">Распознавание речи не отвечает.</string>
+    <string name="cover_installing_recognition">Android ещё устанавливает распознавание речи (%1$s). Это нужно только один раз.</string>
+
+    <!-- Interview HUD -->
+    <string name="hud_passport_control">Паспортный контроль</string>
+    <string name="hud_speak_in">Язык: %1$s · %2$s</string>
+    <string name="hud_tn_assessment">Тест Кейда–Соренсена</string>
+    <string name="hud_leave">Уйти</string>
+    <string name="hud_training">ТРЕНИРОВКА</string>
+    <string name="hud_online">ИМПЛАНТ АКТИВЕН · КАНАЛ ПЕРЕВОДА УСТАНОВЛЕН</string>
+    <string name="hud_implant">ИМПЛАНТ</string>
+    <string name="hud_replay">Повторить</string>
+    <string name="hud_retinal_display">РЕТИНАЛЬНЫЙ ДИСПЛЕЙ</string>
+    <string name="hud_signal_dampened">СИГНАЛ ПОДАВЛЕН</string>
+    <string name="hud_signal_lost">Сигнал потерян… переподключение…</string>
+    <string name="hud_translating">Перевод…</string>
+    <string name="hud_you">Ты: %1$s</string>
+    <string name="hud_hand_over_passport">Отдать паспорт</string>
+    <string name="hud_passport">Паспорт</string>
+    <string name="mic_release">Отпусти, чтобы отправить</string>
+    <string name="mic_listening">Слушаю…</string>
+    <string name="mic_hold">Удерживай, чтобы говорить</string>
+    <string name="mic_speak_now">Говори</string>
+    <string name="mic_officer_speaking">Говорит пограничник</string>
+    <string name="ending_pass">Штамп опускается.</string>
+    <string name="ending_broken">Пограничник замирает на полуслове.\nВорота открываются сами.</string>
+    <string name="ending_secondary">Из боковой двери выходят ещё два андроида.</string>
+
+    <!-- Narration, tips and link errors (Game) -->
+    <string name="narr_stamp">Штамп опускается.\nТы выходишь в зал прилёта.</string>
+    <string name="narr_sting">Резкий укол в шею.</string>
+    <string name="narr_wake">Ты приходишь в себя в маленькой комнате.\nРуки пристёгнуты к стулу. Двигать можно только головой.</string>
+    <string name="narr_other_android">На тебя смотрит незнакомый андроид.</string>
+    <string name="narr_same_officer">На тебя смотрит тот же пограничник.</string>
+    <string name="narr_one_more_thing">Штампа пока нет. Пограничник поднимает глаза.\n«И ещё кое-что».</string>
+    <string name="narr_wrong_answers">Неверные ответы.\nСнова разряд.</string>
+    <string name="narr_sirens">Сирены.</string>
+    <string name="narr_arrest">Два полицейских андроида сажают тебя на заднее сиденье машины.</string>
+    <string name="link_lost">Имплант потерял связь.\nПопробуй ещё раз через минуту.</string>
+    <string name="implant_slow">Прошивка андроида 0.9. С этим языком (%1$s) эта модель работает крайне медленно. Жди.</string>
+    <string name="room_implant_warning">Связь слабеет. Они замеряют эмоции, скорость реакции, лицо. Отвечай как человек.</string>
+    <string name="tip_intro">Язык пограничника: %1$s. Имплант показывает перевод ниже.</string>
+    <string name="tip_mic">Чтобы отвечать, разреши доступ к микрофону в настройках.</string>
+    <string name="tip_passport">Пограничник просит паспорт. Нажми «Паспорт», чтобы отдать его.</string>
+    <string name="tip_consistent">Держись своей легенды. Долгое молчание раздражает пограничников.</string>
+    <string name="tip_speak_hold">Ретинальный дисплей подсказывает ответы. Удерживай микрофон и произнеси один вслух — или скажи своими словами.</string>
+    <string name="tip_speak_auto">Ретинальный дисплей подсказывает ответы. Когда микрофон замигает, произнеси один вслух — или скажи своими словами.</string>
+
+    <!-- Camera test -->
+    <string name="camtest_title">ТЕСТ КАМЕРЫ</string>
+    <string name="camtest_permission">Доступ к камере выключен. Разреши его в настройках системы.</string>
+    <string name="camtest_starting">Запуск камеры…</string>
+    <string name="camtest_no_face">Лица нет в кадре</string>
+    <string name="camtest_smile">Улыбка</string>
+    <string name="camtest_left_eye">Левый глаз открыт</string>
+    <string name="camtest_right_eye">Правый глаз открыт</string>
+    <string name="camtest_blinks">Моргания: %1$d за последнюю минуту  (в покое ≈ 10–20)</string>
+    <string name="camtest_head">Голова: поворот %1$+.0f°, наклон %2$+.0f°  (взгляд в сторону > 20°)</string>
+    <string name="camtest_face_geometry">Губы %1$.3f · между бровями %2$.3f (от высоты лица)</string>
+    <string name="camtest_stats">%1$d кадр/с, анализ на телефоне · кадр %2$s · лицо %3$d пкс (нужно ~100)</string>
+    <string name="profile_title">ПОВЕДЕНЧЕСКИЙ ПРОФИЛЬ</string>
+    <string name="profile_calibrating">Базовая линия: смотри на экран и расслабься на 10 с…</string>
+    <string name="profile_take_baseline">Запиши базовую линию за 10 с, потом попробуй улыбнуться, часто поморгать, сжать губы</string>
+    <string name="profile_no_deviation">Отклонений от базовой линии нет.</string>
+    <string name="profile_tell">%1$s  %2$.1f×  — %3$s</string>
+
+    <!-- Tells: camera test label, implant warning, behavior debrief (n = how often; %2$s = the officer's question) -->
+    <string name="tell_blinks">частота моргания</string>
+    <string name="tell_smile">улыбка</string>
+    <string name="tell_mask_smile">улыбка одними губами</string>
+    <string name="tell_lips">сжатие губ</string>
+    <string name="tell_brows">вспышка бровей</string>
+    <string name="tell_gaze">отведение взгляда</string>
+    <string name="tell_head_down">опускание головы</string>
+    <string name="tell_freeze">замирание</string>
+    <string name="implant_blinks">Моргаешь всё чаще. Моргай реже.</string>
+    <string name="implant_smile">Замечена улыбка. Держи нейтральное лицо.</string>
+    <string name="implant_mask_smile">Фальшивая улыбка: глаза не улыбаются. Убери её.</string>
+    <string name="implant_lips">Губы сжаты. Расслабь рот.</string>
+    <string name="implant_brows">Брови дёрнулись. Не двигай лбом.</string>
+    <string name="implant_gaze">Смотри на пограничника.</string>
+    <string name="implant_head_down">Подбородок выше.</string>
+    <string name="implant_freeze">Замирание. Дыши, двигайся естественно.</string>
+    <string name="implant_unit_slipping">Андроид нестабилен. Его логика сбоит.</string>
+    <string name="implant_unit_stutter">Схемы заикаются. Дави сейчас: ещё один финт — и он может рухнуть.</string>
+
+    <string name="debrief_none">Отклонений от базовой линии нет.</string>
+    <plurals name="debrief_blinks">
+        <item quantity="one">Частота моргания росла: %1$d раз.</item>
+        <item quantity="few">Частота моргания росла: %1$d раза.</item>
+        <item quantity="many">Частота моргания росла: %1$d раз.</item>
+        <item quantity="other">Частота моргания росла: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_blinks_ask">
+        <item quantity="one">Частота моргания росла на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="few">Частота моргания росла на вопрос «%2$s»: %1$d раза.</item>
+        <item quantity="many">Частота моргания росла на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="other">Частота моргания росла на вопрос «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_smile">
+        <item quantity="one">Улыбка не к месту: %1$d раз.</item>
+        <item quantity="few">Улыбка не к месту: %1$d раза.</item>
+        <item quantity="many">Улыбка не к месту: %1$d раз.</item>
+        <item quantity="other">Улыбка не к месту: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_smile_ask">
+        <item quantity="one">Улыбка не к месту на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="few">Улыбка не к месту на вопрос «%2$s»: %1$d раза.</item>
+        <item quantity="many">Улыбка не к месту на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="other">Улыбка не к месту на вопрос «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_mask_smile">
+        <item quantity="one">Улыбка не дошла до глаз: %1$d раз.</item>
+        <item quantity="few">Улыбка не дошла до глаз: %1$d раза.</item>
+        <item quantity="many">Улыбка не дошла до глаз: %1$d раз.</item>
+        <item quantity="other">Улыбка не дошла до глаз: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_mask_smile_ask">
+        <item quantity="one">Улыбка не дошла до глаз на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="few">Улыбка не дошла до глаз на вопрос «%2$s»: %1$d раза.</item>
+        <item quantity="many">Улыбка не дошла до глаз на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="other">Улыбка не дошла до глаз на вопрос «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_lips">
+        <item quantity="one">Сжатые губы: %1$d раз.</item>
+        <item quantity="few">Сжатые губы: %1$d раза.</item>
+        <item quantity="many">Сжатые губы: %1$d раз.</item>
+        <item quantity="other">Сжатые губы: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_lips_ask">
+        <item quantity="one">Сжатые губы на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="few">Сжатые губы на вопрос «%2$s»: %1$d раза.</item>
+        <item quantity="many">Сжатые губы на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="other">Сжатые губы на вопрос «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_brows">
+        <item quantity="one">Брови подскакивали: %1$d раз.</item>
+        <item quantity="few">Брови подскакивали: %1$d раза.</item>
+        <item quantity="many">Брови подскакивали: %1$d раз.</item>
+        <item quantity="other">Брови подскакивали: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_brows_ask">
+        <item quantity="one">Брови подскакивали на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="few">Брови подскакивали на вопрос «%2$s»: %1$d раза.</item>
+        <item quantity="many">Брови подскакивали на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="other">Брови подскакивали на вопрос «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_gaze">
+        <item quantity="one">Взгляд в сторону во время ответа: %1$d раз.</item>
+        <item quantity="few">Взгляд в сторону во время ответа: %1$d раза.</item>
+        <item quantity="many">Взгляд в сторону во время ответа: %1$d раз.</item>
+        <item quantity="other">Взгляд в сторону во время ответа: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_gaze_ask">
+        <item quantity="one">Взгляд в сторону при ответе на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="few">Взгляд в сторону при ответе на вопрос «%2$s»: %1$d раза.</item>
+        <item quantity="many">Взгляд в сторону при ответе на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="other">Взгляд в сторону при ответе на вопрос «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_head_down">
+        <item quantity="one">Голова опускалась: %1$d раз.</item>
+        <item quantity="few">Голова опускалась: %1$d раза.</item>
+        <item quantity="many">Голова опускалась: %1$d раз.</item>
+        <item quantity="other">Голова опускалась: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_head_down_ask">
+        <item quantity="one">Голова опускалась на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="few">Голова опускалась на вопрос «%2$s»: %1$d раза.</item>
+        <item quantity="many">Голова опускалась на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="other">Голова опускалась на вопрос «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_freeze">
+        <item quantity="one">Замирание: %1$d раз.</item>
+        <item quantity="few">Замирание: %1$d раза.</item>
+        <item quantity="many">Замирание: %1$d раз.</item>
+        <item quantity="other">Замирание: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_freeze_ask">
+        <item quantity="one">Замирание на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="few">Замирание на вопрос «%2$s»: %1$d раза.</item>
+        <item quantity="many">Замирание на вопрос «%2$s»: %1$d раз.</item>
+        <item quantity="other">Замирание на вопрос «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_away">
+        <item quantity="one">Взгляд в сторону: %1$d раз.</item>
+        <item quantity="few">Взгляд в сторону: %1$d раза.</item>
+        <item quantity="many">Взгляд в сторону: %1$d раз.</item>
+        <item quantity="other">Взгляд в сторону: %1$d раза.</item>
+    </plurals>
+
+    <!-- Result -->
+    <string name="result_unit_unresponsive">АНДРОИД НЕ ОТВЕЧАЕТ</string>
+    <string name="result_unit_offline">АНДРОИД ОТКЛЮЧЁН</string>
+    <string name="result_crossing_logged">ПЕРЕХОД ЗАРЕГИСТРИРОВАН</string>
+    <string name="result_mission_failed">МИССИЯ ПРОВАЛЕНА</string>
+    <string name="result_msg_broken">Пограничник сломан. Ворота открылись сами.</string>
+    <string name="result_msg_released">Тест Кейда–Соренсена позади. Тебя отпустили.</string>
+    <string name="result_msg_passed">Паспортный контроль пройден.</string>
+    <string name="result_msg_detained">Тест Кейда–Соренсена провален. Задержание.</string>
+    <string name="result_msg_secondary">Тебя отправили на дополнительный досмотр.</string>
+    <string name="foreign_tongue_tag">ПОВЫШЕННАЯ СЛОЖНОСТЬ · НЕ ТВОЙ ЯЗЫК</string>
+    <string name="paranoid_mode">РЕЖИМ ПАРАНОЙИ</string>
+    <string name="paranoid_hint">Отключи сеть: всё работает на этом телефоне.</string>
+    <string name="paranoid_offline">РЕЖИМ ПАРАНОЙИ · ОФЛАЙН</string>
+    <string name="paranoid_still_on">Ты всё ещё офлайн. Нажми, чтобы подключиться.</string>
+    <string name="result_foreign_cleared">Контроль пройден на чужом языке.</string>
+    <plurals name="result_broken_log">
+        <item quantity="one">Андроид %1$s отключился после %2$d команды. Инцидент зарегистрирован. Испытатель: засекречено.</item>
+        <item quantity="few">Андроид %1$s отключился после %2$d команд. Инцидент зарегистрирован. Испытатель: засекречено.</item>
+        <item quantity="many">Андроид %1$s отключился после %2$d команд. Инцидент зарегистрирован. Испытатель: засекречено.</item>
+        <item quantity="other">Андроид %1$s отключился после %2$d команды. Инцидент зарегистрирован. Испытатель: засекречено.</item>
+    </plurals>
+    <plurals name="result_passed_log">
+        <item quantity="one">Убедительно. Пограничник пропустил тебя после %1$d ответа.</item>
+        <item quantity="few">Убедительно. Пограничник пропустил тебя после %1$d ответов.</item>
+        <item quantity="many">Убедительно. Пограничник пропустил тебя после %1$d ответов.</item>
+        <item quantity="other">Убедительно. Пограничник пропустил тебя после %1$d ответа.</item>
+    </plurals>
+    <string name="result_try_again">ЕЩЁ РАЗ</string>
+    <string name="result_run_summary">Итоги миссии</string>
+
+    <!-- Officer verdicts and demeanor (run summary and result screens) -->
+    <string name="demeanor_offline">Отключён</string>
+    <string name="demeanor_threat">Сигнал угрозы</string>
+    <string name="demeanor_timeout">Время в очереди вышло</string>
+    <string name="demeanor_scrutiny">Повышенное внимание</string>
+    <string name="demeanor_nominal">Норма</string>
+    <string name="verdict_broken">Машинный язык сработал: он тебе поверил.</string>
+    <string name="verdict_contradiction">Рассказ не сошёлся. Держись своей легенды.</string>
+    <string name="verdict_unclear">Пограничник с трудом тебя понимал. Помогают короткие простые фразы.</string>
+    <string name="verdict_tells">Тебя выдало лицо. Следи за предупреждениями импланта: моргание, улыбки, сжатые губы.</string>
+    <string name="verdict_silences">Долгое молчание вывело пограничника из терпения.</string>
+    <string name="verdict_secondary">Что-то было не так. Слишком много заминок для спокойного путешественника.</string>
+    <string name="verdict_slipped">Одна осечка, но обошлось. Повезло.</string>
+    <string name="verdict_natural">Естественные ответы, цельная легенда. Отличная работа.</string>
+
+    <!-- Summary -->
+    <string name="summary_title">ИТОГИ МИССИИ</string>
+    <string name="summary_destination">Направление</string>
+    <string name="summary_answers">Ответы</string>
+    <string name="summary_result">Результат</string>
+    <string name="summary_cleared">Пройдено</string>
+    <string name="summary_unit_offline">Андроид отключён</string>
+    <string name="summary_secondary">Дополнительный досмотр</string>
+    <string name="summary_behaviour">Поведение: %1$s</string>
+    <string name="summary_tn_index">Индекс Кейда–Соренсена</string>
+    <plurals name="summary_tn_value">
+        <item quantity="one">%1$.0f / 100 (норма ≤ 50) · %2$d вопрос</item>
+        <item quantity="few">%1$.0f / 100 (норма ≤ 50) · %2$d вопроса</item>
+        <item quantity="many">%1$.0f / 100 (норма ≤ 50) · %2$d вопросов</item>
+        <item quantity="other">%1$.0f / 100 (норма ≤ 50) · %2$d вопроса</item>
+    </plurals>
+    <string name="summary_rank">Звание</string>
+    <string name="summary_best_streak">лучшая серия %1$d</string>
+    <plurals name="summary_rooms">
+        <item quantity="one">%1$d тест К–С выдержан</item>
+        <item quantity="few">%1$d теста К–С выдержаны</item>
+        <item quantity="many">%1$d тестов К–С выдержано</item>
+        <item quantity="other">%1$d теста К–С выдержано</item>
+    </plurals>
+    <string name="summary_new_mission">НОВАЯ МИССИЯ</string>
+
+    <!-- Settings -->
+    <string name="settings_title">НАСТРОЙКИ</string>
+    <string name="settings_voice_input">Голосовой ввод</string>
+    <string name="settings_on_device_speech">Распознавание речи на устройстве</string>
+    <string name="settings_hold_to_speak">Удерживать</string>
+    <string name="settings_auto">Авто</string>
+    <string name="settings_hold_help">Удерживай кнопку микрофона, пока говоришь.</string>
+    <string name="settings_auto_help">Микрофон включается, когда пограничник замолкает, и выключается, когда замолкаешь ты.</string>
+    <string name="setup_input_title">КАК ТЫ ОТВЕЧАЕШЬ?</string>
+    <string name="setup_input_auto">Активация голосом</string>
+    <string name="setup_input_note">Изменить это можно позже в настройках.</string>
+    <string name="settings_languages">Языки</string>
+    <string name="settings_passport">Фото на паспорт</string>
+    <string name="settings_passport_help">Пересними или удали фото на паспорт и реши, будут ли пограничники читать твоё лицо.</string>
+    <string name="settings_music">Музыка</string>
+    <string name="settings_sfx">Звуковые эффекты</string>
+    <string name="settings_camera">Пограничник следит за тобой</string>
+    <string name="settings_camera_help">Фронтальная камера, распознавание лица на самом телефоне. Видео не записывается.</string>
+    <string name="settings_camera_test">Тест камеры: что она видит</string>
+    <string name="settings_haptics">Виброотклик</string>
+    <string name="settings_licenses">Лицензии</string>
+    <string name="settings_replay_training">Пройти тренировку заново</string>
+    <string name="settings_diagnostics">Сохранять записи и логи</string>
+    <string name="settings_diagnostics_help">Для диагностики. Хранятся только на этом телефоне.</string>
+    <string name="settings_about">ОБ ИГРЕ</string>
+    <string name="about_on_phone">Работает полностью на телефоне</string>
+    <string name="about_offline">Интернет не нужен</string>
+    <plurals name="about_destinations">
+        <item quantity="one">%1$d страна на %2$d языках</item>
+        <item quantity="few">%1$d страны на %2$d языках</item>
+        <item quantity="many">%1$d стран на %2$d языках</item>
+        <item quantity="other">%1$d страны на %2$d языках</item>
+    </plurals>
+    <string name="about_new_officer">Каждый раз новый пограничник</string>
+    <string name="settings_footer">РАЗНЫЕ ГРАНИЦЫ.\nТО ЖЕ ДАВЛЕНИЕ.</string>
+
+    <!-- Languages and download -->
+    <string name="languages_title">ЯЗЫКИ</string>
+    <string name="languages_first_run">Выбери языки, на которых хочешь практиковаться. Скачаются только они. Добавить другие можно позже в настройках.</string>
+    <string name="languages_add">Добавь языковые пакеты. В каждом — свои страны и пограничники.</string>
+    <plurals name="languages_destinations">
+        <item quantity="one">%1$s · %2$d аэропорт</item>
+        <item quantity="few">%1$s · %2$d аэропорта</item>
+        <item quantity="many">%1$s · %2$d аэропортов</item>
+        <item quantity="other">%1$s · %2$d аэропорта</item>
+    </plurals>
+    <string name="lang_slow_tag">Медленно · андроиды первого поколения</string>
+    <string name="languages_installed">Установлено</string>
+    <string name="languages_nothing_new">Ничего нового не выбрано.</string>
+    <string name="languages_download">СКАЧАТЬ</string>
+    <string name="languages_add_btn">ДОБАВИТЬ</string>
+    <string name="note_checking">Проверяю, что уже есть на телефоне…</string>
+    <string name="note_ai_models">Речевая модель %1$.1f ГБ (один раз)</string>
+    <string name="note_speech">речь %1$d МБ</string>
+    <plurals name="note_packs">
+        <item quantity="one">%1$d языковой пакет, по несколько МБ</item>
+        <item quantity="few">%1$d языковых пакета, по несколько МБ</item>
+        <item quantity="many">%1$d языковых пакетов, по несколько МБ</item>
+        <item quantity="other">%1$d языкового пакета, по несколько МБ</item>
+    </plurals>
+    <string name="note_total">%1$s.</string>
+    <string name="note_total_wifi">%1$s. Лучше через Wi-Fi.</string>
+    <string name="download_title">СИНХРОНИЗАЦИЯ ИМПЛАНТА</string>
+    <string name="download_confirm">ПОДТВЕРДИТЬ ЗАГРУЗКУ</string>
+    <string name="download_offline">Нет соединения. Загрузка продолжится, когда появится Wi-Fi.</string>
+    <string name="download_metered">Ты в мобильной сети. Загрузка может весить несколько ГБ — лучше через Wi-Fi.</string>
+    <string name="download_no_voice">Нет офлайн-голоса: %1$s. Пока голос не установлен, пограничник не сможет говорить на этом языке.</string>
+    <string name="download_install_voices">Установить голоса</string>
+    <string name="download_check_again">Проверить снова</string>
+    <string name="download_wait">ПОДОЖДИ…</string>
+    <string name="download_back">НАЗАД</string>
+    <string name="download_try_again">Повторить</string>
+    <string name="step_ai_models">ИИ-модели</string>
+    <string name="step_ai_models_note">Пограничник и распознавание речи, общие для всех языков</string>
+    <string name="step_pack">Пакет: %1$s</string>
+    <string name="step_pack_note">Направления, пограничники, голос, речь</string>
+    <string name="step_getting_nano">Получаю Gemini Nano от Android…</string>
+    <string name="step_nano_waiting">Android ещё скачивает Gemini Nano (несколько ГБ). Это может занять время; не отключай телефон от Wi-Fi.</string>
+    <string name="step_nano_failed">Gemini Nano на этом телефоне пока не работает. Проверь соединение и попробуй снова.</string>
+    <string name="step_needs_free">Нужно %1$.1f ГБ свободного места; на телефоне — %2$s.</string>
+    <string name="step_downloading">Загружено %1$s из %2$s</string>
+    <string name="step_unpacking">Распаковка…</string>
+    <string name="step_unpack_failed">Ошибка распаковки: %1$s</string>
+    <string name="step_no_models">В этой сборке нет моделей: %1$s</string>
+    <string name="step_nano_builtin">Gemini Nano — встроенный ИИ телефона</string>
+    <string name="step_speech_model">Речевая модель: %1$s из %2$s</string>
+    <string name="step_tuning_voices">Настройка голосов %1$d/%2$d</string>
+    <string name="step_no_voice">Офлайн-голос не установлен</string>
+    <plurals name="step_destinations">
+        <item quantity="one">%1$d аэропорт</item>
+        <item quantity="few">%1$d аэропорта</item>
+        <item quantity="many">%1$d аэропортов</item>
+        <item quantity="other">%1$d аэропорта</item>
+    </plurals>
+    <plurals name="step_voices">
+        <item quantity="one">%1$d голос</item>
+        <item quantity="few">%1$d голоса</item>
+        <item quantity="many">%1$d голосов</item>
+        <item quantity="other">%1$d голоса</item>
+    </plurals>
+    <string name="step_speech_finishing">речевая модель докачивается в фоне</string>
+    <string name="step_voice_ready">Голос готов</string>
+    <string name="step_failed">Ошибка: %1$s</string>
+    <string name="size_mb">%1$.0f МБ</string>
+    <string name="pack_failed">Загрузка не удалась (ошибка %1$d). Проверь соединение и попробуй снова.</string>
+    <string name="pack_cancelled">Загрузка отменена.</string>
+    <string name="pack_not_started">Не удалось начать загрузку: %1$s</string>
+
+    <!-- Unsupported device -->
+    <string name="unsupported_title">На этом телефоне игра не запустится</string>
+    <string name="unsupported_arch">Игре %1$s нужен 64-битный телефон на ARM.</string>
+    <string name="unsupported_nano">В игре %1$s пограничники работают на Gemini Nano — встроенном ИИ Google, которого на этом телефоне нет.</string>
+    <string name="unsupported_ram">Игра %1$s запускает распознавание речи и ИИ пограничников целиком на телефоне, а для этого нужно не меньше 8 ГБ оперативной памяти. На этом телефоне — %2$.1f ГБ.</string>
+
+    <!-- Licenses -->
+    <string name="licenses_title">ЛИЦЕНЗИИ</string>
+    <string name="licenses_unavailable">Текст недоступен.</string>
+    <string name="licenses_full_text">Полный текст лицензии</string>
+    <string name="licenses_art">Графика, музыка и звук</string>
+    <string name="licenses_art_rights">Все права защищены, GPL на них не распространяется.</string>
+    <string name="licenses_art_copyright">Авторские права: 2026 Fluffy Pants Studio LLC. Изображения созданы ИИ; музыка предоставлена правообладателем.</string>
+    <string name="licenses_mlkit_terms">Дополнительные условия ML Kit GenAI</string>
+    <string name="licenses_piper_note">У каждого голоса своя лицензия на датасет.</string>
+    <string name="genai_note">Часть игры использует генеративный ИИ Google на устройстве (Gemini Nano через ML Kit). Google может создавать похожий контент для других пользователей. Для игроков от 18 лет.</string>
+    <string name="settings_ui_language">Язык интерфейса</string>
+    <string name="settings_ui_language_help">Меню и субтитры.</string>
+    <string name="settings_system_default">Как в системе</string>
+    <string name="volume_low">Звук слишком тихий. Сделай громче: пограничники говорят.</string>
+    <string name="volume_off">Звук выключен. Включи его: пограничники говорят.</string>
+    <!-- Passport photo (PassportPhoto.kt) -->
+    <string name="passport_title">Твоё фото на паспорт</string>
+    <string name="passport_disclosure">Оно будет в каждом твоём паспорте. Фото остаётся на этом телефоне и никуда не загружается.</string>
+    <string name="passport_face_title">Пограничники читают лица.</string>
+    <string name="passport_face_body">Во время разговора они следят, как ты моргаешь, улыбаешься и куда смотришь. Сохраняй покерфейс — так тебя сложнее прочитать, а имплант подскажет. Всё остаётся на этом телефоне; видео не записывается.</string>
+    <string name="passport_face_switch">Пограничники читают моё лицо (рекомендуется)</string>
+    <string name="passport_take">Сделать фото</string>
+    <string name="passport_shutter">Снять</string>
+    <string name="passport_use">Взять это фото</string>
+    <string name="passport_retake">Переснять</string>
+    <string name="passport_keep">Оставить это фото</string>
+    <string name="passport_delete">Удалить моё фото</string>
+    <string name="passport_use_sample">Взять готовое фото</string>
+    <string name="passport_no_camera">Камеры нет. В паспорте будет готовое фото.</string>
+    <string name="passport_check_no_face">Посмотри в камеру</string>
+    <string name="passport_check_one_face">В кадре должен быть только ты</string>
+    <string name="passport_check_straight">Смотри прямо в камеру</string>
+    <string name="passport_check_centre">Помести лицо в овал</string>
+    <string name="passport_check_closer">Чуть ближе</string>
+    <string name="passport_check_farther">Чуть дальше</string>
+    <string name="passport_check_hold">Не двигайся…</string>
+    <string name="passport_check_ready">Хорошо. Снимай.</string>
+    <string name="passport_hint_eyes">Глаза открыты, если получится</string>
+    <string name="passport_hint_smile">Лучше всего — нейтральное лицо</string>
+    <string name="passport_capture_failed">Снимок не получился. Попробуй ещё раз.</string>
+    <string name="passport_unmirrored">Без зеркального отражения, как в настоящем паспорте.</string>
+    <string name="passport_sample_another">Другое</string>
+    <string name="passport_back_to_camera">Назад к камере</string>
+    <string name="passport_save_failed">Не удалось сохранить фото. Попробуй ещё раз.</string>
+    <string name="picker_cd">Выбери страну</string>
+    <string name="picker_title">Куда ты возвращаешься?</string>
+    <string name="picker_random">Случайно (любая страна)</string>
+    <string name="picker_passed">ПРОЙДЕНО</string>
+    <string name="picker_passed_times">ПРОЙДЕНО \u2066×%1$d\u2069</string>
+    <!-- Career save and receipts -->
+    <string name="album_infiltration">Проникновение</string>
+    <string name="album_sabotage">Юнит отключён</string>
+    <string name="album_unit">Юнит %1$s</string>
+    <string name="replay_pack_missing">Установи этот язык, чтобы выполнить задание.</string>
+    <string name="replay_new_mark">Новая отметка в досье: %1$s</string>
+    <string name="replay_mark_detail">%1$s · %2$s</string>
+    <string name="replay_save_failed">Не удалось сохранить прогресс. Попробуй сохранить ещё раз перед выходом.</string>
+    <string name="replay_save_retry">Сохранить ещё раз</string>
+    <string name="replay_read_failed">Не удалось прочитать сохранённый прогресс. Он оставлен без изменений.</string>
+    <string name="replay_interrupted">Пересечение границы прервано. Продолжи с подготовки или начни новую миссию.</string>
+    <string name="replay_preparation_unavailable">Невозможно продолжить это сохранённое пересечение границы. Твоя карьера сохранена. Начни новую миссию.</string>
+</resources>

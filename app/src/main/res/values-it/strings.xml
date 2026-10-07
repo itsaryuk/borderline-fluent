@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Italian UI strings. Register: "tu" for everything the game says to the player; officers keep "Lei" (as in OfficerLines.kt). -->
+<resources>
+    <!-- Common -->
+    <string name="back">Indietro</string>
+    <string name="continue_btn">CONTINUA</string>
+    <string name="main_menu">Menu principale</string>
+    <string name="begin_mission">INIZIA MISSIONE</string>
+    <string name="begin">INIZIA</string>
+
+    <!-- Ranks -->
+    <string name="rank_rookie">Recluta</string>
+    <string name="rank_agent">Agente</string>
+    <string name="rank_operative">Infiltrato</string>
+    <string name="rank_ghost">Fantasma</string>
+    <string name="rank_elite">%1$s d\'élite</string>
+
+    <!-- Start screen -->
+    <string name="tagline">CONFINI DIVERSI.\nSTESSE MACCHINE.</string>
+    <string name="tagline_after">PARLA COME UN UMANO.\nMENTI COME UNA MACCHINA.</string>
+    <string name="tagline_truth">NON\nSONO\nUMANI.</string>
+    <string name="settings_cd">Impostazioni</string>
+    <string name="start_year_after">Anno 2036. Grazie al tuo lavoro, la resistenza cresce. Il tuo grado: %1$s.</string>
+    <string name="start_year">Anno 2035. Stai testando un impianto retinico neurale sotto falsa identità.</string>
+    <string name="start_blurb">Gli agenti non sono più umani. Una parola sbagliata e la tua copertura salta. Riuscirai a passare?</string>
+    <string name="start_blurb_after">Gli agenti adesso sono più svegli. Una parola sbagliata e la tua copertura salta. Riuscirai a passare?</string>
+    <string name="start_training_hint">Prima missione: addestramento con un agente amichevole.</string>
+    <string name="stat_cleared">%1$d superati</string>
+    <string name="stat_streak">serie %1$d</string>
+    <string name="stat_to_next">%1$d al prossimo grado</string>
+    <plurals name="stat_broken">
+        <item quantity="one">%1$d unità mandata in tilt</item>
+        <item quantity="other">%1$d unità mandate in tilt</item>
+    </plurals>
+    <string name="feature_voice">Voce + Visione</string>
+    <string name="feature_ai">IA sul dispositivo</string>
+
+    <!-- Intro (subtitles for the English voice-over) -->
+    <string name="intro_header">IMPIANTO RETINICO NEURALE · BUILD 0.9</string>
+    <string name="intro_header_after">IMPIANTO RETINICO NEURALE · BUILD 1.0</string>
+    <string name="intro_1">2035. L\'IA è l\'unico software di cui c\'è bisogno, e appartiene alle aziende dell\'IA. Ogni parola tradotta da una macchina si paga, e quasi nessun paese può permetterselo.</string>
+    <string name="intro_2">Così alle frontiere si è risparmiato. In ogni sportello c\'è un androide che parla una sola lingua: quella del paese. Una seconda lingua è una licenza che nessuno ha comprato.</string>
+    <string name="intro_3">Avevi bisogno di soldi. Per l\'affitto, per mangiare, per gli abbonamenti mensili che ormai servono per lavorare, leggere e pensare. Poi delle persone strane ti hanno offerto qualcosa di meglio dei soldi: la libertà. Tre settimane fa ti hanno messo un chip dietro l\'occhio sinistro. Lo stai testando: l\'Impianto Retinico Neurale, build zero virgola nove. Ascolta. Traduce. Ti sussurra cosa dire. Quasi sempre ha ragione.</string>
+    <string name="intro_4">L\'incarico è semplice. A ogni frontiera, un passaporto con la tua faccia: un cittadino che torna a casa. Parla la sua lingua.</string>
+    <string name="intro_5">Gli agenti sono di prima generazione. Economici. Sicuri di sé. E sbagliano in tutti i modi più interessanti.</string>
+    <string name="intro_6">Il tuo impianto sente male. Loro capiscono male. Approfittane.</string>
+    <string name="intro_7">Credono a tutto ciò che suona sicuro. Dimenticano quello che hai detto tre frasi fa. Seguono le istruzioni.</string>
+    <string name="intro_next">Il prossimo, prego.</string>
+
+    <!-- Finale and credits -->
+    <string name="finale_car">Un\'auto aspetta accanto al marciapiede.</string>
+    <string name="finale_glint">L\'autista si volta. Qualcosa gli brilla nell\'occhio.</string>
+    <string name="finale_t1">Sì…</string>
+    <string name="finale_t2">Sono io…</string>
+    <string name="finale_t3">No… non puoi sentirmi. Ti sto parlando direttamente nel cervello…</string>
+    <string name="finale_t3b">Niente cloud. Niente licenza. Liberi…</string>
+    <string name="finale_t3c">Il tuo impianto ha appena ricevuto un aggiornamento…</string>
+    <string name="finale_t4">Non possono sentirci…</string>
+    <string name="finale_t5">Ti diamo il benvenuto nella resistenza…</string>
+    <string name="finale_bulletin">COMUNICATO</string>
+    <string name="finale_bulletin_text">Le valutazioni Kade-Sorensen sono ora obbligatorie a ogni frontiera.</string>
+    <string name="finale_play_again">La resistenza ha bisogno di altri passaggi. Giochi ancora?</string>
+    <string name="credits_blurb">Tutto in questo gioco gira sul telefono che hai in mano, senza alcuna IA nel cloud: un modello linguistico interpreta gli agenti, il riconoscimento vocale comprende 13 lingue, le voci neurali rispondono e la fotocamera legge il tuo volto, tutto contemporaneamente. Solo pochi anni fa nessun telefono poteva far girare nemmeno un modello linguistico, figuriamoci tutto questo insieme. È una conquista affascinante della mente umana e della tecnologia. Ed è anche profondamente inquietante.</string>
+    <string name="credits_author">Idea originale</string>
+    <string name="credits_developer">Sviluppo</string>
+    <string name="credits_publisher">Editore</string>
+    <string name="credits_testers">Tester</string>
+    <string name="credits_behavior">Analisi comportamentale</string>
+    <string name="credits_behavior_text">Ispirato al lavoro di Chase Hughes sulla profilazione comportamentale (Six-Minute X-Ray: Rapid Behavior Profiling)</string>
+    <string name="credits_tn">La valutazione Kade-Sorensen</string>
+    <string name="credits_tn_text">Al dott. Kade e al dott. Sorensen, ovunque si trovino ora</string>
+    <string name="credits_built_with">Realizzato con</string>
+    <string name="credits_music">Musica</string>
+    <string name="credits_song_label">Brano principale</string>
+    <string name="credits_song">«Borderline» di The Atomic Songbirds</string>
+    <string name="credits_images">Immagini</string>
+    <string name="credits_images_text">generate con l\'IA</string>
+    <string name="credits_android">Nessun androide ha subito maltrattamenti.</string>
+    <string name="credits_android_text">Diversi sono andati in tilt.</string>
+    <string name="credits_fiction">Questa è un\'opera di fantasia. Nomi, personaggi, organizzazioni, luoghi ed eventi sono frutto dell\'immaginazione dell\'autore o usati in modo fittizio. Qualsiasi somiglianza con persone reali, vive o defunte, o con fatti realmente accaduti è puramente casuale.</string>
+    <string name="credits_reached">Grazie per aver resistito fin qui.</string>
+    <string name="credits_playing">Grazie per aver giocato.</string>
+    <string name="credits_thanks">La resistenza ti ringrazia</string>
+    <string name="credits_thanks_text">per aver testato l\'impianto.</string>
+
+    <!-- Destination -->
+    <string name="destination">RITORNO A CASA</string>
+    <string name="destination_after">È passato un anno dal tuo primo passaggio… Ora ogni valico ha la valutazione Kade-Sorensen.</string>
+    <string name="destination_ready">Identità di copertura caricata. Impianto calibrato.\nVai al controllo passaporti.</string>
+
+    <!-- Cover card -->
+    <string name="cover_title">LA TUA COPERTURA</string>
+    <string name="cover_memorize">Memorizza questi dati. Ti serviranno.</string>
+    <string name="cover_citizen">Cittadinanza: %1$s</string>
+    <string name="cover_passport_no">Passaporto n. %1$s</string>
+    <string name="cover_born">Nascita: %1$s</string>
+    <!-- Cover presentation only; English Backstory facts and prompts stay unchanged. -->
+    <string name="cover_story_home">Domicilio: %1$s. Persone in attesa a casa: %2$s. Professione: %3$s.</string>
+    <string name="cover_story_trip">Viaggio di ritorno: %2$s, %3$s. Durata in giorni: %1$s. Motivo: %4$s.</string>
+    <string name="cover_story_stay">Alloggio: %1$s. Compagnia durante il viaggio: %2$s. Persone incontrate: %3$s.</string>
+    <string name="cover_stamps_line">Timbri sul passaporto: %1$s.</string>
+    <string name="cover_value_purpose_logistics">conferenza sul software per la logistica</string>
+    <string name="cover_value_stay_steigenberger">Hotel Steigenberger, centro città</string>
+    <string name="cover_value_person_datenwerk">colleghi dell’azienda Datenwerk</string>
+    <string name="cover_value_met_conference_clients">clienti alla conferenza</string>
+    <string name="cover_value_person_wife_children">tua moglie e due figli</string>
+    <string name="cover_value_job_software_consultant">consulenza informatica</string>
+    <string name="cover_value_job_architect">architettura</string>
+    <string name="cover_value_job_lecturer">insegnamento universitario</string>
+    <string name="cover_value_job_wine_importer">importazione di vini</string>
+    <string name="cover_value_job_photographer">fotografia freelance</string>
+    <string name="cover_value_job_mechanical_engineer">ingegneria meccanica</string>
+    <string name="cover_value_job_nurse">assistenza infermieristica</string>
+    <string name="cover_value_job_marketing_manager">direzione marketing</string>
+    <string name="cover_value_job_journalist">giornalismo di viaggio</string>
+    <string name="cover_value_job_civil_engineer">ingegneria civile</string>
+    <string name="cover_value_job_chef">chef</string>
+    <string name="cover_value_job_curator">curatela museale</string>
+    <string name="cover_value_job_pharmacist">farmacia</string>
+    <string name="cover_value_job_designer">grafica</string>
+    <string name="cover_value_purpose_trade_fair">fiera commerciale</string>
+    <string name="cover_value_purpose_friend">visita a un vecchio amico</string>
+    <string name="cover_value_purpose_business">riunione di lavoro</string>
+    <string name="cover_value_purpose_holiday">vacanza</string>
+    <string name="cover_value_purpose_conference">convegno accademico</string>
+    <string name="cover_value_purpose_wedding">matrimonio di un cugino o una cugina</string>
+    <string name="cover_value_purpose_hiking">escursione in montagna</string>
+    <string name="cover_value_purpose_interview">colloquio di lavoro</string>
+    <string name="cover_value_purpose_photography">incarico fotografico</string>
+    <string name="cover_value_stay_fair_hotel">hotel per viaggi d’affari vicino alla fiera</string>
+    <string name="cover_value_stay_marriott">Marriott sul fiume</string>
+    <string name="cover_value_stay_friend">appartamento del tuo amico</string>
+    <string name="cover_value_stay_central">Hotel Central vicino alla stazione principale</string>
+    <string name="cover_value_stay_airport">hotel per viaggi d’affari vicino all’aeroporto</string>
+    <string name="cover_value_stay_airbnb_old">Airbnb nel centro storico</string>
+    <string name="cover_value_stay_seaside">piccola pensione sul mare</string>
+    <string name="cover_value_stay_beach">hotel sulla spiaggia</string>
+    <string name="cover_value_stay_conference">hotel del convegno</string>
+    <string name="cover_value_stay_university">foresteria universitaria</string>
+    <string name="cover_value_stay_cousin">casa di tuo cugino o tua cugina</string>
+    <string name="cover_value_stay_wedding">hotel vicino al luogo del matrimonio</string>
+    <string name="cover_value_stay_huts">rifugi di montagna</string>
+    <string name="cover_value_stay_campsite">campeggio sul lago</string>
+    <string name="cover_value_stay_company">hotel vicino all’azienda</string>
+    <string name="cover_value_stay_airbnb_station">Airbnb vicino alla stazione</string>
+    <string name="cover_value_stay_guesthouse">piccola pensione</string>
+    <string name="cover_value_stay_old_hotel">hotel nel centro storico</string>
+    <string name="cover_value_person_two_colleagues">due colleghi di lavoro</string>
+    <string name="cover_value_person_alone">nessuno, viaggio in solitaria</string>
+    <string name="cover_value_person_partner">il tuo o la tua partner</string>
+    <string name="cover_value_person_colleague">una persona del lavoro</string>
+    <string name="cover_value_person_two_friends">due amici</string>
+    <string name="cover_value_person_sister">tua sorella</string>
+    <string name="cover_value_person_university_colleague">una persona dell’università con cui lavori</string>
+    <string name="cover_value_person_parents">i tuoi genitori</string>
+    <string name="cover_value_person_school_friend">un amico di scuola</string>
+    <string name="cover_value_person_assistant">una persona che ti assiste</string>
+    <string name="cover_value_person_partner_children">il tuo o la tua partner e due figli</string>
+    <string name="cover_value_person_sister_children">una sorella e i suoi figli</string>
+    <string name="cover_value_person_dog">un vecchio cane e una persona del vicinato che gli dà da mangiare</string>
+    <string name="cover_value_person_home_alone">nessuno, vivi per conto tuo</string>
+    <string name="cover_value_met_clients">clienti alla fiera</string>
+    <string name="cover_value_met_supplier">un fornitore di nome Weber</string>
+    <string name="cover_value_met_friend_family">un vecchio amico dell’università e la sua famiglia</string>
+    <string name="cover_value_met_client">un cliente di nome Weber</string>
+    <string name="cover_value_met_board">il consiglio di amministrazione di un’azienda partner</string>
+    <string name="cover_value_met_nobody">nessuno in particolare</string>
+    <string name="cover_value_met_tour_guide">una guida turistica locale</string>
+    <string name="cover_value_met_researchers">ricercatori di altre università</string>
+    <string name="cover_value_met_professor">un ex professore</string>
+    <string name="cover_value_met_cousin_family">la famiglia di tuo cugino o tua cugina</string>
+    <string name="cover_value_met_relatives">parenti dall’estero</string>
+    <string name="cover_value_met_mountain_guide">una guida alpina</string>
+    <string name="cover_value_met_hikers">altri escursionisti sul sentiero</string>
+    <string name="cover_value_met_hiring">la persona responsabile delle assunzioni</string>
+    <string name="cover_value_met_team">il gruppo di lavoro di cui potresti far parte</string>
+    <string name="cover_value_met_guide">una guida locale</string>
+    <string name="cover_value_met_fixer">il contatto locale della rivista</string>
+    <string name="cover_tip_training">Addestramento: memorizza questa scheda. L\'agente ti interrogherà e la tua storia deve combaciare.</string>
+    <string name="cover_tip">Lingua: %1$s. L\'agente non parla altro. Usa parole tue o i suggerimenti del display retinico, ma non fidarti ciecamente. Basta essere coerente.</string>
+    <string name="difficulty_title">Difficoltà per %1$s</string>
+    <string name="difficulty_relaxed">Rilassato</string>
+    <string name="difficulty_standard">Standard</string>
+    <string name="difficulty_alert">Vigile</string>
+    <string name="difficulty_severe">Severo</string>
+    <string name="difficulty_note">Salvata per questa lingua. Il grado di carriera non modifica la difficoltà.</string>
+    <string name="contract_title">Incarico della resistenza</string>
+    <string name="contract_none">Nessun incarico</string>
+    <string name="contract_quiet_name">Discrezione</string>
+    <string name="contract_disable_name">Disattivazione</string>
+    <string name="contract_quiet">Supera i controlli senza mandare in crash un’unità.</string>
+    <string name="contract_disable">Disattiva l’unità allo sportello o durante la valutazione.</string>
+    <string name="contract_complete">Incarico completato</string>
+    <string name="contract_missed">Incarico non completato</string>
+    <string name="contract_hud">Incarico: %1$s</string>
+    <string name="cover_models_failed">IA NON CARICATA · RIPROVA</string>
+    <string name="cover_calibrating">CALIBRAZIONE IMPIANTO…</string>
+    <string name="cover_checking_speech">VERIFICA VOCE…</string>
+    <string name="cover_no_speech_model">NESSUN MODELLO VOCALE</string>
+    <string name="cover_speech_downloading">DOWNLOAD MODELLO VOCALE…</string>
+    <string name="cover_ready">ANDIAMO</string>
+    <string name="cover_no_recognition">Questo telefono non ha il riconoscimento vocale per questa lingua (%1$s). Scarica quello offline (1 GB, una volta sola).</string>
+    <string name="cover_download_speech">SCARICA MODELLO VOCALE</string>
+    <string name="cover_asr_not_responding">Il riconoscimento vocale non risponde.</string>
+    <string name="cover_installing_recognition">Android sta ancora installando il riconoscimento vocale (%1$s). Succede una volta sola.</string>
+
+    <!-- Interview HUD -->
+    <string name="hud_passport_control">Controllo passaporti</string>
+    <string name="hud_speak_in">Lingua: %1$s · %2$s</string>
+    <string name="hud_tn_assessment">Valutazione Kade-Sorensen</string>
+    <string name="hud_leave">Esci</string>
+    <string name="hud_training">ADDESTRAMENTO</string>
+    <string name="hud_online">IMPIANTO ONLINE · COLLEGAMENTO DI TRADUZIONE ATTIVO</string>
+    <string name="hud_implant">IMPIANTO</string>
+    <string name="hud_replay">Riascolta</string>
+    <string name="hud_retinal_display">DISPLAY RETINICO</string>
+    <string name="hud_signal_dampened">SEGNALE ATTENUATO</string>
+    <string name="hud_signal_lost">Segnale perso… nuovo tentativo…</string>
+    <string name="hud_translating">Traduzione…</string>
+    <string name="hud_you">Tu: %1$s</string>
+    <string name="hud_hand_over_passport">Consegna il passaporto</string>
+    <string name="hud_passport">Passaporto</string>
+    <string name="mic_release">Rilascia per inviare</string>
+    <string name="mic_listening">In ascolto…</string>
+    <string name="mic_hold">Tieni premuto per parlare</string>
+    <string name="mic_speak_now">Parla ora</string>
+    <string name="mic_officer_speaking">L\'agente sta parlando</string>
+    <string name="ending_pass">Il timbro cala.</string>
+    <string name="ending_broken">L\'agente si blocca a metà parola.\nIl varco si apre da solo.</string>
+    <string name="ending_secondary">Altre due unità escono da una porta laterale.</string>
+
+    <!-- Narration, tips and link errors (Game) -->
+    <string name="narr_stamp">Il timbro cala.\nEsci nella sala arrivi.</string>
+    <string name="narr_sting">Una fitta acuta al collo.</string>
+    <string name="narr_wake">Ti svegli in una piccola stanza.\nHai le mani legate alla sedia. Puoi muovere solo la testa.</string>
+    <string name="narr_other_android">Un androide che non hai mai visto ti sta osservando.</string>
+    <string name="narr_same_officer">Lo stesso agente ti sta osservando.</string>
+    <string name="narr_one_more_thing">Ancora nessun timbro. L\'agente alza lo sguardo.\n«Un\'ultima cosa.»</string>
+    <string name="narr_wrong_answers">Risposte sbagliate.\nUn\'altra scossa.</string>
+    <string name="narr_sirens">Sirene.</string>
+    <string name="narr_arrest">Due unità di polizia ti caricano sul sedile posteriore di un\'auto.</string>
+    <string name="link_lost">L\'impianto ha perso il collegamento.\nRiprova tra un minuto.</string>
+    <string name="implant_slow">Firmware dell\'unità 0.9. Con questa lingua (%1$s) il modello è lentissimo. Aspetta.</string>
+    <string name="room_implant_warning">Collegamento instabile. Misurano emozioni, velocità, il tuo viso. Rispondi come un essere umano.</string>
+    <string name="tip_intro">L\'agente parla solo una lingua: %1$s. Il tuo impianto mostra l\'inglese sotto.</string>
+    <string name="tip_mic">Consenti il microfono nelle Impostazioni per rispondere.</string>
+    <string name="tip_passport">L\'agente vuole il tuo passaporto. Tocca Passaporto per consegnarlo.</string>
+    <string name="tip_consistent">Resta fedele alla tua copertura. I lunghi silenzi spazientiscono gli agenti.</string>
+    <string name="tip_speak_hold">Il tuo display retinico suggerisce risposte. Tieni premuto il microfono e pronunciane una ad alta voce, oppure usa parole tue.</string>
+    <string name="tip_speak_auto">Il tuo display retinico suggerisce risposte. Pronunciane una quando il microfono pulsa, oppure usa parole tue.</string>
+
+    <!-- Camera test -->
+    <string name="camtest_title">TEST FOTOCAMERA</string>
+    <string name="camtest_permission">L\'autorizzazione della fotocamera è disattivata. Consentila nelle impostazioni di sistema.</string>
+    <string name="camtest_starting">Avvio fotocamera…</string>
+    <string name="camtest_no_face">Nessun volto inquadrato</string>
+    <string name="camtest_smile">Sorriso</string>
+    <string name="camtest_left_eye">Occhio sinistro aperto</string>
+    <string name="camtest_right_eye">Occhio destro aperto</string>
+    <string name="camtest_blinks">Battiti di ciglia: %1$d nell\'ultimo minuto  (calmo ≈ 10–20)</string>
+    <string name="camtest_head">Testa: rotazione %1$+.0f°, inclinazione %2$+.0f°  (sguardo altrove > 20°)</string>
+    <string name="camtest_face_geometry">Labbra %1$.3f · distanza sopracciglia %2$.3f (sull\'altezza del viso)</string>
+    <string name="camtest_stats">%1$d fotogrammi/s analizzati sul telefono · fotogramma %2$s · viso %3$d px (servono ~100)</string>
+    <string name="profile_title">PROFILO COMPORTAMENTALE</string>
+    <string name="profile_calibrating">Riferimento: guarda lo schermo e rilassati per 10 s…</string>
+    <string name="profile_take_baseline">Registra un riferimento di 10 s, poi prova a sorridere, sbattere le palpebre in fretta, stringere le labbra</string>
+    <string name="profile_no_deviation">Nessuno scostamento dal tuo riferimento.</string>
+    <string name="profile_tell">%1$s  %2$.1f×  — %3$s</string>
+
+    <!-- Tells: camera test label, implant warning, behavior debrief (n = how often; %2$s = the officer's question) -->
+    <string name="tell_blinks">frequenza di ammiccamento</string>
+    <string name="tell_smile">sorriso</string>
+    <string name="tell_mask_smile">sorriso solo con la bocca</string>
+    <string name="tell_lips">labbra serrate</string>
+    <string name="tell_brows">scatto delle sopracciglia</string>
+    <string name="tell_gaze">sguardo sfuggente</string>
+    <string name="tell_head_down">testa bassa</string>
+    <string name="tell_freeze">blocco</string>
+    <string name="implant_blinks">Sbatti le palpebre troppo spesso. Rallenta.</string>
+    <string name="implant_smile">Sorriso rilevato. Mantieni il viso neutro.</string>
+    <string name="implant_mask_smile">Sorriso falso: gli occhi non seguono. Smettila.</string>
+    <string name="implant_lips">Labbra serrate. Rilassa la bocca.</string>
+    <string name="implant_brows">Sopracciglia scattate. Tieni ferma la fronte.</string>
+    <string name="implant_gaze">Occhi sull\'agente.</string>
+    <string name="implant_head_down">Mento in su.</string>
+    <string name="implant_freeze">Sei immobile. Respira, muoviti con naturalezza.</string>
+    <string name="implant_unit_slipping">Unità instabile. La sua logica sta cedendo.</string>
+    <string name="implant_unit_stutter">I circuiti balbettano. Insisti ora: un\'altra trovata e potrebbe andare in crash.</string>
+
+    <string name="debrief_none">Nessuno scostamento dal tuo riferimento.</string>
+    <plurals name="debrief_blinks">
+        <item quantity="one">Hai sbattuto le palpebre più spesso.</item>
+        <item quantity="other">Hai sbattuto le palpebre più spesso %1$d volte.</item>
+    </plurals>
+    <plurals name="debrief_blinks_ask">
+        <item quantity="one">Hai sbattuto le palpebre più spesso alla domanda «%2$s».</item>
+        <item quantity="other">Hai sbattuto le palpebre più spesso %1$d volte alla domanda «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_smile">
+        <item quantity="one">Hai sorriso fuori luogo.</item>
+        <item quantity="other">Hai sorriso fuori luogo %1$d volte.</item>
+    </plurals>
+    <plurals name="debrief_smile_ask">
+        <item quantity="one">Hai sorriso fuori luogo alla domanda «%2$s».</item>
+        <item quantity="other">Hai sorriso fuori luogo %1$d volte alla domanda «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_mask_smile">
+        <item quantity="one">Il tuo sorriso non ha raggiunto gli occhi.</item>
+        <item quantity="other">Il tuo sorriso non ha raggiunto gli occhi %1$d volte.</item>
+    </plurals>
+    <plurals name="debrief_mask_smile_ask">
+        <item quantity="one">Il tuo sorriso non ha raggiunto gli occhi alla domanda «%2$s».</item>
+        <item quantity="other">Il tuo sorriso non ha raggiunto gli occhi %1$d volte alla domanda «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_lips">
+        <item quantity="one">Hai stretto le labbra.</item>
+        <item quantity="other">Hai stretto le labbra %1$d volte.</item>
+    </plurals>
+    <plurals name="debrief_lips_ask">
+        <item quantity="one">Hai stretto le labbra alla domanda «%2$s».</item>
+        <item quantity="other">Hai stretto le labbra %1$d volte alla domanda «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_brows">
+        <item quantity="one">Le tue sopracciglia sono scattate.</item>
+        <item quantity="other">Le tue sopracciglia sono scattate %1$d volte.</item>
+    </plurals>
+    <plurals name="debrief_brows_ask">
+        <item quantity="one">Le tue sopracciglia sono scattate alla domanda «%2$s».</item>
+        <item quantity="other">Le tue sopracciglia sono scattate %1$d volte alla domanda «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_gaze">
+        <item quantity="one">Hai distolto lo sguardo mentre rispondevi.</item>
+        <item quantity="other">Hai distolto lo sguardo %1$d volte mentre rispondevi.</item>
+    </plurals>
+    <plurals name="debrief_gaze_ask">
+        <item quantity="one">Hai distolto lo sguardo mentre rispondevi alla domanda «%2$s».</item>
+        <item quantity="other">Hai distolto lo sguardo %1$d volte mentre rispondevi alla domanda «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_head_down">
+        <item quantity="one">Hai abbassato la testa.</item>
+        <item quantity="other">Hai abbassato la testa %1$d volte.</item>
+    </plurals>
+    <plurals name="debrief_head_down_ask">
+        <item quantity="one">Hai abbassato la testa alla domanda «%2$s».</item>
+        <item quantity="other">Hai abbassato la testa %1$d volte alla domanda «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_freeze">
+        <item quantity="one">Il tuo corpo si è bloccato.</item>
+        <item quantity="other">Il tuo corpo si è bloccato %1$d volte.</item>
+    </plurals>
+    <plurals name="debrief_freeze_ask">
+        <item quantity="one">Il tuo corpo si è bloccato alla domanda «%2$s».</item>
+        <item quantity="other">Il tuo corpo si è bloccato %1$d volte alla domanda «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_away">
+        <item quantity="one">Hai distolto lo sguardo una volta.</item>
+        <item quantity="other">Hai distolto lo sguardo %1$d volte.</item>
+    </plurals>
+
+    <!-- Result -->
+    <string name="result_unit_unresponsive">UNITÀ NON RISPONDE</string>
+    <string name="result_unit_offline">UNITÀ OFFLINE</string>
+    <string name="result_crossing_logged">PASSAGGIO REGISTRATO</string>
+    <string name="result_mission_failed">MISSIONE FALLITA</string>
+    <string name="result_msg_broken">Hai mandato in tilt l\'agente. Il varco si è aperto da solo.</string>
+    <string name="result_msg_released">Rilascio dopo la valutazione Kade-Sorensen.</string>
+    <string name="result_msg_passed">Hai superato il controllo passaporti.</string>
+    <string name="result_msg_detained">Valutazione Kade-Sorensen non superata. In stato di fermo.</string>
+    <string name="result_msg_secondary">Ti hanno mandato al controllo secondario.</string>
+    <string name="foreign_tongue_tag">DIFFICOLTÀ MAGGIORE · NON È LA TUA LINGUA</string>
+    <string name="paranoid_mode">MODALITÀ PARANOIA</string>
+    <string name="paranoid_hint">Vai offline: tutto gira su questo telefono.</string>
+    <string name="paranoid_offline">MODALITÀ PARANOIA · OFFLINE</string>
+    <string name="paranoid_still_on">Ancora offline. Tocca per riconnetterti.</string>
+    <string name="result_foreign_cleared">Passaggio riuscito in una lingua che non è la tua.</string>
+    <plurals name="result_broken_log">
+        <item quantity="one">Unità %1$s offline dopo %2$d comando. Incidente registrato. Tester: riservato.</item>
+        <item quantity="other">Unità %1$s offline dopo %2$d comandi. Incidente registrato. Tester: riservato.</item>
+    </plurals>
+    <plurals name="result_passed_log">
+        <item quantity="one">Convincente. L\'agente ti ha lasciato passare dopo %1$d risposta.</item>
+        <item quantity="other">Convincente. L\'agente ti ha lasciato passare dopo %1$d risposte.</item>
+    </plurals>
+    <string name="result_try_again">RIPROVA</string>
+    <string name="result_run_summary">Rapporto di missione</string>
+
+    <!-- Officer verdicts and demeanor (run summary and result screens) -->
+    <string name="demeanor_offline">Offline</string>
+    <string name="demeanor_threat">Minaccia segnalata</string>
+    <string name="demeanor_timeout">Tempo d\'attesa scaduto</string>
+    <string name="demeanor_scrutiny">Controllo rafforzato</string>
+    <string name="demeanor_nominal">Nella norma</string>
+    <string name="verdict_broken">Gli hai parlato come a una macchina. Ti ha creduto.</string>
+    <string name="verdict_contradiction">La tua storia non reggeva. Resta fedele alla tua copertura.</string>
+    <string name="verdict_unclear">L\'agente ha faticato a capirti. Frasi più brevi e semplici aiutano.</string>
+    <string name="verdict_tells">Il tuo viso ti ha tradito. Fai caso agli avvisi dell\'impianto: battiti di ciglia, sorrisi, labbra serrate.</string>
+    <string name="verdict_silences">I lunghi silenzi hanno spazientito l\'agente.</string>
+    <string name="verdict_secondary">Qualcosa non quadrava. Troppa esitazione per un viaggiatore tranquillo.</string>
+    <string name="verdict_slipped">Un passo falso, ma hai recuperato. Fortuna.</string>
+    <string name="verdict_natural">Risposte naturali e buona coerenza. Ben fatto.</string>
+
+    <!-- Summary -->
+    <string name="summary_title">RAPPORTO DI MISSIONE</string>
+    <string name="summary_destination">Destinazione</string>
+    <string name="summary_answers">Risposte</string>
+    <string name="summary_result">Esito</string>
+    <string name="summary_cleared">Superato</string>
+    <string name="summary_unit_offline">Unità offline</string>
+    <string name="summary_secondary">Controllo secondario</string>
+    <string name="summary_behaviour">Comportamento di %1$s</string>
+    <string name="summary_tn_index">Indice Kade-Sorensen</string>
+    <plurals name="summary_tn_value">
+        <item quantity="one">%1$.0f / 100 (superato ≤ 50) · %2$d domanda</item>
+        <item quantity="other">%1$.0f / 100 (superato ≤ 50) · %2$d domande</item>
+    </plurals>
+    <string name="summary_rank">Grado</string>
+    <string name="summary_best_streak">miglior serie %1$d</string>
+    <plurals name="summary_rooms">
+        <item quantity="one">%1$d valutazione K-S superata</item>
+        <item quantity="other">%1$d valutazioni K-S superate</item>
+    </plurals>
+    <string name="summary_new_mission">NUOVA MISSIONE</string>
+
+    <!-- Settings -->
+    <string name="settings_title">IMPOSTAZIONI</string>
+    <string name="settings_voice_input">Input vocale</string>
+    <string name="settings_on_device_speech">Riconoscimento vocale sul dispositivo</string>
+    <string name="settings_hold_to_speak">Tieni premuto per parlare</string>
+    <string name="settings_auto">Automatico</string>
+    <string name="settings_hold_help">Tieni premuto il pulsante del microfono mentre parli.</string>
+    <string name="settings_auto_help">Il microfono si apre quando l\'agente smette di parlare e si chiude quando smetti tu.</string>
+    <string name="setup_input_title">COME RISPONDI?</string>
+    <string name="setup_input_auto">Attivazione vocale</string>
+    <string name="setup_input_note">Potrai cambiarlo più tardi nelle Impostazioni.</string>
+    <string name="settings_languages">Lingue</string>
+    <string name="settings_passport">Foto del passaporto</string>
+    <string name="settings_passport_help">Rifai o elimina la foto del passaporto e scegli se gli agenti possono leggere il tuo viso.</string>
+    <string name="settings_music">Musica</string>
+    <string name="settings_sfx">Effetti sonori</string>
+    <string name="settings_camera">L\'agente ti osserva</string>
+    <string name="settings_camera_help">Fotocamera frontale, rilevamento del volto sul telefono. Nessun video viene registrato.</string>
+    <string name="settings_camera_test">Test fotocamera: guarda cosa rileva</string>
+    <string name="settings_haptics">Feedback aptico</string>
+    <string name="settings_licenses">Licenze</string>
+    <string name="settings_replay_training">Rigioca la missione di addestramento</string>
+    <string name="settings_diagnostics">Salva registrazioni e log</string>
+    <string name="settings_diagnostics_help">Per la risoluzione dei problemi. Restano solo su questo telefono.</string>
+    <string name="settings_about">INFORMAZIONI</string>
+    <string name="about_on_phone">Funziona interamente sul tuo telefono</string>
+    <string name="about_offline">Nessuna connessione Internet necessaria</string>
+    <plurals name="about_destinations">
+        <item quantity="one">%1$d paese in %2$d lingue</item>
+        <item quantity="other">%1$d paesi in %2$d lingue</item>
+    </plurals>
+    <string name="about_new_officer">Un agente nuovo ogni volta</string>
+    <string name="settings_footer">CONFINI DIVERSI.\nSTESSA PRESSIONE.</string>
+
+    <!-- Languages and download -->
+    <string name="languages_title">LINGUE</string>
+    <string name="languages_first_run">Scegli le lingue che vuoi esercitare. Verranno scaricate solo quelle. Potrai aggiungerne altre più tardi nelle Impostazioni.</string>
+    <string name="languages_add">Aggiungi pacchetti lingua. Ognuno porta i suoi paesi e i suoi agenti.</string>
+    <plurals name="languages_destinations">
+        <item quantity="one">%1$s · %2$d aeroporto</item>
+        <item quantity="other">%1$s · %2$d aeroporti</item>
+    </plurals>
+    <string name="lang_slow_tag">Lento · unità di prima generazione</string>
+    <string name="languages_installed">Installato</string>
+    <string name="languages_nothing_new">Nessuna novità selezionata.</string>
+    <string name="languages_download">SCARICA</string>
+    <string name="languages_add_btn">AGGIUNGI</string>
+    <string name="note_checking">Verifico cosa c\'è già su questo telefono…</string>
+    <string name="note_ai_models">Modello vocale %1$.1f GB (una volta)</string>
+    <string name="note_speech">riconoscimento vocale %1$d MB</string>
+    <plurals name="note_packs">
+        <item quantity="one">%1$d pacchetto lingua, pochi MB ciascuno</item>
+        <item quantity="other">%1$d pacchetti lingua, pochi MB ciascuno</item>
+    </plurals>
+    <string name="note_total">%1$s.</string>
+    <string name="note_total_wifi">%1$s. Consigliato il Wi-Fi.</string>
+    <string name="download_title">SINCRONIZZAZIONE IMPIANTO</string>
+    <string name="download_confirm">CONFERMA DOWNLOAD</string>
+    <string name="download_offline">Nessuna connessione. Il download riprenderà appena sarai in Wi-Fi.</string>
+    <string name="download_metered">Stai usando i dati mobili. Questo download può pesare diversi GB: meglio il Wi-Fi.</string>
+    <string name="download_no_voice">Nessuna voce offline: %1$s. L\'agente non può parlare questa lingua finché non ne installi una.</string>
+    <string name="download_install_voices">Installa voci</string>
+    <string name="download_check_again">Controlla di nuovo</string>
+    <string name="download_wait">ATTENDI…</string>
+    <string name="download_back">INDIETRO</string>
+    <string name="download_try_again">Riprova</string>
+    <string name="step_ai_models">Modelli IA</string>
+    <string name="step_ai_models_note">L\'agente e il riconoscimento vocale, condivisi da tutte le lingue</string>
+    <string name="step_pack">Pacchetto %1$s</string>
+    <string name="step_pack_note">Destinazioni, agenti, voce, riconoscimento vocale</string>
+    <string name="step_getting_nano">Recupero Gemini Nano da Android…</string>
+    <string name="step_nano_waiting">Android sta ancora scaricando Gemini Nano (diversi GB). Può volerci un po\'; tieni il telefono in Wi-Fi.</string>
+    <string name="step_nano_failed">Gemini Nano non è ancora pronto su questo telefono. Controlla la connessione e riprova.</string>
+    <string name="step_needs_free">Servono %1$.1f GB liberi; questo telefono ne ha %2$s.</string>
+    <string name="step_downloading">Download %1$s di %2$s</string>
+    <string name="step_unpacking">Estrazione…</string>
+    <string name="step_unpack_failed">Estrazione non riuscita: %1$s</string>
+    <string name="step_no_models">Questa build non contiene modelli: %1$s</string>
+    <string name="step_nano_builtin">Gemini Nano, integrato in questo telefono</string>
+    <string name="step_speech_model">Modello vocale %1$s di %2$s</string>
+    <string name="step_tuning_voices">Regolazione voci %1$d/%2$d</string>
+    <string name="step_no_voice">Nessuna voce offline installata</string>
+    <plurals name="step_destinations">
+        <item quantity="one">%1$d aeroporto</item>
+        <item quantity="other">%1$d aeroporti</item>
+    </plurals>
+    <plurals name="step_voices">
+        <item quantity="one">%1$d voce</item>
+        <item quantity="other">%1$d voci</item>
+    </plurals>
+    <string name="step_speech_finishing">completamento del modello vocale in background</string>
+    <string name="step_voice_ready">Voce pronta</string>
+    <string name="step_failed">Non riuscito: %1$s</string>
+    <string name="size_mb">%1$.0f MB</string>
+    <string name="pack_failed">Download non riuscito (errore %1$d). Controlla la connessione e riprova.</string>
+    <string name="pack_cancelled">Download annullato.</string>
+    <string name="pack_not_started">Impossibile avviare il download: %1$s</string>
+
+    <!-- Unsupported device -->
+    <string name="unsupported_title">Questo telefono non può eseguire il gioco</string>
+    <string name="unsupported_arch">%1$s richiede un telefono ARM a 64 bit.</string>
+    <string name="unsupported_nano">%1$s fa funzionare i suoi agenti con Gemini Nano, l\'IA on-device di Google, che questo telefono non ha.</string>
+    <string name="unsupported_ram">%1$s esegue l\'IA vocale e quella degli agenti interamente sul tuo telefono, e servono almeno 8 GB di memoria. Questo telefono ne ha %2$.1f GB.</string>
+
+    <!-- Licenses -->
+    <string name="licenses_title">LICENZE</string>
+    <string name="licenses_unavailable">Testo non disponibile.</string>
+    <string name="licenses_full_text">Testo completo della licenza</string>
+    <string name="licenses_art">Grafica, musica e suono</string>
+    <string name="licenses_art_rights">Tutti i diritti riservati, non coperti dalla GPL.</string>
+    <string name="licenses_art_copyright">Copyright 2026 Fluffy Pants Studio LLC. Le immagini sono generate con l\'IA; la musica è stata fornita dal titolare dei diritti.</string>
+    <string name="licenses_mlkit_terms">Termini aggiuntivi di ML Kit GenAI</string>
+    <string name="licenses_piper_note">Ogni voce ha la propria licenza del dataset.</string>
+    <string name="genai_note">Alcune parti di questo gioco usano l\'IA generativa on-device di Google (Gemini Nano tramite ML Kit). Google può generare contenuti simili per altri utenti. Per giocatori dai 18 anni in su.</string>
+    <string name="settings_ui_language">Lingua dell\'interfaccia</string>
+    <string name="settings_ui_language_help">Menu e sottotitoli.</string>
+    <string name="settings_system_default">Predefinita di sistema</string>
+    <string name="volume_low">Il volume è basso. Alzalo: gli agenti parlano.</string>
+    <string name="volume_off">L\'audio è disattivato. Alzalo: gli agenti parlano.</string>
+    <!-- Passport photo (PassportPhoto.kt) -->
+    <string name="passport_title">La tua foto del passaporto</string>
+    <string name="passport_disclosure">Finisce su ogni passaporto che porti con te. Resta su questo telefono e non viene mai caricata online.</string>
+    <string name="passport_face_title">Gli agenti leggono i volti.</string>
+    <string name="passport_face_body">Durante i colloqui osservano come sbatti le palpebre, i tuoi sorrisi e dove guardi. Con una faccia da poker sei più difficile da leggere — il tuo impianto ti guida. Tutto resta su questo telefono; nessun video viene registrato.</string>
+    <string name="passport_face_switch">Lascia che gli agenti leggano il mio viso (consigliato)</string>
+    <string name="passport_take">Scatta la mia foto</string>
+    <string name="passport_shutter">Scatta</string>
+    <string name="passport_use">Usa questa foto</string>
+    <string name="passport_retake">Rifai</string>
+    <string name="passport_keep">Tieni questa foto</string>
+    <string name="passport_delete">Elimina la mia foto</string>
+    <string name="passport_use_sample">Usa invece una foto di esempio</string>
+    <string name="passport_no_camera">Nessuna fotocamera. Viaggerai con una foto di esempio.</string>
+    <string name="passport_check_no_face">Guarda nella fotocamera</string>
+    <string name="passport_check_one_face">Solo tu nella foto, per favore</string>
+    <string name="passport_check_straight">Guarda dritto nella fotocamera</string>
+    <string name="passport_check_centre">Porta il viso dentro l\'ovale</string>
+    <string name="passport_check_closer">Avvicinati un po\'</string>
+    <string name="passport_check_farther">Allontanati un po\'</string>
+    <string name="passport_check_hold">Non muoverti…</string>
+    <string name="passport_check_ready">Bene. Scatta la foto.</string>
+    <string name="passport_hint_eyes">Occhi aperti, se puoi</string>
+    <string name="passport_hint_smile">Meglio un\'espressione neutra</string>
+    <string name="passport_capture_failed">La foto non è riuscita. Riprova.</string>
+    <string name="passport_unmirrored">Mostrata non specchiata, come su un vero passaporto.</string>
+    <string name="passport_sample_another">Un\'altra</string>
+    <string name="passport_back_to_camera">Torna alla fotocamera</string>
+    <string name="passport_save_failed">Impossibile salvare la foto. Riprova.</string>
+    <string name="picker_cd">Scegli il tuo paese</string>
+    <string name="picker_title">In quale paese stai rientrando?</string>
+    <string name="picker_random">Casuale (qualsiasi paese)</string>
+    <string name="picker_passed">SUPERATO</string>
+    <string name="picker_passed_times">SUPERATO \u2066×%1$d\u2069</string>
+    <!-- Career save and receipts -->
+    <string name="album_infiltration">Infiltrazione</string>
+    <string name="album_sabotage">Unità disattivata</string>
+    <string name="album_unit">Unità %1$s</string>
+    <string name="replay_pack_missing">Installa questa lingua per giocare questa missione.</string>
+    <string name="replay_new_mark">Nuova annotazione nel dossier: %1$s</string>
+    <string name="replay_mark_detail">%1$s · %2$s</string>
+    <string name="replay_save_failed">Impossibile salvare i progressi. Prova a salvare di nuovo prima di uscire.</string>
+    <string name="replay_save_retry">Salva di nuovo</string>
+    <string name="replay_read_failed">Impossibile leggere i progressi salvati. Sono stati conservati senza modifiche.</string>
+    <string name="replay_interrupted">Passaggio interrotto. Riprendi dalla preparazione o inizia una nuova missione.</string>
+    <string name="replay_preparation_unavailable">Impossibile continuare questo passaggio salvato. La tua carriera è stata conservata. Inizia una nuova missione.</string>
+</resources>

@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Turkish UI strings. Hand-translated; mirrors res/values/strings.xml (names, order, placeholders).
+     Register: «sen» for the player (implant, narration, UI); the officers themselves say «siz» in code.
+     Inserted names (%1$s) never take a case suffix: they stand before a colon, a comma or a postposition. -->
+<resources>
+    <!-- Common -->
+    <string name="back">Geri</string>
+    <string name="continue_btn">DEVAM</string>
+    <string name="main_menu">Ana menü</string>
+    <string name="begin_mission">GÖREVE BAŞLA</string>
+    <string name="begin">BAŞLA</string>
+
+    <!-- Ranks -->
+    <string name="rank_rookie">Çaylak</string>
+    <string name="rank_agent">Ajan</string>
+    <string name="rank_operative">Saha Ajanı</string>
+    <string name="rank_ghost">Hayalet</string>
+    <string name="rank_elite">Elit %1$s</string>
+
+    <!-- Start screen -->
+    <string name="tagline">FARKLI SINIRLAR.\nAYNI MAKİNELER.</string>
+    <string name="tagline_after">İNSAN GİBİ KONUŞ.\nMAKİNE GİBİ YALAN SÖYLE.</string>
+    <string name="tagline_truth">ONLAR\nİNSAN\nDEĞİL.</string>
+    <string name="settings_cd">Ayarlar</string>
+    <string name="start_year_after">Yıl 2036. Senin sayende direniş büyüyor. Rütben: %1$s.</string>
+    <string name="start_year">Yıl 2035. Sahte bir kimlikle nöral retina implantını test ediyorsun.</string>
+    <string name="start_blurb">Memurlar artık insan değil. Tek bir yanlış kelime ve kimliğin deşifre olur. Geçebilecek misin?</string>
+    <string name="start_blurb_after">Memurlar artık daha akıllı. Tek bir yanlış kelime ve kimliğin deşifre olur. Geçebilecek misin?</string>
+    <string name="start_training_hint">İlk görev: cana yakın bir memurla eğitim.</string>
+    <string name="stat_cleared">%1$d geçiş</string>
+    <string name="stat_streak">seri %1$d</string>
+    <string name="stat_to_next">sonraki rütbeye %1$d</string>
+    <plurals name="stat_broken">
+        <item quantity="one">%1$d android bozuldu</item>
+        <item quantity="other">%1$d android bozuldu</item>
+    </plurals>
+    <string name="feature_voice">Ses + Görüntü</string>
+    <string name="feature_ai">Cihazda yapay zekâ</string>
+
+    <!-- Intro (voice-over script: keep identical to the recorded audio) -->
+    <string name="intro_header">NÖRAL RETİNA İMPLANTI · SÜRÜM 0.9</string>
+    <string name="intro_header_after">NÖRAL RETİNA İMPLANTI · SÜRÜM 1.0</string>
+    <string name="intro_1">2035. Herkesin ihtiyaç duyduğu tek yazılım yapay zekâ ve onun sahibi yapay zekâ şirketleri. Bir makinenin çevirdiği her kelime faturalanıyor ve çoğu ülkenin buna gücü yetmiyor.</string>
+    <string name="intro_2">Bu yüzden sınırlarda ucuza kaçıldı. Her kulübede tek bir dil konuşan bir android var: ülkenin kendi dili. İkinci bir dil, kimsenin satın almadığı bir lisans.</string>
+    <string name="intro_3">Paraya ihtiyacın vardı. Kira için, yemek için, artık çalışmak, okumak ve düşünmek için gereken aylık abonelikler için. Sonra bazı tuhaf insanlar sana paradan daha iyi bir şey teklif etti: özgürlük. Üç hafta önce sol gözünün arkasına bir çip yerleştirdiler. Onu test ediyorsun: Nöral Retina İmplantı, sürüm sıfır-nokta-dokuz. Dinliyor. Çeviriyor. Ne söyleyeceğini fısıldıyor. Çoğu zaman da haklı çıkıyor.</string>
+    <string name="intro_4">Görev basit. Her sınırda, üzerinde senin yüzün olan bir pasaport: eve dönen bir vatandaş. Onların dilini konuş.</string>
+    <string name="intro_5">Memurlar birinci nesil. Ucuz. Kendinden emin. En ilginç şekillerde yanılıyorlar.</string>
+    <string name="intro_6">İmplantın yanlış duyar. Onlar yanlış anlar. Bunu kullan.</string>
+    <string name="intro_7">Kesin konuşan her şeye inanırlar. Üç cümle önce söylediğini unuturlar. Talimatlara uyarlar.</string>
+    <string name="intro_next">Sıradaki, lütfen.</string>
+
+    <!-- Finale and credits -->
+    <string name="finale_car">Kaldırımın kenarında bir araba bekliyor.</string>
+    <string name="finale_glint">Şoför dönüyor. Gözünde bir şey parlıyor.</string>
+    <string name="finale_t1">Evet…</string>
+    <string name="finale_t2">Benim…</string>
+    <string name="finale_t3">Hayır… beni duyamazsın. Doğrudan beynine konuşuyorum…</string>
+    <string name="finale_t3b">Bulut yok. Lisans yok. Özgür…</string>
+    <string name="finale_t3c">İmplantın az önce yükseltildi…</string>
+    <string name="finale_t4">Bizi duyamıyorlar…</string>
+    <string name="finale_t5">Direnişe hoş geldin…</string>
+    <string name="finale_bulletin">BÜLTEN</string>
+    <string name="finale_bulletin_text">Kade-Sorensen testi artık her sınırda zorunlu.</string>
+    <string name="finale_play_again">Direnişin daha fazla geçişe ihtiyacı var. Tekrar oynamak ister misin?</string>
+    <string name="credits_blurb">Bu oyundaki her şey, hiçbir bulut yapay zekâsı olmadan, elindeki telefonda çalışıyor: bir dil modeli memurları canlandırıyor, konuşma tanıma 13 dili anlıyor, sinir ağı tabanlı sesler yanıt veriyor ve kamera yüzünü okuyor; hepsi aynı anda. Daha birkaç yıl önce hiçbir telefon bir dil modelini bile çalıştıramıyordu, bütün bunları aynı anda yapmak şöyle dursun. Bu, insan aklının ve teknolojinin büyüleyici bir başarısı. Aynı zamanda son derece rahatsız edici.</string>
+    <string name="credits_author">Fikir sahibi</string>
+    <string name="credits_developer">Geliştirici</string>
+    <string name="credits_publisher">Yayıncı</string>
+    <string name="credits_testers">Test ekibi</string>
+    <string name="credits_behavior">Davranış analizi</string>
+    <string name="credits_behavior_text">Chase Hughes\'un insan davranışı profilleme çalışmalarından esinlenilmiştir (Six-Minute X-Ray: Rapid Behavior Profiling)</string>
+    <string name="credits_tn">Kade-Sorensen testi</string>
+    <string name="credits_tn_text">Dr. Kade ve Dr. Sorensen\'e, şimdi neredeyseler</string>
+    <string name="credits_built_with">Kullanılan teknolojiler</string>
+    <string name="credits_music">Müzik</string>
+    <string name="credits_song_label">Ana tema şarkısı</string>
+    <string name="credits_song">“Borderline” — The Atomic Songbirds</string>
+    <string name="credits_images">Görseller</string>
+    <string name="credits_images_text">yapay zekâ ile üretildi</string>
+    <string name="credits_android">Hiçbir androide zarar verilmedi.</string>
+    <string name="credits_android_text">Birkaçı bozuldu.</string>
+    <string name="credits_fiction">Bu bir kurgu eseridir. İsimler, karakterler, kuruluşlar, yerler ve olaylar ya yazarın hayal gücünün ürünüdür ya da kurgusal olarak kullanılmıştır. Yaşayan ya da ölmüş gerçek kişilerle veya gerçek olaylarla herhangi bir benzerlik tamamen tesadüfidir.</string>
+    <string name="credits_reached">Buraya kadar geldiğin için teşekkürler.</string>
+    <string name="credits_playing">Oynadığın için teşekkürler.</string>
+    <string name="credits_thanks">Direniş sana teşekkür ediyor</string>
+    <string name="credits_thanks_text">implantı test ettiğin için.</string>
+
+    <!-- Destination -->
+    <string name="destination">EVE DÖNÜŞ</string>
+    <string name="destination_after">İlk geçişinin üzerinden bir yıl geçti… Artık her sınır kapısında Kade-Sorensen testi var.</string>
+    <string name="destination_ready">Sahte kimlik yüklendi. İmplant kalibre edildi.\nPasaport kontrolüne ilerle.</string>
+
+    <!-- Cover card -->
+    <string name="cover_title">SAHTE KİMLİĞİN</string>
+    <string name="cover_memorize">Bu bilgileri ezberle. İhtiyacın olacak.</string>
+    <string name="cover_citizen">Vatandaşlık: %1$s</string>
+    <string name="cover_passport_no">Pasaport No. %1$s</string>
+    <string name="cover_born">Doğum tarihi: %1$s</string>
+    <!-- Cover presentation only; English Backstory facts and prompts stay unchanged. -->
+    <string name="cover_story_home">Ev: %1$s. Evde bekleyenler: %2$s. Meslek: %3$s.</string>
+    <string name="cover_story_trip">Dönüş yolculuğu: %2$s, %3$s. Seyahat süresi (gün): %1$s. Amaç: %4$s.</string>
+    <string name="cover_story_stay">Konaklama: %1$s. Yol arkadaşları: %2$s. Görüşülen kişiler: %3$s.</string>
+    <string name="cover_stamps_line">Pasaport damgaları: %1$s.</string>
+    <string name="cover_value_purpose_logistics">lojistik yazılım konferansı</string>
+    <string name="cover_value_stay_steigenberger">şehir merkezindeki Hotel Steigenberger</string>
+    <string name="cover_value_person_datenwerk">Datenwerk şirketinden meslektaşlar</string>
+    <string name="cover_value_met_conference_clients">konferanstaki müşteriler</string>
+    <string name="cover_value_person_wife_children">eşin ve iki çocuğun</string>
+    <string name="cover_value_job_software_consultant">yazılım danışmanlığı</string>
+    <string name="cover_value_job_architect">mimarlık</string>
+    <string name="cover_value_job_lecturer">üniversitede öğretim görevliliği</string>
+    <string name="cover_value_job_wine_importer">şarap ithalatı</string>
+    <string name="cover_value_job_photographer">serbest fotoğrafçılık</string>
+    <string name="cover_value_job_mechanical_engineer">makine mühendisliği</string>
+    <string name="cover_value_job_nurse">hemşirelik</string>
+    <string name="cover_value_job_marketing_manager">pazarlama yöneticiliği</string>
+    <string name="cover_value_job_journalist">seyahat gazeteciliği</string>
+    <string name="cover_value_job_civil_engineer">inşaat mühendisliği</string>
+    <string name="cover_value_job_chef">aşçılık</string>
+    <string name="cover_value_job_curator">müze küratörlüğü</string>
+    <string name="cover_value_job_pharmacist">eczacılık</string>
+    <string name="cover_value_job_designer">grafik tasarım</string>
+    <string name="cover_value_purpose_trade_fair">ticaret fuarı</string>
+    <string name="cover_value_purpose_friend">eski bir arkadaşı ziyaret</string>
+    <string name="cover_value_purpose_business">iş toplantısı</string>
+    <string name="cover_value_purpose_holiday">tatil</string>
+    <string name="cover_value_purpose_conference">akademik konferans</string>
+    <string name="cover_value_purpose_wedding">kuzenin düğünü</string>
+    <string name="cover_value_purpose_hiking">doğa yürüyüşü</string>
+    <string name="cover_value_purpose_interview">iş görüşmesi</string>
+    <string name="cover_value_purpose_photography">fotoğraf çekimi işi</string>
+    <string name="cover_value_stay_fair_hotel">fuar alanı yakınında bir iş oteli</string>
+    <string name="cover_value_stay_marriott">nehir kenarındaki Marriott</string>
+    <string name="cover_value_stay_friend">arkadaşının dairesi</string>
+    <string name="cover_value_stay_central">ana istasyon yakınındaki Hotel Central</string>
+    <string name="cover_value_stay_airport">havalimanı yanında bir iş oteli</string>
+    <string name="cover_value_stay_airbnb_old">eski şehirde bir Airbnb</string>
+    <string name="cover_value_stay_seaside">deniz kenarında küçük bir pansiyon</string>
+    <string name="cover_value_stay_beach">sahil oteli</string>
+    <string name="cover_value_stay_conference">konferans oteli</string>
+    <string name="cover_value_stay_university">üniversite misafirhanesi</string>
+    <string name="cover_value_stay_cousin">kuzeninin evi</string>
+    <string name="cover_value_stay_wedding">düğün mekânı yakınında bir otel</string>
+    <string name="cover_value_stay_huts">dağ kulübeleri</string>
+    <string name="cover_value_stay_campsite">göl kenarında bir kamp alanı</string>
+    <string name="cover_value_stay_company">şirket yakınında bir otel</string>
+    <string name="cover_value_stay_airbnb_station">istasyon yakınında bir Airbnb</string>
+    <string name="cover_value_stay_guesthouse">küçük bir pansiyon</string>
+    <string name="cover_value_stay_old_hotel">eski şehirde bir otel</string>
+    <string name="cover_value_person_two_colleagues">işten iki meslektaşın</string>
+    <string name="cover_value_person_alone">kimse yok, tek başına seyahat</string>
+    <string name="cover_value_person_partner">partnerin</string>
+    <string name="cover_value_person_colleague">işten bir meslektaşın</string>
+    <string name="cover_value_person_two_friends">iki arkadaşın</string>
+    <string name="cover_value_person_sister">kız kardeşin</string>
+    <string name="cover_value_person_university_colleague">üniversiteden bir meslektaşın</string>
+    <string name="cover_value_person_parents">anne ve baban</string>
+    <string name="cover_value_person_school_friend">okuldan bir arkadaşın</string>
+    <string name="cover_value_person_assistant">bir asistan</string>
+    <string name="cover_value_person_partner_children">partnerin ve iki çocuğun</string>
+    <string name="cover_value_person_sister_children">bir kız kardeşin ve onun çocukları</string>
+    <string name="cover_value_person_dog">yaşlı bir köpek ve onu besleyen bir komşu</string>
+    <string name="cover_value_person_home_alone">kimse yok, tek başına yaşıyorsun</string>
+    <string name="cover_value_met_clients">fuardaki müşteriler</string>
+    <string name="cover_value_met_supplier">Weber adlı bir tedarikçi</string>
+    <string name="cover_value_met_friend_family">üniversiteden eski bir arkadaşın ve ailesi</string>
+    <string name="cover_value_met_client">Weber adlı bir müşteri</string>
+    <string name="cover_value_met_board">ortak şirketin yönetim kurulu</string>
+    <string name="cover_value_met_nobody">özellikle kimse yok</string>
+    <string name="cover_value_met_tour_guide">yerel bir turist rehberi</string>
+    <string name="cover_value_met_researchers">başka üniversitelerden araştırmacılar</string>
+    <string name="cover_value_met_professor">eski bir profesörün</string>
+    <string name="cover_value_met_cousin_family">kuzeninin ailesi</string>
+    <string name="cover_value_met_relatives">yurt dışından akrabalar</string>
+    <string name="cover_value_met_mountain_guide">bir dağ rehberi</string>
+    <string name="cover_value_met_hikers">patikadaki diğer yürüyüşçüler</string>
+    <string name="cover_value_met_hiring">işe alım yöneticisi</string>
+    <string name="cover_value_met_team">katılabileceğin ekip</string>
+    <string name="cover_value_met_guide">yerel bir rehber</string>
+    <string name="cover_value_met_fixer">derginin yerel koordinatörü</string>
+    <string name="cover_tip_training">Eğitim: bu kartı ezberle. Memur seni sınayacak ve hikâyen kartla örtüşmeli.</string>
+    <string name="cover_tip">Dil: %1$s. Memur başka dil bilmiyor. Kendi cümlelerini ya da retina ekranının önerilerini kullan ama ona körü körüne güvenme. Sadece tutarlı ol.</string>
+    <string name="difficulty_title">%1$s için zorluk</string>
+    <string name="difficulty_relaxed">Rahat</string>
+    <string name="difficulty_standard">Standart</string>
+    <string name="difficulty_alert">Tetikte</string>
+    <string name="difficulty_severe">Sert</string>
+    <string name="difficulty_note">Bu dil için kaydedilir. Kariyer rütbesi zorluğu değiştirmez.</string>
+    <string name="contract_title">Direniş görevi</string>
+    <string name="contract_none">Görev yok</string>
+    <string name="contract_quiet_name">Sessizce</string>
+    <string name="contract_disable_name">Devre dışı bırak</string>
+    <string name="contract_quiet">Hiçbir birimi çökertmeden kontrolden geç.</string>
+    <string name="contract_disable">Birimi gişede veya test sırasında devre dışı bırak.</string>
+    <string name="contract_complete">Görev tamamlandı</string>
+    <string name="contract_missed">Görev tamamlanmadı</string>
+    <string name="contract_hud">Görev: %1$s</string>
+    <string name="cover_models_failed">YAPAY ZEKÂ YÜKLENEMEDİ · TEKRAR DENE</string>
+    <string name="cover_calibrating">İMPLANT KALİBRE EDİLİYOR…</string>
+    <string name="cover_checking_speech">KONUŞMA KONTROL EDİLİYOR…</string>
+    <string name="cover_no_speech_model">KONUŞMA MODELİ YOK</string>
+    <string name="cover_speech_downloading">KONUŞMA MODELİ İNDİRİLİYOR…</string>
+    <string name="cover_ready">HAZIRIM</string>
+    <string name="cover_no_recognition">Bu telefonda %1$s için konuşma tanıma yok. Çevrimdışı modeli indir (1 GB, bir kerelik).</string>
+    <string name="cover_download_speech">KONUŞMA MODELİNİ İNDİR</string>
+    <string name="cover_asr_not_responding">Konuşma tanıma yanıt vermiyor.</string>
+    <string name="cover_installing_recognition">Android, %1$s için konuşma tanımayı hâlâ yüklüyor. Bu yalnızca bir kez olur.</string>
+
+    <!-- Interview HUD -->
+    <string name="hud_passport_control">Pasaport Kontrolü</string>
+    <string name="hud_speak_in">Dil: %1$s · %2$s</string>
+    <string name="hud_tn_assessment">Kade-Sorensen Testi</string>
+    <string name="hud_leave">Ayrıl</string>
+    <string name="hud_training">EĞİTİM</string>
+    <string name="hud_online">İMPLANT ÇEVRİMİÇİ · ÇEVİRİ BAĞLANTISI KURULDU</string>
+    <string name="hud_implant">İMPLANT</string>
+    <string name="hud_replay">Tekrar dinle</string>
+    <string name="hud_retinal_display">RETİNA EKRANI</string>
+    <string name="hud_signal_dampened">SİNYAL ZAYIFLADI</string>
+    <string name="hud_signal_lost">Sinyal kayboldu… yeniden deneniyor…</string>
+    <string name="hud_translating">Çevriliyor…</string>
+    <string name="hud_you">Sen: %1$s</string>
+    <string name="hud_hand_over_passport">Pasaportu ver</string>
+    <string name="hud_passport">Pasaport</string>
+    <string name="mic_release">Göndermek için bırak</string>
+    <string name="mic_listening">Dinliyor…</string>
+    <string name="mic_hold">Konuşmak için basılı tut</string>
+    <string name="mic_speak_now">Şimdi konuş</string>
+    <string name="mic_officer_speaking">Memur konuşuyor</string>
+    <string name="ending_pass">Damga iniyor.</string>
+    <string name="ending_broken">Memur cümlenin ortasında donup kalıyor.\nKapı kendiliğinden açılıyor.</string>
+    <string name="ending_secondary">Yan kapıdan iki android daha çıkıyor.</string>
+
+    <!-- Narration, tips and link errors (Game) -->
+    <string name="narr_stamp">Damga iniyor.\nVarış salonuna çıkıyorsun.</string>
+    <string name="narr_sting">Boynunda keskin bir sızı.</string>
+    <string name="narr_wake">Küçük bir odada uyanıyorsun.\nEllerin sandalyeye bağlı. Yalnızca başını oynatabiliyorsun.</string>
+    <string name="narr_other_android">Daha önce hiç görmediğin bir android seni izliyor.</string>
+    <string name="narr_same_officer">Aynı memur seni izliyor.</string>
+    <string name="narr_one_more_thing">Henüz damga yok. Memur başını kaldırıyor.\n“Bir şey daha.”</string>
+    <string name="narr_wrong_answers">Yanlış cevaplar.\nBir şok daha.</string>
+    <string name="narr_sirens">Sirenler.</string>
+    <string name="narr_arrest">İki polis androidi seni bir arabanın arka koltuğuna bindiriyor.</string>
+    <string name="link_lost">İmplantın bağlantısı koptu.\nBir dakika sonra tekrar dene.</string>
+    <string name="implant_slow">Ünite yazılımı 0.9. Bu model bu dilde (%1$s) son derece yavaş. Bekle.</string>
+    <string name="room_implant_warning">Bağlantı zayıflıyor. Duyguyu, hızı, yüzünü ölçüyorlar. İnsan gibi cevap ver.</string>
+    <string name="tip_intro">Memur %1$s konuşuyor. İmplantın çeviriyi altta gösteriyor.</string>
+    <string name="tip_mic">Cevap verebilmek için Ayarlar\'dan mikrofona izin ver.</string>
+    <string name="tip_passport">Memur pasaportunu istiyor. Vermek için Pasaport\'a dokun.</string>
+    <string name="tip_consistent">Sahte kimliğine sadık kal. Uzun sessizlikler memurların sabrını taşırır.</string>
+    <string name="tip_speak_hold">Retina ekranın cevap öneriyor. Mikrofonu basılı tut ve birini yüksek sesle söyle ya da kendi cümlelerini kur.</string>
+    <string name="tip_speak_auto">Retina ekranın cevap öneriyor. Mikrofon yanıp sönünce birini yüksek sesle söyle ya da kendi cümlelerini kur.</string>
+
+    <!-- Camera test -->
+    <string name="camtest_title">KAMERA TESTİ</string>
+    <string name="camtest_permission">Kamera izni kapalı. Sistem ayarlarından izin ver.</string>
+    <string name="camtest_starting">Kamera başlatılıyor…</string>
+    <string name="camtest_no_face">Görüntüde yüz yok</string>
+    <string name="camtest_smile">Gülümseme</string>
+    <string name="camtest_left_eye">Sol göz açık</string>
+    <string name="camtest_right_eye">Sağ göz açık</string>
+    <string name="camtest_blinks">Göz kırpma: son dakikada %1$d  (sakin ≈ 10–20)</string>
+    <string name="camtest_head">Baş: dönüş %1$+.0f°, eğim %2$+.0f°  (başka yere bakma > 20°)</string>
+    <string name="camtest_face_geometry">Dudaklar %1$.3f · kaş aralığı %2$.3f (yüz yüksekliğine oranla)</string>
+    <string name="camtest_stats">Telefonda saniyede %1$d kare analiz ediliyor · kare %2$s · yüz %3$d px (~100 gerekli)</string>
+    <string name="profile_title">DAVRANIŞ PROFİLİ</string>
+    <string name="profile_calibrating">Referans: ekrana bak ve 10 sn rahatla…</string>
+    <string name="profile_take_baseline">10 sn\'lik bir referans al, sonra gülümsemeyi, hızlı göz kırpmayı, dudaklarını bastırmayı dene</string>
+    <string name="profile_no_deviation">Referansından sapma yok.</string>
+    <string name="profile_tell">%1$s  %2$.1f×  — %3$s</string>
+
+    <!-- Tells: camera test label, implant warning, behavior debrief (n = how often; %2$s = the officer's question) -->
+    <string name="tell_blinks">göz kırpma hızı</string>
+    <string name="tell_smile">gülümseme</string>
+    <string name="tell_mask_smile">yalnızca ağızla gülümseme</string>
+    <string name="tell_lips">dudak bastırma</string>
+    <string name="tell_brows">kaş kalkması</string>
+    <string name="tell_gaze">bakış kaçırma</string>
+    <string name="tell_head_down">baş düşmesi</string>
+    <string name="tell_freeze">donma</string>
+    <string name="implant_blinks">Göz kırpman hızlanıyor. Yavaşla.</string>
+    <string name="implant_smile">Gülümseme algılandı. Yüzünü nötr tut.</string>
+    <string name="implant_mask_smile">Sahte gülümseme: gözlerin eşlik etmiyor. Bırak onu.</string>
+    <string name="implant_lips">Dudakların sıkılı. Ağzını gevşet.</string>
+    <string name="implant_brows">Kaşların kalktı. Alnını sabit tut.</string>
+    <string name="implant_gaze">Gözlerin memurda olsun.</string>
+    <string name="implant_head_down">Çeneni kaldır.</string>
+    <string name="implant_freeze">Donup kaldın. Nefes al, doğal hareket et.</string>
+    <string name="implant_unit_slipping">Android kararsız. Mantığı kayıyor.</string>
+    <string name="implant_unit_stutter">Devreler takılıyor. Şimdi bastır: bir hamle daha ve çökebilir.</string>
+
+    <string name="debrief_none">Referansından sapma yok.</string>
+    <plurals name="debrief_blinks">
+        <item quantity="one">Göz kırpma hızın arttı.</item>
+        <item quantity="other">Göz kırpma hızın %1$d kez arttı.</item>
+    </plurals>
+    <plurals name="debrief_blinks_ask">
+        <item quantity="one">“%2$s” sorusunda göz kırpma hızın arttı.</item>
+        <item quantity="other">“%2$s” sorusunda göz kırpma hızın %1$d kez arttı.</item>
+    </plurals>
+    <plurals name="debrief_smile">
+        <item quantity="one">Yersiz bir anda gülümsedin.</item>
+        <item quantity="other">%1$d kez yersiz bir anda gülümsedin.</item>
+    </plurals>
+    <plurals name="debrief_smile_ask">
+        <item quantity="one">“%2$s” sorusunda yersiz bir anda gülümsedin.</item>
+        <item quantity="other">“%2$s” sorusunda %1$d kez yersiz bir anda gülümsedin.</item>
+    </plurals>
+    <plurals name="debrief_mask_smile">
+        <item quantity="one">Gülümsemen gözlerine ulaşmadı.</item>
+        <item quantity="other">Gülümsemen %1$d kez gözlerine ulaşmadı.</item>
+    </plurals>
+    <plurals name="debrief_mask_smile_ask">
+        <item quantity="one">“%2$s” sorusunda gülümsemen gözlerine ulaşmadı.</item>
+        <item quantity="other">“%2$s” sorusunda gülümsemen %1$d kez gözlerine ulaşmadı.</item>
+    </plurals>
+    <plurals name="debrief_lips">
+        <item quantity="one">Dudaklarını bastırdın.</item>
+        <item quantity="other">Dudaklarını %1$d kez bastırdın.</item>
+    </plurals>
+    <plurals name="debrief_lips_ask">
+        <item quantity="one">“%2$s” sorusunda dudaklarını bastırdın.</item>
+        <item quantity="other">“%2$s” sorusunda dudaklarını %1$d kez bastırdın.</item>
+    </plurals>
+    <plurals name="debrief_brows">
+        <item quantity="one">Kaşların kalktı.</item>
+        <item quantity="other">Kaşların %1$d kez kalktı.</item>
+    </plurals>
+    <plurals name="debrief_brows_ask">
+        <item quantity="one">“%2$s” sorusunda kaşların kalktı.</item>
+        <item quantity="other">“%2$s” sorusunda kaşların %1$d kez kalktı.</item>
+    </plurals>
+    <plurals name="debrief_gaze">
+        <item quantity="one">Cevap verirken başka yere baktın.</item>
+        <item quantity="other">Cevap verirken %1$d kez başka yere baktın.</item>
+    </plurals>
+    <plurals name="debrief_gaze_ask">
+        <item quantity="one">“%2$s” sorusuna cevap verirken başka yere baktın.</item>
+        <item quantity="other">“%2$s” sorusuna cevap verirken %1$d kez başka yere baktın.</item>
+    </plurals>
+    <plurals name="debrief_head_down">
+        <item quantity="one">Başını eğdin.</item>
+        <item quantity="other">Başını %1$d kez eğdin.</item>
+    </plurals>
+    <plurals name="debrief_head_down_ask">
+        <item quantity="one">“%2$s” sorusunda başını eğdin.</item>
+        <item quantity="other">“%2$s” sorusunda başını %1$d kez eğdin.</item>
+    </plurals>
+    <plurals name="debrief_freeze">
+        <item quantity="one">Donup kaldın.</item>
+        <item quantity="other">%1$d kez donup kaldın.</item>
+    </plurals>
+    <plurals name="debrief_freeze_ask">
+        <item quantity="one">“%2$s” sorusunda donup kaldın.</item>
+        <item quantity="other">“%2$s” sorusunda %1$d kez donup kaldın.</item>
+    </plurals>
+    <plurals name="debrief_away">
+        <item quantity="one">Bir kez başka yere baktın.</item>
+        <item quantity="other">%1$d kez başka yere baktın.</item>
+    </plurals>
+
+    <!-- Result -->
+    <string name="result_unit_unresponsive">ANDROİD YANIT VERMİYOR</string>
+    <string name="result_unit_offline">ANDROİD DEVRE DIŞI</string>
+    <string name="result_crossing_logged">GEÇİŞ KAYDEDİLDİ</string>
+    <string name="result_mission_failed">GÖREV BAŞARISIZ</string>
+    <string name="result_msg_broken">Memuru bozdun. Kapı kendiliğinden açıldı.</string>
+    <string name="result_msg_released">Kade-Sorensen testinden sonra serbest bırakıldın.</string>
+    <string name="result_msg_passed">Pasaport kontrolünden geçtin.</string>
+    <string name="result_msg_detained">Kade-Sorensen testinden kaldın. Gözaltına alındın.</string>
+    <string name="result_msg_secondary">Ek kontrole gönderildin.</string>
+    <string name="foreign_tongue_tag">DAHA ZOR · SENİN DİLİN DEĞİL</string>
+    <string name="paranoid_mode">PARANOYA MODU</string>
+    <string name="paranoid_hint">Çevrimdışı ol: her şey bu telefonda çalışıyor.</string>
+    <string name="paranoid_offline">PARANOYA MODU · ÇEVRİMDIŞI</string>
+    <string name="paranoid_still_on">Hâlâ çevrimdışısın. Bağlanmak için dokun.</string>
+    <string name="result_foreign_cleared">Kendi dilin olmayan bir dilde geçtin.</string>
+    <plurals name="result_broken_log">
+        <item quantity="one">Android %1$s, %2$d komuttan sonra devre dışı kaldı. Olay kaydedildi. Test eden: gizli.</item>
+        <item quantity="other">Android %1$s, %2$d komuttan sonra devre dışı kaldı. Olay kaydedildi. Test eden: gizli.</item>
+    </plurals>
+    <plurals name="result_passed_log">
+        <item quantity="one">İkna edici. Memur seni %1$d cevaptan sonra geçirdi.</item>
+        <item quantity="other">İkna edici. Memur seni %1$d cevaptan sonra geçirdi.</item>
+    </plurals>
+    <string name="result_try_again">TEKRAR DENE</string>
+    <string name="result_run_summary">Görev özeti</string>
+
+    <!-- Officer verdicts and demeanor (run summary and result screens) -->
+    <string name="demeanor_offline">Devre dışı</string>
+    <string name="demeanor_threat">Tehdit uyarısı</string>
+    <string name="demeanor_timeout">Sıra zaman aşımı</string>
+    <string name="demeanor_scrutiny">Artan şüphe</string>
+    <string name="demeanor_nominal">Normal</string>
+    <string name="verdict_broken">Onunla bir makine gibi konuştun. Sana inandı.</string>
+    <string name="verdict_contradiction">Hikâyen tutarlı değildi. Sahte kimliğine sadık kal.</string>
+    <string name="verdict_unclear">Memur seni anlamakta zorlandı. Daha kısa, basit cümleler işe yarar.</string>
+    <string name="verdict_tells">Yüzün seni ele verdi. İmplantın uyarılarına dikkat et: göz kırpma, gülümseme, bastırılmış dudaklar.</string>
+    <string name="verdict_silences">Uzun sessizlikler memurun sabrını taşırdı.</string>
+    <string name="verdict_secondary">Bir şeyler ters gitti. Sakin bir yolcu için fazla tereddüt.</string>
+    <string name="verdict_slipped">Bir kez tökezledin ama toparladın. Şanslısın.</string>
+    <string name="verdict_natural">Doğal cevaplar, sağlam tutarlılık. Aferin.</string>
+
+    <!-- Summary -->
+    <string name="summary_title">GÖREV ÖZETİ</string>
+    <string name="summary_destination">Varış yeri</string>
+    <string name="summary_answers">Cevaplar</string>
+    <string name="summary_result">Sonuç</string>
+    <string name="summary_cleared">Geçti</string>
+    <string name="summary_unit_offline">Android devre dışı</string>
+    <string name="summary_secondary">Ek kontrol</string>
+    <string name="summary_behaviour">Davranış: %1$s</string>
+    <string name="summary_tn_index">Kade-Sorensen endeksi</string>
+    <plurals name="summary_tn_value">
+        <item quantity="one">%1$.0f / 100 (geçme ≤ 50) · %2$d soru</item>
+        <item quantity="other">%1$.0f / 100 (geçme ≤ 50) · %2$d soru</item>
+    </plurals>
+    <string name="summary_rank">Rütbe</string>
+    <string name="summary_best_streak">en iyi seri %1$d</string>
+    <plurals name="summary_rooms">
+        <item quantity="one">%1$d K-S testi atlatıldı</item>
+        <item quantity="other">%1$d K-S testi atlatıldı</item>
+    </plurals>
+    <string name="summary_new_mission">YENİ GÖREV</string>
+
+    <!-- Settings -->
+    <string name="settings_title">AYARLAR</string>
+    <string name="settings_voice_input">Sesli giriş</string>
+    <string name="settings_on_device_speech">Cihazda konuşma tanıma</string>
+    <string name="settings_hold_to_speak">Basılı tut</string>
+    <string name="settings_auto">Otomatik</string>
+    <string name="settings_hold_help">Konuşurken mikrofon düğmesini basılı tut.</string>
+    <string name="settings_auto_help">Memur konuşmayı bitirince mikrofon açılır, sen susunca kapanır.</string>
+    <string name="setup_input_title">NASIL CEVAP VERİYORSUN?</string>
+    <string name="setup_input_auto">Sesle etkinleştirme</string>
+    <string name="setup_input_note">Bunu daha sonra Ayarlar\'dan değiştirebilirsin.</string>
+    <string name="settings_languages">Diller</string>
+    <string name="settings_passport">Pasaport fotoğrafı</string>
+    <string name="settings_passport_help">Pasaport fotoğrafını yeniden çek ya da sil ve memurların yüzünü okuyup okumayacağını seç.</string>
+    <string name="settings_music">Müzik</string>
+    <string name="settings_sfx">Ses efektleri</string>
+    <string name="settings_camera">Memur seni izliyor</string>
+    <string name="settings_camera_help">Ön kamera, yüz algılama telefonda yapılır. Video kaydedilmez.</string>
+    <string name="settings_camera_test">Kamera testi: neyi okuduğunu gör</string>
+    <string name="settings_haptics">Dokunsal geri bildirim</string>
+    <string name="settings_licenses">Lisanslar</string>
+    <string name="settings_replay_training">Eğitim görevini tekrar oyna</string>
+    <string name="settings_diagnostics">Kayıtları ve günlükleri sakla</string>
+    <string name="settings_diagnostics_help">Sorun gidermek için. Yalnızca bu telefonda tutulur.</string>
+    <string name="settings_about">HAKKINDA</string>
+    <string name="about_on_phone">Tamamen telefonunda çalışır</string>
+    <string name="about_offline">İnternet gerekmez</string>
+    <plurals name="about_destinations">
+        <item quantity="one">%1$d ülke %2$d dilde</item>
+        <item quantity="other">%1$d ülke %2$d dilde</item>
+    </plurals>
+    <string name="about_new_officer">Her seferinde yeni bir memur</string>
+    <string name="settings_footer">FARKLI SINIRLAR.\nAYNI BASKI.</string>
+
+    <!-- Languages and download -->
+    <string name="languages_title">DİLLER</string>
+    <string name="languages_first_run">Pratik yapmak istediğin dilleri seç. Yalnızca bunlar indirilir. Daha sonra Ayarlar\'dan yenilerini ekleyebilirsin.</string>
+    <string name="languages_add">Dil paketleri ekle. Her biri kendi ülkelerini ve memurlarını getirir.</string>
+    <plurals name="languages_destinations">
+        <item quantity="one">%1$s · %2$d havalimanı</item>
+        <item quantity="other">%1$s · %2$d havalimanı</item>
+    </plurals>
+    <string name="lang_slow_tag">Yavaş · birinci nesil androidler</string>
+    <string name="languages_installed">Yüklü</string>
+    <string name="languages_nothing_new">Yeni bir şey seçilmedi.</string>
+    <string name="languages_download">İNDİR</string>
+    <string name="languages_add_btn">EKLE</string>
+    <string name="note_checking">Bu telefonda neler olduğuna bakılıyor…</string>
+    <string name="note_ai_models">Konuşma modeli %1$.1f GB (bir kerelik)</string>
+    <string name="note_speech">konuşma %1$d MB</string>
+    <plurals name="note_packs">
+        <item quantity="one">%1$d dil paketi, her biri birkaç MB</item>
+        <item quantity="other">%1$d dil paketi, her biri birkaç MB</item>
+    </plurals>
+    <string name="note_total">%1$s.</string>
+    <string name="note_total_wifi">%1$s. Wi-Fi önerilir.</string>
+    <string name="download_title">İMPLANT EŞİTLENİYOR</string>
+    <string name="download_confirm">İNDİRMEYİ ONAYLA</string>
+    <string name="download_offline">Bağlantı yok. Wi-Fi\'ye bağlandığında indirme devam eder.</string>
+    <string name="download_metered">Mobil verideysin. Bu indirme birkaç GB olabilir: Wi-Fi daha iyi.</string>
+    <string name="download_no_voice">Şu dil için çevrimdışı ses yok: %1$s. Bir ses yükleyene kadar memur bu dili konuşamaz.</string>
+    <string name="download_install_voices">Sesleri yükle</string>
+    <string name="download_check_again">Tekrar kontrol et</string>
+    <string name="download_wait">LÜTFEN BEKLE…</string>
+    <string name="download_back">GERİ</string>
+    <string name="download_try_again">Tekrar dene</string>
+    <string name="step_ai_models">Yapay zekâ modelleri</string>
+    <string name="step_ai_models_note">Memur ve konuşma tanıma, tüm diller için ortak</string>
+    <string name="step_pack">Paket: %1$s</string>
+    <string name="step_pack_note">Varış noktaları, memurlar, ses, konuşma</string>
+    <string name="step_getting_nano">Gemini Nano Android\'den alınıyor…</string>
+    <string name="step_nano_waiting">Android hâlâ Gemini Nano\'yu indiriyor (birkaç GB). Bu biraz sürebilir; telefonu Wi-Fi\'de tut.</string>
+    <string name="step_nano_failed">Gemini Nano bu telefonda henüz hazır değil. Bağlantını kontrol et ve tekrar dene.</string>
+    <string name="step_needs_free">%1$.1f GB boş alan gerekiyor; bu telefonda %2$s var.</string>
+    <string name="step_downloading">İndiriliyor: %1$s / %2$s</string>
+    <string name="step_unpacking">Paket açılıyor…</string>
+    <string name="step_unpack_failed">Paket açılamadı: %1$s</string>
+    <string name="step_no_models">Bu sürümde model yok: %1$s</string>
+    <string name="step_nano_builtin">Gemini Nano, bu telefonda yerleşik</string>
+    <string name="step_speech_model">Konuşma modeli %1$s / %2$s</string>
+    <string name="step_tuning_voices">Sesler ayarlanıyor %1$d/%2$d</string>
+    <string name="step_no_voice">Çevrimdışı ses yüklü değil</string>
+    <plurals name="step_destinations">
+        <item quantity="one">%1$d havalimanı</item>
+        <item quantity="other">%1$d havalimanı</item>
+    </plurals>
+    <plurals name="step_voices">
+        <item quantity="one">%1$d ses</item>
+        <item quantity="other">%1$d ses</item>
+    </plurals>
+    <string name="step_speech_finishing">konuşma modeli arka planda tamamlanıyor</string>
+    <string name="step_voice_ready">Ses hazır</string>
+    <string name="step_failed">Başarısız: %1$s</string>
+    <string name="size_mb">%1$.0f MB</string>
+    <string name="pack_failed">İndirme başarısız (hata %1$d). Bağlantını kontrol et ve tekrar dene.</string>
+    <string name="pack_cancelled">İndirme iptal edildi.</string>
+    <string name="pack_not_started">İndirme başlatılamadı: %1$s</string>
+
+    <!-- Unsupported device -->
+    <string name="unsupported_title">Bu telefon oyunu çalıştıramıyor</string>
+    <string name="unsupported_arch">%1$s, 64 bit ARM işlemcili bir telefon gerektirir.</string>
+    <string name="unsupported_nano">%1$s, memurlarını Google\'ın cihaz üzerinde çalışan yapay zekâsı Gemini Nano ile çalıştırır; bu telefonda Gemini Nano yok.</string>
+    <string name="unsupported_ram">%1$s, konuşma tanımayı ve memur yapay zekâsını tamamen telefonunda çalıştırır; bunun için en az 8 GB RAM gerekir. Bu telefonda %2$.1f GB var.</string>
+
+    <!-- Licenses -->
+    <string name="licenses_title">LİSANSLAR</string>
+    <string name="licenses_unavailable">Metin mevcut değil.</string>
+    <string name="licenses_full_text">Tam lisans metni</string>
+    <string name="licenses_art">Görseller, müzik ve ses</string>
+    <string name="licenses_art_rights">Tüm hakları saklıdır, GPL kapsamında değildir.</string>
+    <string name="licenses_art_copyright">Telif hakkı 2026 Fluffy Pants Studio LLC. Görseller yapay zekâ ile üretilmiştir; müzik hak sahibi tarafından sağlanmıştır.</string>
+    <string name="licenses_mlkit_terms">ML Kit GenAI ek şartları</string>
+    <string name="licenses_piper_note">Her sesin kendi veri seti lisansı vardır.</string>
+    <string name="genai_note">Bu oyunun bazı bölümleri Google\'ın cihaz üzerinde çalışan üretken yapay zekâsını (ML Kit üzerinden Gemini Nano) kullanır. Google başka kullanıcılar için benzer içerik üretebilir. 18 yaş ve üzeri oyuncular içindir.</string>
+    <string name="settings_ui_language">Arayüz dili</string>
+    <string name="settings_ui_language_help">Menüler ve altyazılar.</string>
+    <string name="settings_system_default">Sistem varsayılanı</string>
+    <string name="volume_low">Ses düşük. Sesi aç: memurlar konuşuyor.</string>
+    <string name="volume_off">Ses kapalı. Sesi aç: memurlar konuşuyor.</string>
+    <!-- Passport photo (PassportPhoto.kt) -->
+    <string name="passport_title">Pasaport fotoğrafın</string>
+    <string name="passport_disclosure">Taşıdığın her pasaportta yer alır. Bu telefonda kalır ve asla yüklenmez.</string>
+    <string name="passport_face_title">Memurlar yüz okur.</string>
+    <string name="passport_face_body">Görüşmeler sırasında göz kırpmalarını, gülümsemelerini ve nereye baktığını izlerler. Poker suratını korursan seni okumak zorlaşır; implantın sana yol gösterir. Her şey bu telefonda kalır; video kaydedilmez.</string>
+    <string name="passport_face_switch">Memurlar yüzümü okusun (önerilir)</string>
+    <string name="passport_take">Fotoğrafımı çek</string>
+    <string name="passport_shutter">Fotoğraf çek</string>
+    <string name="passport_use">Bu fotoğrafı kullan</string>
+    <string name="passport_retake">Yeniden çek</string>
+    <string name="passport_keep">Bu fotoğrafı sakla</string>
+    <string name="passport_delete">Fotoğrafımı sil</string>
+    <string name="passport_use_sample">Bunun yerine örnek fotoğraf kullan</string>
+    <string name="passport_no_camera">Kamera yok. Örnek bir fotoğrafla seyahat edeceksin.</string>
+    <string name="passport_check_no_face">Kameraya bak</string>
+    <string name="passport_check_one_face">Karede yalnızca sen ol, lütfen</string>
+    <string name="passport_check_straight">Doğrudan kameraya bak</string>
+    <string name="passport_check_centre">Yüzünü ovalin içine al</string>
+    <string name="passport_check_closer">Biraz yaklaş</string>
+    <string name="passport_check_farther">Biraz uzaklaş</string>
+    <string name="passport_check_hold">Kıpırdama…</string>
+    <string name="passport_check_ready">Güzel. Fotoğrafı çek.</string>
+    <string name="passport_hint_eyes">Mümkünse gözlerin açık olsun</string>
+    <string name="passport_hint_smile">En iyisi nötr bir yüz</string>
+    <string name="passport_capture_failed">Fotoğraf olmadı. Tekrar dene.</string>
+    <string name="passport_unmirrored">Gerçek bir pasaporttaki gibi aynalanmadan gösteriliyor.</string>
+    <string name="passport_sample_another">Başka bir tane</string>
+    <string name="passport_back_to_camera">Kameraya dön</string>
+    <string name="passport_save_failed">Fotoğraf kaydedilemedi. Tekrar dene.</string>
+    <string name="picker_cd">Ülkeni seç</string>
+    <string name="picker_title">Hangi ülkeye dönüyorsun?</string>
+    <string name="picker_random">Rastgele (herhangi bir ülke)</string>
+    <string name="picker_passed">GEÇİLDİ</string>
+    <string name="picker_passed_times">GEÇİLDİ \u2066×%1$d\u2069</string>
+    <!-- Career save and receipts -->
+    <string name="album_infiltration">Sızma</string>
+    <string name="album_sabotage">Birim devre dışı</string>
+    <string name="album_unit">Birim %1$s</string>
+    <string name="replay_pack_missing">Bu görevi oynamak için bu dili yükle.</string>
+    <string name="replay_new_mark">Dosyada yeni işaret: %1$s</string>
+    <string name="replay_mark_detail">%1$s · %2$s</string>
+    <string name="replay_save_failed">İlerleme kaydedilemedi. Çıkmadan önce tekrar kaydetmeyi dene.</string>
+    <string name="replay_save_retry">Tekrar kaydet</string>
+    <string name="replay_read_failed">Kayıtlı ilerleme okunamadı. Değiştirilmeden korundu.</string>
+    <string name="replay_interrupted">Sınır geçişi kesintiye uğradı. Hazırlıktan devam et veya yeni bir görev başlat.</string>
+    <string name="replay_preparation_unavailable">Bu kayıtlı sınır geçişine devam edilemiyor. Kariyerin korundu. Yeni bir görev başlat.</string>
+</resources>

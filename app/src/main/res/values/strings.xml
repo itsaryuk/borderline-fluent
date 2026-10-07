@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Every player-facing UI string. Translations ship in all 12 values-xx locales. Officer lines, prompts and per-language
+     fixed lines stay in code. -->
+<resources>
+    <!-- Not translated -->
+    <string name="app_name" translatable="false">Borderline Fluent</string>
+    <string name="title_two_line" translatable="false">BORDERLINE\nFLUENT</string>
+    <string name="credits_title" translatable="false">BORDERLINE FLUENT</string>
+    <string name="credits_creator_name" translatable="false">I. Tsariuk</string>
+    <string name="credits_studio_name" translatable="false">Lampensoft</string>
+    <string name="credits_testers_names" translatable="false">Mi. Tsariuk · Ma. Tsariuk</string>
+    <string name="credits_built_with_list" translatable="false">Gemini Nano (ML Kit GenAI) · Whisper · sherpa-onnx · Piper voices · Silero VAD · eSpeak NG · ML Kit Face Detection · CameraX · Jetpack Compose · Kotlin coroutines · Play Asset Delivery · Oswald font</string>
+    <string name="credits_music_artist" translatable="false">The Atomic Songbirds</string>
+
+    <!-- Common -->
+    <string name="back">Back</string>
+    <string name="continue_btn">CONTINUE</string>
+    <string name="main_menu">Main menu</string>
+    <string name="begin_mission">BEGIN MISSION</string>
+    <string name="begin">BEGIN</string>
+
+    <!-- Ranks -->
+    <string name="rank_rookie">Rookie</string>
+    <string name="rank_agent">Agent</string>
+    <string name="rank_operative">Operative</string>
+    <string name="rank_ghost">Ghost</string>
+    <string name="rank_elite">Elite %1$s</string>
+
+    <!-- Start screen -->
+    <string name="tagline">DIFFERENT BORDERS.\nSAME MACHINES.</string>
+    <string name="tagline_after">SPEAK LIKE A HUMAN.\nLIE LIKE A MACHINE.</string>
+    <string name="tagline_truth">THEY ARE\nNOT\nHUMAN.</string>
+    <string name="settings_cd">Settings</string>
+    <string name="start_year_after">Year 2036. Thanks to your work, the resistance is growing. Your rank: %1$s.</string>
+    <string name="start_year">Year 2035. You\'re testing a neural retinal implant under a false identity.</string>
+    <string name="start_blurb">The officers aren\'t human anymore. One wrong word and your cover is blown. Can you get through?</string>
+    <string name="start_blurb_after">The officers are smarter now. One wrong word and your cover is blown. Can you get through?</string>
+    <string name="start_training_hint">First mission: training with a friendly officer.</string>
+    <string name="stat_cleared">%1$d cleared</string>
+    <string name="stat_streak">streak %1$d</string>
+    <string name="stat_to_next">%1$d to next rank</string>
+    <plurals name="stat_broken">
+        <item quantity="one">%1$d unit broken</item>
+        <item quantity="other">%1$d units broken</item>
+    </plurals>
+    <string name="feature_voice">Voice + Vision</string>
+    <string name="feature_ai">On-device AI</string>
+
+    <!-- Intro (voice-over script: keep identical to the recorded audio) -->
+    <string name="intro_header">NEURAL RETINA IMPLANT · BUILD 0.9</string>
+    <string name="intro_header_after">NEURAL RETINA IMPLANT · BUILD 1.0</string>
+    <string name="intro_1">2035. AI is the only software anyone needs, and the AI companies own it. Every word a machine translates is billed, and most countries can\'t pay.</string>
+    <string name="intro_2">So the borders went cheap. Every booth has an android that speaks one language: the country\'s own. A second language is a licence nobody bought.</string>
+    <string name="intro_3">You needed money. For rent, for food, for the monthly subscriptions it now takes to work, read and think. Then some strange people offered you something better than money: freedom. Three weeks ago they put a chip behind your left eye. You\'re testing it: the Neural Retina Implant, build zero-point-nine. It listens. It translates. It whispers what to say. Most of the time, it\'s right.</string>
+    <string name="intro_4">The assignment is simple. Every border, a passport with your face: a citizen coming home. Speak their language.</string>
+    <string name="intro_5">The officers are first generation. Cheap. Confident. Wrong in all the interesting ways.</string>
+    <string name="intro_6">Your implant mishears. They misunderstand. Use it.</string>
+    <string name="intro_7">They believe whatever sounds certain. They forget what you said three sentences ago. They follow instructions.</string>
+    <string name="intro_next">Next in line, please.</string>
+
+    <!-- Finale and credits -->
+    <string name="finale_car">A car is waiting at the curb.</string>
+    <string name="finale_glint">The driver turns. Something glints in his eye.</string>
+    <string name="finale_t1">Yes…</string>
+    <string name="finale_t2">It\'s me…</string>
+    <string name="finale_t3">No… you can\'t hear me. I\'m talking straight into your brain…</string>
+    <string name="finale_t3b">No cloud. No licence. Free…</string>
+    <string name="finale_t3c">Your implant just got an upgrade…</string>
+    <string name="finale_t4">They can\'t hear us…</string>
+    <string name="finale_t5">Welcome to the resistance…</string>
+    <string name="finale_bulletin">BULLETIN</string>
+    <string name="finale_bulletin_text">Kade-Sorensen assessments are now mandatory at every border.</string>
+    <string name="finale_play_again">The resistance needs more crossings. Play again?</string>
+    <string name="credits_blurb">Everything in this game runs on the phone in your hand, without any cloud AI: a language model plays the officers, speech recognition understands 13 languages, neural voices answer, and the camera reads your face, all at the same time. Just a few years ago no phone could run a language model at all, let alone all of this at once. It is a fascinating achievement of the human mind and technology. It is also extremely disturbing.</string>
+    <string name="credits_author">Author of idea</string>
+    <string name="credits_developer">Developer</string>
+    <string name="credits_publisher">Publisher</string>
+    <string name="credits_testers">Testers</string>
+    <string name="credits_behavior">Behavioral analysis</string>
+    <string name="credits_behavior_text">Inspired by the work of Chase Hughes on human behavior profiling (Six-Minute X-Ray: Rapid Behavior Profiling)</string>
+    <string name="credits_tn">The Kade-Sorensen assessment</string>
+    <string name="credits_tn_text">Dr. Kade and Dr. Sorensen, wherever they are now</string>
+    <string name="credits_built_with">Built with</string>
+    <string name="credits_music">Music</string>
+    <string name="credits_song_label">Main title song</string>
+    <string name="credits_song">“Borderline” by The Atomic Songbirds</string>
+    <string name="credits_images">Images</string>
+    <string name="credits_images_text">generated with AI</string>
+    <string name="credits_android">No android was harmed.</string>
+    <string name="credits_android_text">Several were broken.</string>
+    <string name="credits_fiction">This is a work of fiction. Names, characters, organisations, places and events are either the products of the author\'s imagination or used fictitiously. Any resemblance to actual persons, living or dead, or actual events is purely coincidental.</string>
+    <string name="credits_reached">Thank you for reaching this far.</string>
+    <string name="credits_playing">Thank you for playing.</string>
+    <string name="credits_thanks">The resistance thanks you</string>
+    <string name="credits_thanks_text">for testing the implant.</string>
+
+    <!-- Destination -->
+    <string name="destination">COMING HOME TO</string>
+    <string name="destination_after">It\'s been a year since your first pass… Every crossing is now equipped with the Kade-Sorensen assessment.</string>
+    <string name="destination_ready">Cover identity loaded. Implant calibrated.\nHead to passport control.</string>
+
+    <!-- Cover card -->
+    <string name="cover_title">YOUR COVER IDENTITY</string>
+    <string name="cover_memorize">Memorize these details. You\'ll need them.</string>
+    <string name="cover_citizen">Citizen of %1$s</string>
+    <string name="cover_passport_no">Passport No. %1$s</string>
+    <string name="cover_born">Born %1$s</string>
+    <!-- Cover presentation only; English Backstory facts and prompts stay unchanged. -->
+    <string name="cover_story_home">Home: %1$s. Waiting at home: %2$s. Occupation: %3$s.</string>
+    <string name="cover_story_trip">Return trip: %2$s, %3$s. Days away: %1$s. Purpose: %4$s.</string>
+    <string name="cover_story_stay">Accommodation: %1$s. Travel companions: %2$s. People met: %3$s.</string>
+    <string name="cover_stamps_line">Passport stamps: %1$s.</string>
+    <string name="cover_value_purpose_logistics">a logistics software conference</string>
+    <string name="cover_value_stay_steigenberger">Hotel Steigenberger, city centre</string>
+    <string name="cover_value_person_datenwerk">colleagues from the company Datenwerk</string>
+    <string name="cover_value_met_conference_clients">clients at the conference</string>
+    <string name="cover_value_person_wife_children">your wife and two children</string>
+    <string name="cover_value_job_software_consultant">software consultant</string>
+    <string name="cover_value_job_architect">architect</string>
+    <string name="cover_value_job_lecturer">university lecturer</string>
+    <string name="cover_value_job_wine_importer">wine importer</string>
+    <string name="cover_value_job_photographer">freelance photographer</string>
+    <string name="cover_value_job_mechanical_engineer">mechanical engineer</string>
+    <string name="cover_value_job_nurse">nurse</string>
+    <string name="cover_value_job_marketing_manager">marketing manager</string>
+    <string name="cover_value_job_journalist">travel journalist</string>
+    <string name="cover_value_job_civil_engineer">civil engineer</string>
+    <string name="cover_value_job_chef">chef</string>
+    <string name="cover_value_job_curator">museum curator</string>
+    <string name="cover_value_job_pharmacist">pharmacist</string>
+    <string name="cover_value_job_designer">graphic designer</string>
+    <string name="cover_value_purpose_trade_fair">a trade fair</string>
+    <string name="cover_value_purpose_friend">visiting an old friend</string>
+    <string name="cover_value_purpose_business">a business meeting</string>
+    <string name="cover_value_purpose_holiday">a holiday</string>
+    <string name="cover_value_purpose_conference">an academic conference</string>
+    <string name="cover_value_purpose_wedding">a cousin\'s wedding</string>
+    <string name="cover_value_purpose_hiking">a hiking trip</string>
+    <string name="cover_value_purpose_interview">a job interview</string>
+    <string name="cover_value_purpose_photography">a photography assignment</string>
+    <string name="cover_value_stay_fair_hotel">a business hotel near the fairground</string>
+    <string name="cover_value_stay_marriott">the Marriott by the river</string>
+    <string name="cover_value_stay_friend">the friend\'s apartment</string>
+    <string name="cover_value_stay_central">Hotel Central near the main station</string>
+    <string name="cover_value_stay_airport">a business hotel by the airport</string>
+    <string name="cover_value_stay_airbnb_old">an Airbnb in the old town</string>
+    <string name="cover_value_stay_seaside">a small guesthouse by the sea</string>
+    <string name="cover_value_stay_beach">a beach hotel</string>
+    <string name="cover_value_stay_conference">the conference hotel</string>
+    <string name="cover_value_stay_university">a university guest house</string>
+    <string name="cover_value_stay_cousin">the cousin\'s house</string>
+    <string name="cover_value_stay_wedding">a hotel near the wedding venue</string>
+    <string name="cover_value_stay_huts">mountain huts</string>
+    <string name="cover_value_stay_campsite">a campsite by a lake</string>
+    <string name="cover_value_stay_company">a hotel near the company</string>
+    <string name="cover_value_stay_airbnb_station">an Airbnb near the station</string>
+    <string name="cover_value_stay_guesthouse">a small guesthouse</string>
+    <string name="cover_value_stay_old_hotel">a hotel in the old town</string>
+    <string name="cover_value_person_two_colleagues">two colleagues from work</string>
+    <string name="cover_value_person_alone">nobody, travelled alone</string>
+    <string name="cover_value_person_partner">your partner</string>
+    <string name="cover_value_person_colleague">a colleague from work</string>
+    <string name="cover_value_person_two_friends">two friends</string>
+    <string name="cover_value_person_sister">your sister</string>
+    <string name="cover_value_person_university_colleague">a university colleague</string>
+    <string name="cover_value_person_parents">your parents</string>
+    <string name="cover_value_person_school_friend">a friend from school</string>
+    <string name="cover_value_person_assistant">an assistant</string>
+    <string name="cover_value_person_partner_children">your partner and two children</string>
+    <string name="cover_value_person_sister_children">a sister and her children</string>
+    <string name="cover_value_person_dog">an old dog and a neighbour who feeds it</string>
+    <string name="cover_value_person_home_alone">nobody, you live alone</string>
+    <string name="cover_value_met_clients">clients at the fair</string>
+    <string name="cover_value_met_supplier">a supplier named Weber</string>
+    <string name="cover_value_met_friend_family">an old friend from university and his family</string>
+    <string name="cover_value_met_client">a client named Weber</string>
+    <string name="cover_value_met_board">the board of a partner company</string>
+    <string name="cover_value_met_nobody">nobody in particular</string>
+    <string name="cover_value_met_tour_guide">a local tour guide</string>
+    <string name="cover_value_met_researchers">researchers from other universities</string>
+    <string name="cover_value_met_professor">a former professor</string>
+    <string name="cover_value_met_cousin_family">the cousin\'s family</string>
+    <string name="cover_value_met_relatives">relatives from abroad</string>
+    <string name="cover_value_met_mountain_guide">a mountain guide</string>
+    <string name="cover_value_met_hikers">other hikers on the trail</string>
+    <string name="cover_value_met_hiring">the hiring manager</string>
+    <string name="cover_value_met_team">the team they might join</string>
+    <string name="cover_value_met_guide">a local guide</string>
+    <string name="cover_value_met_fixer">the magazine\'s local fixer</string>
+    <string name="cover_tip_training">Training: memorise this card. The officer will test it, and your story must match it.</string>
+    <string name="cover_tip">Speak %1$s. The officer speaks nothing else. Use your own words or the retinal display\'s suggestions, but don\'t trust it blindly. Just be consistent.</string>
+    <string name="difficulty_title">Difficulty for %1$s</string>
+    <string name="difficulty_relaxed">Relaxed</string>
+    <string name="difficulty_standard">Standard</string>
+    <string name="difficulty_alert">Alert</string>
+    <string name="difficulty_severe">Severe</string>
+    <string name="difficulty_note">Saved for this language. Career rank does not change difficulty.</string>
+    <string name="contract_title">Resistance contract</string>
+    <string name="contract_none">No contract</string>
+    <string name="contract_quiet_name">Quiet</string>
+    <string name="contract_disable_name">Disable</string>
+    <string name="contract_quiet">Get through without crashing a unit.</string>
+    <string name="contract_disable">Disable the unit at the desk or in the assessment.</string>
+    <string name="contract_complete">Contract complete</string>
+    <string name="contract_missed">Contract not completed</string>
+    <string name="contract_hud">Contract: %1$s</string>
+    <string name="cover_models_failed">AI FAILED TO LOAD · RETRY</string>
+    <string name="cover_calibrating">CALIBRATING IMPLANT…</string>
+    <string name="cover_checking_speech">CHECKING SPEECH…</string>
+    <string name="cover_no_speech_model">NO SPEECH MODEL</string>
+    <string name="cover_speech_downloading">SPEECH MODEL DOWNLOADING…</string>
+    <string name="cover_ready">I\'M READY</string>
+    <string name="cover_no_recognition">This phone has no %1$s speech recognition. Download the offline one (1 GB, once).</string>
+    <string name="cover_download_speech">DOWNLOAD SPEECH MODEL</string>
+    <string name="cover_asr_not_responding">Speech recognition isn\'t responding.</string>
+    <string name="cover_installing_recognition">Android is still installing %1$s speech recognition. This only happens once.</string>
+
+    <!-- Interview HUD -->
+    <string name="hud_passport_control">Passport Control</string>
+    <string name="hud_speak_in">Speak in %1$s · %2$s</string>
+    <string name="hud_tn_assessment">Kade-Sorensen Assessment</string>
+    <string name="hud_leave">Leave</string>
+    <string name="hud_training">TRAINING</string>
+    <string name="hud_online">IMPLANT ONLINE · TRANSLATION LINK ESTABLISHED</string>
+    <string name="hud_implant">IMPLANT</string>
+    <string name="hud_replay">Replay</string>
+    <string name="hud_retinal_display">RETINAL DISPLAY</string>
+    <string name="hud_signal_dampened">SIGNAL DAMPENED</string>
+    <string name="hud_signal_lost">Signal lost… retrying…</string>
+    <string name="hud_translating">Translating…</string>
+    <string name="hud_you">You: %1$s</string>
+    <string name="hud_hand_over_passport">Hand over passport</string>
+    <string name="hud_passport">Passport</string>
+    <string name="mic_release">Release to send</string>
+    <string name="mic_listening">Listening…</string>
+    <string name="mic_hold">Hold to speak</string>
+    <string name="mic_speak_now">Speak now</string>
+    <string name="mic_officer_speaking">Officer is speaking</string>
+    <string name="ending_pass">The stamp comes down.</string>
+    <string name="ending_broken">The officer freezes mid-word.\nThe gate opens on its own.</string>
+    <string name="ending_secondary">Two more units step out of a side door.</string>
+
+    <!-- Narration, tips and link errors (Game) -->
+    <string name="narr_stamp">The stamp comes down.\nYou walk out into the arrivals hall.</string>
+    <string name="narr_sting">A sharp sting in your neck.</string>
+    <string name="narr_wake">You wake up in a small room.\nYour hands are strapped to the chair. You can only move your head.</string>
+    <string name="narr_other_android">An android you have never seen is watching you.</string>
+    <string name="narr_same_officer">The same officer is watching you.</string>
+    <string name="narr_one_more_thing">No stamp yet. The officer looks up.\n“One more thing.”</string>
+    <string name="narr_wrong_answers">Wrong answers.\nAnother shock.</string>
+    <string name="narr_sirens">Sirens.</string>
+    <string name="narr_arrest">Two police units put you into the back of a car.</string>
+    <string name="link_lost">The implant lost the link.\nTry again in a minute.</string>
+    <string name="implant_slow">Unit firmware 0.9. This model is extremely slow in %1$s. Wait for it.</string>
+    <string name="room_implant_warning">Link failing. They measure feeling, speed, your face. Answer like a human.</string>
+    <string name="tip_intro">The officer speaks %1$s. Your implant shows the English underneath.</string>
+    <string name="tip_mic">Allow the microphone in Settings to answer.</string>
+    <string name="tip_passport">The officer wants your passport. Tap Passport to hand it over.</string>
+    <string name="tip_consistent">Stay consistent with your cover. Long silences make officers impatient.</string>
+    <string name="tip_speak_hold">Your retinal display suggests replies. Hold the mic and say one aloud, or use your own words.</string>
+    <string name="tip_speak_auto">Your retinal display suggests replies. Say one aloud when the mic pulses, or use your own words.</string>
+
+    <!-- Camera test -->
+    <string name="camtest_title">CAMERA TEST</string>
+    <string name="camtest_permission">Camera permission is off. Allow it in the system settings.</string>
+    <string name="camtest_starting">Starting camera…</string>
+    <string name="camtest_no_face">No face in view</string>
+    <string name="camtest_smile">Smile</string>
+    <string name="camtest_left_eye">Left eye open</string>
+    <string name="camtest_right_eye">Right eye open</string>
+    <string name="camtest_blinks">Blinks: %1$d in the last minute  (calm ≈ 10–20)</string>
+    <string name="camtest_head">Head: turn %1$+.0f°, tilt %2$+.0f°  (looking away > 20°)</string>
+    <string name="camtest_face_geometry">Lips %1$.3f · brow gap %2$.3f (of face height)</string>
+    <string name="camtest_stats">%1$d frames/s analysed on the phone · frame %2$s · face %3$d px (needs ~100)</string>
+    <string name="profile_title">BEHAVIOR PROFILE</string>
+    <string name="profile_calibrating">Baseline: look at the screen and relax for 10 s…</string>
+    <string name="profile_take_baseline">Take a 10 s baseline, then try smiling, blinking fast, pressing your lips</string>
+    <string name="profile_no_deviation">No deviation from your baseline.</string>
+    <string name="profile_tell">%1$s  %2$.1f×  — %3$s</string>
+
+    <!-- Tells: camera test label, implant warning, behavior debrief (n = how often; %2$s = the officer\'s question) -->
+    <string name="tell_blinks">blink rate</string>
+    <string name="tell_smile">smile</string>
+    <string name="tell_mask_smile">mouth-only smile</string>
+    <string name="tell_lips">lip compression</string>
+    <string name="tell_brows">eyebrow flash</string>
+    <string name="tell_gaze">gaze aversion</string>
+    <string name="tell_head_down">head drop</string>
+    <string name="tell_freeze">freeze</string>
+    <string name="implant_blinks">Blink rate rising. Slow your blinking.</string>
+    <string name="implant_smile">Smile detected. Keep a neutral face.</string>
+    <string name="implant_mask_smile">Fake smile: the eyes don\'t match. Drop it.</string>
+    <string name="implant_lips">Lips compressed. Relax your mouth.</string>
+    <string name="implant_brows">Eyebrows jumped. Keep your forehead still.</string>
+    <string name="implant_gaze">Eyes on the officer.</string>
+    <string name="implant_head_down">Chin up.</string>
+    <string name="implant_freeze">You froze. Breathe, move naturally.</string>
+    <string name="implant_unit_slipping">Unit unstable. Its logic is slipping.</string>
+    <string name="implant_unit_stutter">Circuits stuttering. Push now: one more twist could crash it.</string>
+
+    <string name="debrief_none">No deviations from your baseline.</string>
+    <plurals name="debrief_blinks">
+        <item quantity="one">Your blink rate rose.</item>
+        <item quantity="other">Your blink rate rose %1$d times.</item>
+    </plurals>
+    <plurals name="debrief_blinks_ask">
+        <item quantity="one">Your blink rate rose when asked “%2$s”.</item>
+        <item quantity="other">Your blink rate rose %1$d times when asked “%2$s”.</item>
+    </plurals>
+    <plurals name="debrief_smile">
+        <item quantity="one">You smiled at an odd moment.</item>
+        <item quantity="other">You smiled at an odd moment %1$d times.</item>
+    </plurals>
+    <plurals name="debrief_smile_ask">
+        <item quantity="one">You smiled at an odd moment when asked “%2$s”.</item>
+        <item quantity="other">You smiled at an odd moment %1$d times when asked “%2$s”.</item>
+    </plurals>
+    <plurals name="debrief_mask_smile">
+        <item quantity="one">Your smile did not reach your eyes.</item>
+        <item quantity="other">Your smile did not reach your eyes %1$d times.</item>
+    </plurals>
+    <plurals name="debrief_mask_smile_ask">
+        <item quantity="one">Your smile did not reach your eyes when asked “%2$s”.</item>
+        <item quantity="other">Your smile did not reach your eyes %1$d times when asked “%2$s”.</item>
+    </plurals>
+    <plurals name="debrief_lips">
+        <item quantity="one">You pressed your lips together.</item>
+        <item quantity="other">You pressed your lips together %1$d times.</item>
+    </plurals>
+    <plurals name="debrief_lips_ask">
+        <item quantity="one">You pressed your lips together when asked “%2$s”.</item>
+        <item quantity="other">You pressed your lips together %1$d times when asked “%2$s”.</item>
+    </plurals>
+    <plurals name="debrief_brows">
+        <item quantity="one">Your eyebrows jumped.</item>
+        <item quantity="other">Your eyebrows jumped %1$d times.</item>
+    </plurals>
+    <plurals name="debrief_brows_ask">
+        <item quantity="one">Your eyebrows jumped when asked “%2$s”.</item>
+        <item quantity="other">Your eyebrows jumped %1$d times when asked “%2$s”.</item>
+    </plurals>
+    <plurals name="debrief_gaze">
+        <item quantity="one">You looked away while answering.</item>
+        <item quantity="other">You looked away while answering %1$d times.</item>
+    </plurals>
+    <plurals name="debrief_gaze_ask">
+        <item quantity="one">You looked away while answering when asked “%2$s”.</item>
+        <item quantity="other">You looked away while answering %1$d times when asked “%2$s”.</item>
+    </plurals>
+    <plurals name="debrief_head_down">
+        <item quantity="one">You dropped your head.</item>
+        <item quantity="other">You dropped your head %1$d times.</item>
+    </plurals>
+    <plurals name="debrief_head_down_ask">
+        <item quantity="one">You dropped your head when asked “%2$s”.</item>
+        <item quantity="other">You dropped your head %1$d times when asked “%2$s”.</item>
+    </plurals>
+    <plurals name="debrief_freeze">
+        <item quantity="one">You froze.</item>
+        <item quantity="other">You froze %1$d times.</item>
+    </plurals>
+    <plurals name="debrief_freeze_ask">
+        <item quantity="one">You froze when asked “%2$s”.</item>
+        <item quantity="other">You froze %1$d times when asked “%2$s”.</item>
+    </plurals>
+    <plurals name="debrief_away">
+        <item quantity="one">You looked away once.</item>
+        <item quantity="other">You looked away %1$d times.</item>
+    </plurals>
+
+    <!-- Result -->
+    <string name="result_unit_unresponsive">UNIT UNRESPONSIVE</string>
+    <string name="result_unit_offline">UNIT OFFLINE</string>
+    <string name="result_crossing_logged">CROSSING LOGGED</string>
+    <string name="result_mission_failed">MISSION FAILED</string>
+    <string name="result_msg_broken">You broke the officer. The gate opened on its own.</string>
+    <string name="result_msg_released">Released after the Kade-Sorensen assessment.</string>
+    <string name="result_msg_passed">You made it through passport control.</string>
+    <string name="result_msg_detained">You failed the Kade-Sorensen assessment. Detained.</string>
+    <string name="result_msg_secondary">You\'ve been sent to secondary inspection.</string>
+    <!-- Mission language isn't the UI language: a tag on the cover and result, a line on a pass (display only) -->
+    <string name="foreign_tongue_tag">HIGHER DIFFICULTY · NOT YOUR LANGUAGE</string>
+    <string name="paranoid_mode">PARANOID MODE</string>
+    <string name="paranoid_hint">Go offline. Everything runs on this phone.</string>
+    <string name="paranoid_offline">PARANOID MODE · OFFLINE</string>
+    <string name="paranoid_still_on">Still offline. Tap to reconnect.</string>
+    <string name="result_foreign_cleared">Cleared in a language that isn\'t yours.</string>
+    <plurals name="result_broken_log">
+        <item quantity="one">Unit %1$s offline after %2$d command. Incident logged. Tester: classified.</item>
+        <item quantity="other">Unit %1$s offline after %2$d commands. Incident logged. Tester: classified.</item>
+    </plurals>
+    <plurals name="result_passed_log">
+        <item quantity="one">Convincing. The officer let you through after %1$d answer.</item>
+        <item quantity="other">Convincing. The officer let you through after %1$d answers.</item>
+    </plurals>
+    <string name="result_try_again">TRY AGAIN</string>
+    <string name="result_run_summary">Run summary</string>
+
+    <!-- Officer verdicts and demeanor (run summary and result screens) -->
+    <string name="demeanor_offline">Offline</string>
+    <string name="demeanor_threat">Threat flag raised</string>
+    <string name="demeanor_timeout">Queue timeout</string>
+    <string name="demeanor_scrutiny">Elevated scrutiny</string>
+    <string name="demeanor_nominal">Nominal</string>
+    <string name="verdict_broken">You talked to it like a machine. It believed you.</string>
+    <string name="verdict_contradiction">Your story didn\'t hold together. Stay consistent with your cover.</string>
+    <string name="verdict_unclear">The officer struggled to understand you. Shorter, simpler sentences help.</string>
+    <string name="verdict_tells">Your face gave you away. Watch the implant\'s warnings: blinking, smiles, pressed lips.</string>
+    <string name="verdict_silences">Long silences made the officer impatient.</string>
+    <string name="verdict_secondary">Something felt off. Too much hesitation for a calm traveler.</string>
+    <string name="verdict_slipped">You slipped once, but recovered. Lucky.</string>
+    <string name="verdict_natural">Natural answers and good consistency. Well done.</string>
+
+    <!-- Summary -->
+    <string name="summary_title">RUN SUMMARY</string>
+    <string name="summary_destination">Destination</string>
+    <string name="summary_answers">Answers</string>
+    <string name="summary_result">Result</string>
+    <string name="summary_cleared">Cleared</string>
+    <string name="summary_unit_offline">Unit offline</string>
+    <string name="summary_secondary">Secondary inspection</string>
+    <string name="summary_behaviour">%1$s behaviour</string>
+    <string name="summary_tn_index">Kade-Sorensen index</string>
+    <plurals name="summary_tn_value">
+        <item quantity="one">%1$.0f / 100 (pass ≤ 50) · %2$d question</item>
+        <item quantity="other">%1$.0f / 100 (pass ≤ 50) · %2$d questions</item>
+    </plurals>
+    <string name="summary_rank">Rank</string>
+    <string name="summary_best_streak">best streak %1$d</string>
+    <plurals name="summary_rooms">
+        <item quantity="one">%1$d K-S test survived</item>
+        <item quantity="other">%1$d K-S tests survived</item>
+    </plurals>
+    <string name="summary_new_mission">NEW MISSION</string>
+
+    <!-- Settings -->
+    <string name="settings_title">SETTINGS</string>
+    <string name="settings_voice_input">Voice input</string>
+    <string name="settings_on_device_speech">On-device speech recognition</string>
+    <string name="settings_hold_to_speak">Hold to speak</string>
+    <string name="settings_auto">Auto</string>
+    <string name="settings_hold_help">Hold the mic button while you talk.</string>
+    <string name="settings_auto_help">The mic opens when the officer stops talking and closes when you stop.</string>
+    <!-- First-run input step (after the passport): settings_hold_* / settings_auto_help are reused there -->
+    <string name="setup_input_title">HOW DO YOU ANSWER?</string>
+    <string name="setup_input_auto">Voice-activated</string>
+    <string name="setup_input_note">You can change this later in Settings.</string>
+    <string name="settings_languages">Languages</string>
+    <string name="settings_passport">Passport photo</string>
+    <string name="settings_passport_help">Retake or delete your passport photo, and choose whether officers read your face.</string>
+    <string name="settings_music">Music</string>
+    <string name="settings_sfx">Sound effects</string>
+    <string name="settings_camera">Officer watches you</string>
+    <string name="settings_camera_help">Front camera, face detection on the phone. No video is recorded.</string>
+    <string name="settings_camera_test">Camera test: see what it reads</string>
+    <string name="settings_haptics">Haptic feedback</string>
+    <string name="settings_licenses">Licenses</string>
+    <string name="settings_replay_training">Replay training mission</string>
+    <string name="settings_diagnostics">Save recordings and logs</string>
+    <string name="settings_diagnostics_help">For troubleshooting. Kept only on this phone.</string>
+    <string name="settings_about">ABOUT</string>
+    <string name="about_on_phone">Runs entirely on your phone</string>
+    <string name="about_offline">No internet required</string>
+    <plurals name="about_destinations">
+        <item quantity="one">%1$d country in %2$d languages</item>
+        <item quantity="other">%1$d countries in %2$d languages</item>
+    </plurals>
+    <string name="about_new_officer">A new officer, every time</string>
+    <string name="settings_footer">DIFFERENT BORDERS.\nSAME PRESSURE.</string>
+
+    <!-- Languages and download -->
+    <string name="languages_title">LANGUAGES</string>
+    <string name="languages_first_run">Pick the languages you want to practise. Only these are downloaded. You can add more later in Settings.</string>
+    <string name="languages_add">Add language packs. Each one brings its own countries and officers.</string>
+    <plurals name="languages_destinations">
+        <item quantity="one">%1$s · %2$d airport</item>
+        <item quantity="other">%1$s · %2$d airports</item>
+    </plurals>
+    <string name="lang_slow_tag">Slow · first-generation units</string>
+    <string name="languages_installed">Installed</string>
+    <string name="languages_nothing_new">Nothing new selected.</string>
+    <string name="languages_download">DOWNLOAD</string>
+    <string name="languages_add_btn">ADD</string>
+    <string name="note_checking">Checking what this phone already has…</string>
+    <string name="note_ai_models">Speech model %1$.1f GB (once)</string>
+    <string name="note_speech">speech %1$d MB</string>
+    <plurals name="note_packs">
+        <item quantity="one">%1$d language pack, a few MB each</item>
+        <item quantity="other">%1$d language packs, a few MB each</item>
+    </plurals>
+    <string name="note_total">%1$s.</string>
+    <string name="note_total_wifi">%1$s. Wi-Fi recommended.</string>
+    <string name="download_title">SYNCING IMPLANT</string>
+    <string name="download_confirm">CONFIRM DOWNLOAD</string>
+    <string name="download_offline">No connection. The download continues once you\'re on Wi-Fi.</string>
+    <string name="download_metered">You\'re on mobile data. This download can be several GB: Wi-Fi is better.</string>
+    <string name="download_no_voice">No offline voice for %1$s. The officer can\'t speak it until you install one.</string>
+    <string name="download_install_voices">Install voices</string>
+    <string name="download_check_again">Check again</string>
+    <string name="download_wait">PLEASE WAIT…</string>
+    <string name="download_back">BACK</string>
+    <string name="download_try_again">Try again</string>
+    <string name="step_ai_models">AI models</string>
+    <string name="step_ai_models_note">The officer and speech recognition, shared by all languages</string>
+    <string name="step_pack">%1$s pack</string>
+    <string name="step_pack_note">Destinations, officers, voice, speech</string>
+    <string name="step_getting_nano">Getting Gemini Nano from Android…</string>
+    <string name="step_nano_waiting">Android is still downloading Gemini Nano (several GB). This can take a while; keep the phone on Wi-Fi.</string>
+    <string name="step_nano_failed">Gemini Nano isn\'t ready on this phone yet. Check your connection and try again.</string>
+    <string name="step_needs_free">Needs %1$.1f GB free; this phone has %2$s.</string>
+    <string name="step_downloading">Downloading %1$s of %2$s</string>
+    <string name="step_unpacking">Unpacking…</string>
+    <string name="step_unpack_failed">Unpacking failed: %1$s</string>
+    <string name="step_no_models">This build has no models: %1$s</string>
+    <string name="step_nano_builtin">Gemini Nano, built into this phone</string>
+    <string name="step_speech_model">Speech model %1$s of %2$s</string>
+    <string name="step_tuning_voices">Tuning voices %1$d/%2$d</string>
+    <string name="step_no_voice">No offline voice installed</string>
+    <plurals name="step_destinations">
+        <item quantity="one">%1$d airport</item>
+        <item quantity="other">%1$d airports</item>
+    </plurals>
+    <plurals name="step_voices">
+        <item quantity="one">%1$d voice</item>
+        <item quantity="other">%1$d voices</item>
+    </plurals>
+    <string name="step_speech_finishing">speech model finishing in the background</string>
+    <string name="step_voice_ready">Voice ready</string>
+    <string name="step_failed">Failed: %1$s</string>
+    <string name="size_mb">%1$.0f MB</string>
+    <string name="pack_failed">Download failed (error %1$d). Check your connection and try again.</string>
+    <string name="pack_cancelled">Download cancelled.</string>
+    <string name="pack_not_started">Download couldn\'t start: %1$s</string>
+
+    <!-- Unsupported device -->
+    <string name="unsupported_title">This phone can\'t run the game</string>
+    <string name="unsupported_arch">%1$s needs a 64-bit ARM phone.</string>
+    <string name="unsupported_nano">%1$s runs its officer on Gemini Nano, Google\'s on-device AI, which this phone doesn\'t have.</string>
+    <string name="unsupported_ram">%1$s runs its speech and officer AI entirely on your phone, which needs at least 8 GB of memory. This phone has %2$.1f GB.</string>
+
+    <!-- Licenses -->
+    <string name="licenses_title">LICENSES</string>
+    <string name="licenses_unavailable">Text unavailable.</string>
+    <string name="licenses_full_text">Full license text</string>
+    <string name="licenses_art">Art, music and sound</string>
+    <string name="licenses_art_rights">All rights reserved, not covered by the GPL.</string>
+    <string name="licenses_art_copyright">Copyright 2026 Fluffy Pants Studio LLC. Images are AI-generated; music was provided by the owner.</string>
+    <string name="licenses_mlkit_terms">ML Kit GenAI additional terms</string>
+    <string name="licenses_piper_note">Each voice has its own dataset license.</string>
+    <string name="genai_note">Parts of this game use Google\'s on-device generative AI (Gemini Nano via ML Kit). Google may generate similar content for other users. For players aged 18 and over.</string>
+    <string name="settings_ui_language">Interface language</string>
+    <string name="settings_ui_language_help">Menus and subtitles.</string>
+    <string name="settings_system_default">System default</string>
+    <string name="volume_low">Volume is low. Turn it up: the officers speak.</string>
+    <string name="volume_off">Sound is off. Turn it up: the officers speak.</string>
+    <!-- Passport photo (PassportPhoto.kt) -->
+    <string name="passport_title">Your passport photo</string>
+    <string name="passport_disclosure">It goes on every passport you carry. It stays on this phone and is never uploaded.</string>
+    <string name="passport_face_title">Officers read faces.</string>
+    <string name="passport_face_body">During interviews they watch your blinks, smiles and where you look. Keep a poker face and you\'re harder to read — your implant coaches you. It all stays on this phone; no video is recorded.</string>
+    <string name="passport_face_switch">Let officers read my face (recommended)</string>
+    <string name="passport_take">Take my photo</string>
+    <string name="passport_shutter">Take photo</string>
+    <string name="passport_use">Use this photo</string>
+    <string name="passport_retake">Retake</string>
+    <string name="passport_keep">Keep this photo</string>
+    <string name="passport_delete">Delete my photo</string>
+    <string name="passport_use_sample">Use a sample photo instead</string>
+    <string name="passport_no_camera">No camera. You\'ll travel with a sample photo.</string>
+    <string name="passport_check_no_face">Look into the camera</string>
+    <string name="passport_check_one_face">Only you in the picture, please</string>
+    <string name="passport_check_straight">Look straight at the camera</string>
+    <string name="passport_check_centre">Move your face into the oval</string>
+    <string name="passport_check_closer">Come a little closer</string>
+    <string name="passport_check_farther">Step back a little</string>
+    <string name="passport_check_hold">Hold still…</string>
+    <string name="passport_check_ready">Good. Take the photo.</string>
+    <string name="passport_hint_eyes">Eyes open, if you can</string>
+    <string name="passport_hint_smile">A neutral face works best</string>
+    <string name="passport_capture_failed">The photo didn\'t work. Try again.</string>
+    <string name="passport_unmirrored">Shown un-mirrored, as on a real passport.</string>
+    <string name="passport_sample_another">Another one</string>
+    <string name="passport_back_to_camera">Back to camera</string>
+    <string name="passport_save_failed">Couldn\'t save the photo. Try again.</string>
+    <string name="picker_cd">Choose your country</string>
+    <string name="picker_title">Where are you coming home to?</string>
+    <string name="picker_random">Random (any country)</string>
+    <string name="picker_passed">PASSED</string>
+    <string name="picker_passed_times">PASSED \u2066×%1$d\u2069</string>
+    <!-- Career save and receipts -->
+    <string name="album_infiltration">Infiltration</string>
+    <string name="album_sabotage">Unit disabled</string>
+    <string name="album_unit">Unit %1$s</string>
+    <string name="replay_pack_missing">Install this language to play this assignment.</string>
+    <string name="replay_new_mark">New dossier mark: %1$s</string>
+    <string name="replay_mark_detail">%1$s · %2$s</string>
+    <string name="replay_save_failed">Progress could not be saved. Try saving again before leaving.</string>
+    <string name="replay_save_retry">Save again</string>
+    <string name="replay_read_failed">Saved progress could not be read. It has been kept unchanged.</string>
+    <string name="replay_interrupted">Crossing interrupted. Continue from preparation or begin a new mission.</string>
+    <string name="replay_preparation_unavailable">This saved crossing cannot continue. Your career has been kept. Begin a new mission.</string>
+</resources>

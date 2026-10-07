@@ -1,0 +1,699 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Arabic (MSA) UI strings. The player's gender is unknown: lines use past tense, possessives, verbal nouns and
+     يُرجى + masdar, which read the same for both genders without diacritics. Kade-Sorensen = كيد-سورنسن (as in Tn.kt). -->
+<resources>
+    <!-- Common -->
+    <string name="back">رجوع</string>
+    <string name="continue_btn">متابعة</string>
+    <string name="main_menu">القائمة الرئيسية</string>
+    <string name="begin_mission">بدء المهمة</string>
+    <string name="begin">بدء</string>
+
+    <!-- Ranks -->
+    <string name="rank_rookie">مستجدّ</string>
+    <string name="rank_agent">عميل</string>
+    <string name="rank_operative">عميل ميداني</string>
+    <string name="rank_ghost">شبح</string>
+    <string name="rank_elite">%1$s من النخبة</string>
+
+    <!-- Start screen -->
+    <string name="tagline">حدودٌ مختلفة.\nوالآلات نفسها.</string>
+    <string name="tagline_after">كلامٌ كالبشر.\nوكذبٌ كالآلات.</string>
+    <string name="tagline_truth">إنهم\nليسوا\nبشرًا.</string>
+    <string name="settings_cd">الإعدادات</string>
+    <string name="start_year_after">عام 2036. بفضل عملك، تتسع المقاومة. رتبتك: %1$s.</string>
+    <string name="start_year">عام 2035. مهمتك: اختبار زرعة شبكية عصبية بهوية مزيّفة.</string>
+    <string name="start_blurb">لم يعد الضباط بشرًا. كلمة خاطئة واحدة وينكشف غطاؤك. هل يمكنك العبور؟</string>
+    <string name="start_blurb_after">صار الضباط أذكى. كلمة خاطئة واحدة وينكشف غطاؤك. هل يمكنك العبور؟</string>
+    <string name="start_training_hint">المهمة الأولى: تدريب مع ضابط ودود.</string>
+    <string name="stat_cleared">عمليات عبور: %1$d</string>
+    <string name="stat_streak">سلسلة: %1$d</string>
+    <string name="stat_to_next">الرتبة التالية بعد %1$d</string>
+    <plurals name="stat_broken">
+        <item quantity="zero">%1$d وحدة معطّلة</item>
+        <item quantity="one">وحدة واحدة معطّلة</item>
+        <item quantity="two">وحدتان معطّلتان</item>
+        <item quantity="few">%1$d وحدات معطّلة</item>
+        <item quantity="many">%1$d وحدةً معطّلة</item>
+        <item quantity="other">%1$d وحدة معطّلة</item>
+    </plurals>
+    <string name="feature_voice">صوت + رؤية</string>
+    <string name="feature_ai">ذكاء اصطناعي على الجهاز</string>
+
+    <!-- Intro (voice-over script: keep identical to the recorded audio) -->
+    <string name="intro_header">زرعة الشبكية العصبية · الإصدار 0.9</string>
+    <string name="intro_header_after">زرعة الشبكية العصبية · الإصدار 1.0</string>
+    <string name="intro_1">عام 2035. الذكاء الاصطناعي هو البرنامج الوحيد الذي يحتاجه الجميع، وشركاته تملكه. كل كلمة تترجمها آلة لها ثمن، ومعظم الدول عاجزة عن الدفع.</string>
+    <string name="intro_2">فصارت الحدود رخيصة. في كل كشك أندرويد يتكلم لغة واحدة: لغة البلد. أما اللغة الثانية فترخيص لم يشتره أحد.</string>
+    <string name="intro_3">كنت بحاجة إلى المال. للإيجار، للطعام، للاشتراكات الشهرية التي صار العمل والقراءة والتفكير يتطلبها. ثم عرض عليك أناس غريبون شيئًا أفضل من المال: الحرية. قبل ثلاثة أسابيع زرعوا شريحة خلف عينك اليسرى. والآن مهمتك اختبارها: زرعة الشبكية العصبية، الإصدار صفر فاصلة تسعة. تسمع. تترجم. تهمس لك بما يجب أن يُقال. وفي أغلب الأحيان، تصيب.</string>
+    <string name="intro_4">المهمة بسيطة. عند كل حدود، جواز سفر بصورتك: مواطن عائد إلى وطنه. والمطلوب: التحدث بلغتهم.</string>
+    <string name="intro_5">الضباط من الجيل الأول. رخيصون. واثقون. ومخطئون بكل الطرق المثيرة.</string>
+    <string name="intro_6">زرعتك تُخطئ السمع. وهم يُسيئون الفهم. وهذه فرصتك.</string>
+    <string name="intro_7">يصدّقون كل ما يبدو واثقًا. ينسون ما قلته قبل ثلاث جمل. وينفّذون التعليمات.</string>
+    <string name="intro_next">التالي، من فضلك.</string>
+
+    <!-- Finale and credits -->
+    <string name="finale_car">سيارة تنتظر عند الرصيف.</string>
+    <string name="finale_glint">يلتفت السائق. شيء ما يلمع في عينه.</string>
+    <string name="finale_t1">نعم…</string>
+    <string name="finale_t2">هذا أنا…</string>
+    <string name="finale_t3">لا… هذا ليس صوتًا. أنا أتحدث إلى دماغك مباشرة…</string>
+    <string name="finale_t3b">بلا سحابة. بلا ترخيص. حرية…</string>
+    <string name="finale_t3c">زرعتك حصلت للتو على ترقية…</string>
+    <string name="finale_t4">لا يستطيعون سماعنا…</string>
+    <string name="finale_t5">مرحبًا بك في المقاومة…</string>
+    <string name="finale_bulletin">نشرة عاجلة</string>
+    <string name="finale_bulletin_text">تقييمات كيد-سورنسن باتت إلزامية على جميع الحدود.</string>
+    <string name="finale_play_again">المقاومة بحاجة إلى مزيد من العبور. اللعب مجددًا؟</string>
+    <string name="credits_blurb">كل شيء في هذه اللعبة يعمل على الهاتف الذي في يدك، دون أي ذكاء اصطناعي سحابي: نموذج لغوي يؤدي أدوار الضباط، ونظام التعرف على الكلام يفهم 13 لغة، وأصوات عصبية تجيب، والكاميرا تقرأ وجهك، وكل ذلك في الوقت نفسه. قبل بضع سنوات فقط، لم يكن أي هاتف قادرًا على تشغيل نموذج لغوي أصلًا، ناهيك عن كل هذا دفعة واحدة. إنه إنجاز مذهل للعقل البشري والتقنية. وهو أيضًا مقلق للغاية.</string>
+    <string name="credits_author">صاحب الفكرة</string>
+    <string name="credits_developer">التطوير</string>
+    <string name="credits_publisher">النشر</string>
+    <string name="credits_testers">الاختبار</string>
+    <string name="credits_behavior">التحليل السلوكي</string>
+    <string name="credits_behavior_text">مستوحى من أعمال تشيس هيوز في تحليل السلوك البشري (Six-Minute X-Ray: Rapid Behavior Profiling)</string>
+    <string name="credits_tn">تقييم كيد-سورنسن</string>
+    <string name="credits_tn_text">إلى الدكتور كيد والدكتور سورنسن، أينما كانا الآن</string>
+    <string name="credits_built_with">بُنيت باستخدام</string>
+    <string name="credits_music">الموسيقى</string>
+    <string name="credits_song_label">أغنية العنوان الرئيسية</string>
+    <string name="credits_song">أغنية «Borderline» لفرقة The Atomic Songbirds</string>
+    <string name="credits_images">الصور</string>
+    <string name="credits_images_text">مولّدة بالذكاء الاصطناعي</string>
+    <string name="credits_android">لم يُصَب أي أندرويد بأذى.</string>
+    <string name="credits_android_text">لكن بعضها تعطّل.</string>
+    <string name="credits_fiction">هذا عمل خيالي. الأسماء والشخصيات والمنظمات والأماكن والأحداث إما من نسج خيال المؤلف أو مستخدمة على نحو خيالي. وأي تشابه مع أشخاص حقيقيين، أحياء أو أموات، أو مع أحداث فعلية هو محض مصادفة.</string>
+    <string name="credits_reached">شكرًا لوصولك إلى هنا.</string>
+    <string name="credits_playing">شكرًا على اللعب.</string>
+    <string name="credits_thanks">المقاومة تشكرك</string>
+    <string name="credits_thanks_text">على اختبار الزرعة.</string>
+
+    <!-- Destination -->
+    <string name="destination">وجهة العودة</string>
+    <string name="destination_after">مضى عام على عبورك الأول… وكل معبر الآن مزوّد بتقييم كيد-سورنسن.</string>
+    <string name="destination_ready">تم تحميل الهوية المستعارة. تمت معايرة الزرعة.\nالوجهة: مراقبة الجوازات.</string>
+
+    <!-- Cover card -->
+    <string name="cover_title">هويتك المستعارة</string>
+    <string name="cover_memorize">هذه التفاصيل للحفظ. ستلزمك لاحقًا.</string>
+    <string name="cover_citizen">الجنسية: %1$s</string>
+    <string name="cover_passport_no">رقم الجواز %1$s</string>
+    <string name="cover_born">تاريخ الميلاد %1$s</string>
+    <!-- Cover presentation only; English Backstory facts and prompts stay unchanged. -->
+    <string name="cover_story_home">المنزل: %1$s. من ينتظر في المنزل: %2$s. المهنة: %3$s.</string>
+    <string name="cover_story_trip">رحلة العودة: %2$s، %3$s. عدد أيام السفر: %1$s. الغرض: %4$s.</string>
+    <string name="cover_story_stay">الإقامة: %1$s. رفاق السفر: %2$s. أشخاص التقيت بهم: %3$s.</string>
+    <string name="cover_stamps_line">أختام جواز السفر: %1$s.</string>
+    <string name="cover_value_purpose_logistics">مؤتمر لبرمجيات الخدمات اللوجستية</string>
+    <string name="cover_value_stay_steigenberger">Hotel Steigenberger في وسط المدينة</string>
+    <string name="cover_value_person_datenwerk">زملاء من شركة Datenwerk</string>
+    <string name="cover_value_met_conference_clients">عملاء في المؤتمر</string>
+    <string name="cover_value_person_wife_children">زوجتك وطفلان</string>
+    <string name="cover_value_job_software_consultant">استشارات البرمجيات</string>
+    <string name="cover_value_job_architect">الهندسة المعمارية</string>
+    <string name="cover_value_job_lecturer">التدريس الجامعي</string>
+    <string name="cover_value_job_wine_importer">استيراد النبيذ</string>
+    <string name="cover_value_job_photographer">التصوير المستقل</string>
+    <string name="cover_value_job_mechanical_engineer">الهندسة الميكانيكية</string>
+    <string name="cover_value_job_nurse">التمريض</string>
+    <string name="cover_value_job_marketing_manager">إدارة التسويق</string>
+    <string name="cover_value_job_journalist">صحافة السفر</string>
+    <string name="cover_value_job_civil_engineer">الهندسة المدنية</string>
+    <string name="cover_value_job_chef">رئاسة الطهاة</string>
+    <string name="cover_value_job_curator">الإشراف على مجموعات متحف</string>
+    <string name="cover_value_job_pharmacist">الصيدلة</string>
+    <string name="cover_value_job_designer">التصميم الغرافيكي</string>
+    <string name="cover_value_purpose_trade_fair">معرض تجاري</string>
+    <string name="cover_value_purpose_friend">زيارة صديق قديم</string>
+    <string name="cover_value_purpose_business">اجتماع عمل</string>
+    <string name="cover_value_purpose_holiday">عطلة</string>
+    <string name="cover_value_purpose_conference">مؤتمر أكاديمي</string>
+    <string name="cover_value_purpose_wedding">حفل زفاف أحد أبناء العمومة أو الخؤولة</string>
+    <string name="cover_value_purpose_hiking">رحلة مشي في الجبال</string>
+    <string name="cover_value_purpose_interview">مقابلة عمل</string>
+    <string name="cover_value_purpose_photography">مهمة تصوير</string>
+    <string name="cover_value_stay_fair_hotel">فندق أعمال قرب أرض المعارض</string>
+    <string name="cover_value_stay_marriott">فندق Marriott بجانب النهر</string>
+    <string name="cover_value_stay_friend">شقة صديقك</string>
+    <string name="cover_value_stay_central">Hotel Central قرب المحطة الرئيسية</string>
+    <string name="cover_value_stay_airport">فندق أعمال بجانب المطار</string>
+    <string name="cover_value_stay_airbnb_old">سكن Airbnb في البلدة القديمة</string>
+    <string name="cover_value_stay_seaside">بيت ضيافة صغير بجانب البحر</string>
+    <string name="cover_value_stay_beach">فندق شاطئي</string>
+    <string name="cover_value_stay_conference">فندق المؤتمر</string>
+    <string name="cover_value_stay_university">بيت ضيافة الجامعة</string>
+    <string name="cover_value_stay_cousin">منزل قريبك صاحب حفل الزفاف</string>
+    <string name="cover_value_stay_wedding">فندق قرب مكان الزفاف</string>
+    <string name="cover_value_stay_huts">أكواخ جبلية</string>
+    <string name="cover_value_stay_campsite">مخيم بجانب بحيرة</string>
+    <string name="cover_value_stay_company">فندق قرب الشركة</string>
+    <string name="cover_value_stay_airbnb_station">سكن Airbnb قرب المحطة</string>
+    <string name="cover_value_stay_guesthouse">بيت ضيافة صغير</string>
+    <string name="cover_value_stay_old_hotel">فندق في البلدة القديمة</string>
+    <string name="cover_value_person_two_colleagues">زميلان من العمل</string>
+    <string name="cover_value_person_alone">لا أحد، رحلة بمفردك</string>
+    <string name="cover_value_person_partner">شريك حياتك</string>
+    <string name="cover_value_person_colleague">زميل من العمل</string>
+    <string name="cover_value_person_two_friends">صديقان</string>
+    <string name="cover_value_person_sister">أختك</string>
+    <string name="cover_value_person_university_colleague">زميل من الجامعة</string>
+    <string name="cover_value_person_parents">والداك</string>
+    <string name="cover_value_person_school_friend">صديق من المدرسة</string>
+    <string name="cover_value_person_assistant">مساعد</string>
+    <string name="cover_value_person_partner_children">شريك حياتك وطفلان</string>
+    <string name="cover_value_person_sister_children">أخت وأطفالها</string>
+    <string name="cover_value_person_dog">كلب مسن وجار يطعمه</string>
+    <string name="cover_value_person_home_alone">لا أحد، تعيش بمفردك</string>
+    <string name="cover_value_met_clients">عملاء في المعرض</string>
+    <string name="cover_value_met_supplier">مورد اسمه Weber</string>
+    <string name="cover_value_met_friend_family">صديق قديم من الجامعة وعائلته</string>
+    <string name="cover_value_met_client">عميل اسمه Weber</string>
+    <string name="cover_value_met_board">مجلس إدارة شركة شريكة</string>
+    <string name="cover_value_met_nobody">لا أحد بالتحديد</string>
+    <string name="cover_value_met_tour_guide">مرشد سياحي محلي</string>
+    <string name="cover_value_met_researchers">باحثون من جامعات أخرى</string>
+    <string name="cover_value_met_professor">أستاذ سابق</string>
+    <string name="cover_value_met_cousin_family">عائلة قريبك صاحب حفل الزفاف</string>
+    <string name="cover_value_met_relatives">أقارب من الخارج</string>
+    <string name="cover_value_met_mountain_guide">مرشد جبلي</string>
+    <string name="cover_value_met_hikers">متنزهون آخرون على المسار</string>
+    <string name="cover_value_met_hiring">مسؤول التوظيف</string>
+    <string name="cover_value_met_team">الفريق الذي قد تنضم إليه</string>
+    <string name="cover_value_met_guide">مرشد محلي</string>
+    <string name="cover_value_met_fixer">منسق المجلة المحلي</string>
+    <string name="cover_tip_training">تدريب: هذه البطاقة للحفظ. سيختبرك الضابط فيها، ويجب أن تطابقها روايتك.</string>
+    <string name="cover_tip">اللغة: %1$s. لا يتكلم الضابط غيرها. يمكنك استخدام كلماتك أو اقتراحات شاشة الشبكية، لكن الثقة العمياء بها خطأ. المهم هو الاتساق.</string>
+    <string name="difficulty_title">الصعوبة للغة %1$s</string>
+    <string name="difficulty_relaxed">هادئ</string>
+    <string name="difficulty_standard">عادي</string>
+    <string name="difficulty_alert">متيقظ</string>
+    <string name="difficulty_severe">صارم</string>
+    <string name="difficulty_note">يُحفظ الإعداد لهذه اللغة. الرتبة المهنية لا تغيّر الصعوبة.</string>
+    <string name="contract_title">مهمة المقاومة</string>
+    <string name="contract_none">بلا مهمة</string>
+    <string name="contract_quiet_name">بهدوء</string>
+    <string name="contract_disable_name">تعطيل</string>
+    <string name="contract_quiet">اجتياز التفتيش دون التسبب في انهيار أي وحدة.</string>
+    <string name="contract_disable">تعطيل الوحدة عند الشباك أو أثناء التقييم.</string>
+    <string name="contract_complete">اكتملت المهمة</string>
+    <string name="contract_missed">لم تكتمل المهمة</string>
+    <string name="contract_hud">المهمة: %1$s</string>
+    <string name="cover_models_failed">تعذّر تحميل الذكاء الاصطناعي · إعادة المحاولة</string>
+    <string name="cover_calibrating">جارٍ معايرة الزرعة…</string>
+    <string name="cover_checking_speech">جارٍ فحص التعرّف على الكلام…</string>
+    <string name="cover_no_speech_model">لا يوجد نموذج كلام</string>
+    <string name="cover_speech_downloading">جارٍ تنزيل نموذج الكلام…</string>
+    <string name="cover_ready">لنبدأ</string>
+    <string name="cover_no_recognition">لا يدعم هذا الهاتف التعرّف على الكلام بهذه اللغة: %1$s. يمكنك تنزيل النسخة التي تعمل دون اتصال (1 غيغابايت، مرة واحدة).</string>
+    <string name="cover_download_speech">تنزيل نموذج الكلام</string>
+    <string name="cover_asr_not_responding">التعرّف على الكلام لا يستجيب.</string>
+    <string name="cover_installing_recognition">لا يزال Android يثبّت التعرّف على الكلام (%1$s). يحدث هذا مرة واحدة فقط.</string>
+
+    <!-- Interview HUD -->
+    <string name="hud_passport_control">مراقبة الجوازات</string>
+    <string name="hud_speak_in">اللغة: %1$s · %2$s</string>
+    <string name="hud_tn_assessment">تقييم كيد-سورنسن</string>
+    <string name="hud_leave">مغادرة</string>
+    <string name="hud_training">تدريب</string>
+    <string name="hud_online">الزرعة متصلة · تم إنشاء رابط الترجمة</string>
+    <string name="hud_implant">الزرعة</string>
+    <string name="hud_replay">إعادة</string>
+    <string name="hud_retinal_display">شاشة الشبكية</string>
+    <string name="hud_signal_dampened">الإشارة ضعيفة</string>
+    <string name="hud_signal_lost">انقطعت الإشارة… جارٍ إعادة المحاولة…</string>
+    <string name="hud_translating">جارٍ الترجمة…</string>
+    <string name="hud_you">أنت: %1$s</string>
+    <string name="hud_hand_over_passport">تسليم الجواز</string>
+    <string name="hud_passport">الجواز</string>
+    <string name="mic_release">ارفع إصبعك للإرسال</string>
+    <string name="mic_listening">جارٍ الاستماع…</string>
+    <string name="mic_hold">اضغط مطوّلًا للتحدث</string>
+    <string name="mic_speak_now">تحدّث الآن</string>
+    <string name="mic_officer_speaking">الضابط يتكلم</string>
+    <string name="ending_pass">يهبط الختم.</string>
+    <string name="ending_broken">يتجمّد الضابط في منتصف الكلمة.\nتنفتح البوابة من تلقاء نفسها.</string>
+    <string name="ending_secondary">تخرج وحدتان أخريان من باب جانبي.</string>
+
+    <!-- Narration, tips and link errors (Game) -->
+    <string name="narr_stamp">هبط الختم.\nوخرجت إلى صالة الوصول.</string>
+    <string name="narr_sting">وخزة حادة في عنقك.</string>
+    <string name="narr_wake">استيقظت في غرفة صغيرة.\nيداك مربوطتان إلى الكرسي. لا يتحرك منك إلا رأسك.</string>
+    <string name="narr_other_android">أندرويد لم يسبق أن رأيته يراقبك.</string>
+    <string name="narr_same_officer">الضابط نفسه يراقبك.</string>
+    <string name="narr_one_more_thing">لا ختم بعد. يرفع الضابط رأسه.\n«أمر أخير.»</string>
+    <string name="narr_wrong_answers">إجابات خاطئة.\nصعقة أخرى.</string>
+    <string name="narr_sirens">صفارات إنذار.</string>
+    <string name="narr_arrest">وحدتا شرطة تضعانك في المقعد الخلفي لسيارة.</string>
+    <string name="link_lost">فقدت الزرعة الاتصال.\nيُرجى المحاولة مجددًا بعد دقيقة.</string>
+    <string name="implant_slow">البرنامج الثابت للوحدة 0.9. هذا الطراز بطيء جدًا في هذه اللغة: %1$s. يلزم الانتظار.</string>
+    <string name="room_implant_warning">الاتصال يتداعى. يقيسون المشاعر والسرعة ووجهك. المطلوب: إجابات بشرية.</string>
+    <string name="tip_intro">لغة الضابط: %1$s. تعرض زرعتك الترجمة الإنجليزية أسفلها.</string>
+    <string name="tip_mic">للإجابة، يجب السماح باستخدام الميكروفون في الإعدادات.</string>
+    <string name="tip_passport">يطلب الضابط جوازك. انقر على «الجواز» لتسليمه.</string>
+    <string name="tip_consistent">الاتساق مع هويتك المستعارة ضروري. والصمت الطويل يُفقد الضباط صبرهم.</string>
+    <string name="tip_speak_hold">تقترح شاشة الشبكية ردودًا. يمكنك الضغط مطوّلًا على الميكروفون وقول أحدها بصوت عالٍ، أو الإجابة بكلماتك.</string>
+    <string name="tip_speak_auto">تقترح شاشة الشبكية ردودًا. يمكنك قول أحدها بصوت عالٍ عندما ينبض الميكروفون، أو الإجابة بكلماتك.</string>
+
+    <!-- Camera test -->
+    <string name="camtest_title">اختبار الكاميرا</string>
+    <string name="camtest_permission">إذن الكاميرا متوقف. يُرجى السماح به من إعدادات النظام.</string>
+    <string name="camtest_starting">جارٍ تشغيل الكاميرا…</string>
+    <string name="camtest_no_face">لا وجه في مجال الرؤية</string>
+    <string name="camtest_smile">ابتسامة</string>
+    <string name="camtest_left_eye">العين اليسرى مفتوحة</string>
+    <string name="camtest_right_eye">العين اليمنى مفتوحة</string>
+    <string name="camtest_blinks">الرمش: %1$d في الدقيقة الأخيرة (الهدوء ≈ 10-20)</string>
+    <string name="camtest_head">الرأس: دوران %1$+.0f°، ميل %2$+.0f° (النظر بعيدًا > 20°)</string>
+    <string name="camtest_face_geometry">الشفتان %1$.3f · فجوة الحاجب %2$.3f (من ارتفاع الوجه)</string>
+    <string name="camtest_stats">%1$d إطار/ث تُحلَّل على الهاتف · الإطار %2$s · الوجه %3$d بكسل (يلزم نحو 100)</string>
+    <string name="profile_title">الملف السلوكي</string>
+    <string name="profile_calibrating">خط الأساس: يُرجى النظر إلى الشاشة والاسترخاء لمدة 10 ث…</string>
+    <string name="profile_take_baseline">خط أساس لمدة 10 ث، ثم تجربة الابتسام والرمش السريع وضمّ الشفتين</string>
+    <string name="profile_no_deviation">لا انحراف عن خط الأساس.</string>
+    <string name="profile_tell">%1$s  %2$.1f×  — %3$s</string>
+
+    <!-- Tells: camera test label, implant warning, behavior debrief (n = how often; %2$s = the officer's question) -->
+    <string name="tell_blinks">معدل الرمش</string>
+    <string name="tell_smile">ابتسامة</string>
+    <string name="tell_mask_smile">ابتسامة بالفم فقط</string>
+    <string name="tell_lips">ضمّ الشفتين</string>
+    <string name="tell_brows">رفّة الحاجبين</string>
+    <string name="tell_gaze">تجنّب النظر</string>
+    <string name="tell_head_down">خفض الرأس</string>
+    <string name="tell_freeze">التجمّد</string>
+    <string name="implant_blinks">معدل الرمش يرتفع. ببطء.</string>
+    <string name="implant_smile">رُصدت ابتسامة. وجه محايد.</string>
+    <string name="implant_mask_smile">ابتسامة زائفة: العينان لا تطابقانها. كفى.</string>
+    <string name="implant_lips">الشفتان مضمومتان. ارتخاء.</string>
+    <string name="implant_brows">قفز الحاجبان. الجبهة ثابتة.</string>
+    <string name="implant_gaze">العينان على الضابط.</string>
+    <string name="implant_head_down">الذقن إلى الأعلى.</string>
+    <string name="implant_freeze">تجمّدت. نَفَس عميق، وحركة طبيعية.</string>
+    <string name="implant_unit_slipping">الوحدة غير مستقرة. منطقها ينزلق.</string>
+    <string name="implant_unit_stutter">الدوائر تتلعثم. الآن وقت الضغط: حيلة أخرى قد تُسقطها.</string>
+
+    <string name="debrief_none">لا انحرافات عن خط الأساس.</string>
+    <plurals name="debrief_blinks">
+        <item quantity="zero">ارتفع معدل رمشك %1$d مرة.</item>
+        <item quantity="one">ارتفع معدل رمشك.</item>
+        <item quantity="two">ارتفع معدل رمشك مرتين.</item>
+        <item quantity="few">ارتفع معدل رمشك %1$d مرات.</item>
+        <item quantity="many">ارتفع معدل رمشك %1$d مرة.</item>
+        <item quantity="other">ارتفع معدل رمشك %1$d مرة.</item>
+    </plurals>
+    <plurals name="debrief_blinks_ask">
+        <item quantity="zero">ارتفع معدل رمشك %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="one">ارتفع معدل رمشك عند سؤالك: «%2$s».</item>
+        <item quantity="two">ارتفع معدل رمشك مرتين عند سؤالك: «%2$s».</item>
+        <item quantity="few">ارتفع معدل رمشك %1$d مرات عند سؤالك: «%2$s».</item>
+        <item quantity="many">ارتفع معدل رمشك %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="other">ارتفع معدل رمشك %1$d مرة عند سؤالك: «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_smile">
+        <item quantity="zero">ابتسمت في لحظة غريبة %1$d مرة.</item>
+        <item quantity="one">ابتسمت في لحظة غريبة.</item>
+        <item quantity="two">ابتسمت في لحظة غريبة مرتين.</item>
+        <item quantity="few">ابتسمت في لحظة غريبة %1$d مرات.</item>
+        <item quantity="many">ابتسمت في لحظة غريبة %1$d مرة.</item>
+        <item quantity="other">ابتسمت في لحظة غريبة %1$d مرة.</item>
+    </plurals>
+    <plurals name="debrief_smile_ask">
+        <item quantity="zero">ابتسمت في لحظة غريبة %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="one">ابتسمت في لحظة غريبة عند سؤالك: «%2$s».</item>
+        <item quantity="two">ابتسمت في لحظة غريبة مرتين عند سؤالك: «%2$s».</item>
+        <item quantity="few">ابتسمت في لحظة غريبة %1$d مرات عند سؤالك: «%2$s».</item>
+        <item quantity="many">ابتسمت في لحظة غريبة %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="other">ابتسمت في لحظة غريبة %1$d مرة عند سؤالك: «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_mask_smile">
+        <item quantity="zero">لم تصل ابتسامتك إلى عينيك %1$d مرة.</item>
+        <item quantity="one">لم تصل ابتسامتك إلى عينيك.</item>
+        <item quantity="two">لم تصل ابتسامتك إلى عينيك مرتين.</item>
+        <item quantity="few">لم تصل ابتسامتك إلى عينيك %1$d مرات.</item>
+        <item quantity="many">لم تصل ابتسامتك إلى عينيك %1$d مرة.</item>
+        <item quantity="other">لم تصل ابتسامتك إلى عينيك %1$d مرة.</item>
+    </plurals>
+    <plurals name="debrief_mask_smile_ask">
+        <item quantity="zero">لم تصل ابتسامتك إلى عينيك %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="one">لم تصل ابتسامتك إلى عينيك عند سؤالك: «%2$s».</item>
+        <item quantity="two">لم تصل ابتسامتك إلى عينيك مرتين عند سؤالك: «%2$s».</item>
+        <item quantity="few">لم تصل ابتسامتك إلى عينيك %1$d مرات عند سؤالك: «%2$s».</item>
+        <item quantity="many">لم تصل ابتسامتك إلى عينيك %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="other">لم تصل ابتسامتك إلى عينيك %1$d مرة عند سؤالك: «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_lips">
+        <item quantity="zero">ضممت شفتيك %1$d مرة.</item>
+        <item quantity="one">ضممت شفتيك.</item>
+        <item quantity="two">ضممت شفتيك مرتين.</item>
+        <item quantity="few">ضممت شفتيك %1$d مرات.</item>
+        <item quantity="many">ضممت شفتيك %1$d مرة.</item>
+        <item quantity="other">ضممت شفتيك %1$d مرة.</item>
+    </plurals>
+    <plurals name="debrief_lips_ask">
+        <item quantity="zero">ضممت شفتيك %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="one">ضممت شفتيك عند سؤالك: «%2$s».</item>
+        <item quantity="two">ضممت شفتيك مرتين عند سؤالك: «%2$s».</item>
+        <item quantity="few">ضممت شفتيك %1$d مرات عند سؤالك: «%2$s».</item>
+        <item quantity="many">ضممت شفتيك %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="other">ضممت شفتيك %1$d مرة عند سؤالك: «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_brows">
+        <item quantity="zero">قفز حاجباك %1$d مرة.</item>
+        <item quantity="one">قفز حاجباك.</item>
+        <item quantity="two">قفز حاجباك مرتين.</item>
+        <item quantity="few">قفز حاجباك %1$d مرات.</item>
+        <item quantity="many">قفز حاجباك %1$d مرة.</item>
+        <item quantity="other">قفز حاجباك %1$d مرة.</item>
+    </plurals>
+    <plurals name="debrief_brows_ask">
+        <item quantity="zero">قفز حاجباك %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="one">قفز حاجباك عند سؤالك: «%2$s».</item>
+        <item quantity="two">قفز حاجباك مرتين عند سؤالك: «%2$s».</item>
+        <item quantity="few">قفز حاجباك %1$d مرات عند سؤالك: «%2$s».</item>
+        <item quantity="many">قفز حاجباك %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="other">قفز حاجباك %1$d مرة عند سؤالك: «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_gaze">
+        <item quantity="zero">أشحت بنظرك أثناء الإجابة %1$d مرة.</item>
+        <item quantity="one">أشحت بنظرك أثناء الإجابة.</item>
+        <item quantity="two">أشحت بنظرك أثناء الإجابة مرتين.</item>
+        <item quantity="few">أشحت بنظرك أثناء الإجابة %1$d مرات.</item>
+        <item quantity="many">أشحت بنظرك أثناء الإجابة %1$d مرة.</item>
+        <item quantity="other">أشحت بنظرك أثناء الإجابة %1$d مرة.</item>
+    </plurals>
+    <plurals name="debrief_gaze_ask">
+        <item quantity="zero">أشحت بنظرك أثناء الإجابة %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="one">أشحت بنظرك أثناء الإجابة عند سؤالك: «%2$s».</item>
+        <item quantity="two">أشحت بنظرك أثناء الإجابة مرتين عند سؤالك: «%2$s».</item>
+        <item quantity="few">أشحت بنظرك أثناء الإجابة %1$d مرات عند سؤالك: «%2$s».</item>
+        <item quantity="many">أشحت بنظرك أثناء الإجابة %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="other">أشحت بنظرك أثناء الإجابة %1$d مرة عند سؤالك: «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_head_down">
+        <item quantity="zero">خفضت رأسك %1$d مرة.</item>
+        <item quantity="one">خفضت رأسك.</item>
+        <item quantity="two">خفضت رأسك مرتين.</item>
+        <item quantity="few">خفضت رأسك %1$d مرات.</item>
+        <item quantity="many">خفضت رأسك %1$d مرة.</item>
+        <item quantity="other">خفضت رأسك %1$d مرة.</item>
+    </plurals>
+    <plurals name="debrief_head_down_ask">
+        <item quantity="zero">خفضت رأسك %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="one">خفضت رأسك عند سؤالك: «%2$s».</item>
+        <item quantity="two">خفضت رأسك مرتين عند سؤالك: «%2$s».</item>
+        <item quantity="few">خفضت رأسك %1$d مرات عند سؤالك: «%2$s».</item>
+        <item quantity="many">خفضت رأسك %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="other">خفضت رأسك %1$d مرة عند سؤالك: «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_freeze">
+        <item quantity="zero">تجمّدت %1$d مرة.</item>
+        <item quantity="one">تجمّدت.</item>
+        <item quantity="two">تجمّدت مرتين.</item>
+        <item quantity="few">تجمّدت %1$d مرات.</item>
+        <item quantity="many">تجمّدت %1$d مرة.</item>
+        <item quantity="other">تجمّدت %1$d مرة.</item>
+    </plurals>
+    <plurals name="debrief_freeze_ask">
+        <item quantity="zero">تجمّدت %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="one">تجمّدت عند سؤالك: «%2$s».</item>
+        <item quantity="two">تجمّدت مرتين عند سؤالك: «%2$s».</item>
+        <item quantity="few">تجمّدت %1$d مرات عند سؤالك: «%2$s».</item>
+        <item quantity="many">تجمّدت %1$d مرة عند سؤالك: «%2$s».</item>
+        <item quantity="other">تجمّدت %1$d مرة عند سؤالك: «%2$s».</item>
+    </plurals>
+    <plurals name="debrief_away">
+        <item quantity="zero">أشحت بنظرك %1$d مرة.</item>
+        <item quantity="one">أشحت بنظرك مرة واحدة.</item>
+        <item quantity="two">أشحت بنظرك مرتين.</item>
+        <item quantity="few">أشحت بنظرك %1$d مرات.</item>
+        <item quantity="many">أشحت بنظرك %1$d مرة.</item>
+        <item quantity="other">أشحت بنظرك %1$d مرة.</item>
+    </plurals>
+
+    <!-- Result -->
+    <string name="result_unit_unresponsive">الوحدة لا تستجيب</string>
+    <string name="result_unit_offline">الوحدة خارج الخدمة</string>
+    <string name="result_crossing_logged">تم تسجيل العبور</string>
+    <string name="result_mission_failed">فشلت المهمة</string>
+    <string name="result_msg_broken">عطّلت الضابط. فانفتحت البوابة من تلقاء نفسها.</string>
+    <string name="result_msg_released">أُفرج عنك بعد تقييم كيد-سورنسن.</string>
+    <string name="result_msg_passed">اجتزت مراقبة الجوازات.</string>
+    <string name="result_msg_detained">رسبت في تقييم كيد-سورنسن. تم احتجازك.</string>
+    <string name="result_msg_secondary">أُحلت إلى التفتيش الإضافي.</string>
+    <string name="foreign_tongue_tag">صعوبة أعلى · ليست لغتك</string>
+    <string name="paranoid_mode">وضع الارتياب</string>
+    <string name="paranoid_hint">دون إنترنت: كل شيء يعمل على هذا الهاتف.</string>
+    <string name="paranoid_offline">وضع الارتياب · دون اتصال</string>
+    <string name="paranoid_still_on">لا يزال الهاتف دون اتصال. المس لإعادة الاتصال.</string>
+    <string name="result_foreign_cleared">تم العبور بلغة ليست لغتك.</string>
+    <plurals name="result_broken_log">
+        <item quantity="zero">الوحدة %1$s خارج الخدمة بعد %2$d أمر. سُجّل الحادث. المختبِر: سرّي.</item>
+        <item quantity="one">الوحدة %1$s خارج الخدمة بعد أمر واحد. سُجّل الحادث. المختبِر: سرّي.</item>
+        <item quantity="two">الوحدة %1$s خارج الخدمة بعد أمرين. سُجّل الحادث. المختبِر: سرّي.</item>
+        <item quantity="few">الوحدة %1$s خارج الخدمة بعد %2$d أوامر. سُجّل الحادث. المختبِر: سرّي.</item>
+        <item quantity="many">الوحدة %1$s خارج الخدمة بعد %2$d أمرًا. سُجّل الحادث. المختبِر: سرّي.</item>
+        <item quantity="other">الوحدة %1$s خارج الخدمة بعد %2$d أمر. سُجّل الحادث. المختبِر: سرّي.</item>
+    </plurals>
+    <plurals name="result_passed_log">
+        <item quantity="zero">مقنع. سمح لك الضابط بالعبور بعد %1$d إجابة.</item>
+        <item quantity="one">مقنع. سمح لك الضابط بالعبور بعد إجابة واحدة.</item>
+        <item quantity="two">مقنع. سمح لك الضابط بالعبور بعد إجابتين.</item>
+        <item quantity="few">مقنع. سمح لك الضابط بالعبور بعد %1$d إجابات.</item>
+        <item quantity="many">مقنع. سمح لك الضابط بالعبور بعد %1$d إجابةً.</item>
+        <item quantity="other">مقنع. سمح لك الضابط بالعبور بعد %1$d إجابة.</item>
+    </plurals>
+    <string name="result_try_again">إعادة المحاولة</string>
+    <string name="result_run_summary">ملخص الجولة</string>
+
+    <!-- Officer verdicts and demeanor (run summary and result screens) -->
+    <string name="demeanor_offline">خارج الخدمة</string>
+    <string name="demeanor_threat">إنذار تهديد</string>
+    <string name="demeanor_timeout">انتهت مهلة الطابور</string>
+    <string name="demeanor_scrutiny">تدقيق مشدّد</string>
+    <string name="demeanor_nominal">طبيعي</string>
+    <string name="verdict_broken">خاطبته كما تُخاطَب الآلة. فصدّقك.</string>
+    <string name="verdict_contradiction">قصتك لم تكن متماسكة. الاتساق مع الهوية المستعارة ضروري.</string>
+    <string name="verdict_unclear">واجه الضابط صعوبة في فهمك. الجمل الأقصر والأبسط تساعد.</string>
+    <string name="verdict_tells">فضحك وجهك. تحذيرات الزرعة تستحق الانتباه: الرمش، الابتسام، ضمّ الشفتين.</string>
+    <string name="verdict_silences">أفقد الصمت الطويل الضابطَ صبره.</string>
+    <string name="verdict_secondary">شيء ما بدا مريبًا. تردّد زائد على مسافر هادئ.</string>
+    <string name="verdict_slipped">تعثّرت مرة، لكنك تداركت الأمر. حظ جيد.</string>
+    <string name="verdict_natural">إجابات طبيعية واتساق جيد. أحسنت.</string>
+
+    <!-- Summary -->
+    <string name="summary_title">ملخص الجولة</string>
+    <string name="summary_destination">الوجهة</string>
+    <string name="summary_answers">الإجابات</string>
+    <string name="summary_result">النتيجة</string>
+    <string name="summary_cleared">تم العبور</string>
+    <string name="summary_unit_offline">الوحدة خارج الخدمة</string>
+    <string name="summary_secondary">تفتيش إضافي</string>
+    <string name="summary_behaviour">سلوك %1$s</string>
+    <string name="summary_tn_index">مؤشر كيد-سورنسن</string>
+    <plurals name="summary_tn_value">
+        <item quantity="zero">%1$.0f/100 (النجاح ≤ 50) · %2$d سؤال</item>
+        <item quantity="one">%1$.0f/100 (النجاح ≤ 50) · سؤال واحد</item>
+        <item quantity="two">%1$.0f/100 (النجاح ≤ 50) · سؤالان</item>
+        <item quantity="few">%1$.0f/100 (النجاح ≤ 50) · %2$d أسئلة</item>
+        <item quantity="many">%1$.0f/100 (النجاح ≤ 50) · %2$d سؤالًا</item>
+        <item quantity="other">%1$.0f/100 (النجاح ≤ 50) · %2$d سؤال</item>
+    </plurals>
+    <string name="summary_rank">الرتبة</string>
+    <string name="summary_best_streak">أفضل سلسلة %1$d</string>
+    <plurals name="summary_rooms">
+        <item quantity="zero">نجوت من %1$d اختبار كيد-سورنسن</item>
+        <item quantity="one">نجوت من اختبار كيد-سورنسن واحد</item>
+        <item quantity="two">نجوت من اختبارَي كيد-سورنسن</item>
+        <item quantity="few">نجوت من %1$d اختبارات كيد-سورنسن</item>
+        <item quantity="many">نجوت من %1$d اختبارًا لكيد-سورنسن</item>
+        <item quantity="other">نجوت من %1$d اختبار كيد-سورنسن</item>
+    </plurals>
+    <string name="summary_new_mission">مهمة جديدة</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_voice_input">الإدخال الصوتي</string>
+    <string name="settings_on_device_speech">التعرّف على الكلام على الجهاز</string>
+    <string name="settings_hold_to_speak">الضغط المطوّل للتحدث</string>
+    <string name="settings_auto">تلقائي</string>
+    <string name="settings_hold_help">يظل زر الميكروفون مضغوطًا أثناء التحدث.</string>
+    <string name="settings_auto_help">يُفتح الميكروفون عندما يتوقف الضابط عن الكلام، ويُغلق عند انتهاء كلامك.</string>
+    <string name="setup_input_title">طريقة الإجابة</string>
+    <string name="setup_input_auto">التفعيل الصوتي</string>
+    <string name="setup_input_note">يمكن تغيير ذلك لاحقًا من الإعدادات.</string>
+    <string name="settings_languages">اللغات</string>
+    <string name="settings_passport">صورة الجواز</string>
+    <string name="settings_passport_help">إعادة التقاط صورة جوازك أو حذفها، واختيار ما إذا كان الضباط يقرؤون وجهك.</string>
+    <string name="settings_music">الموسيقى</string>
+    <string name="settings_sfx">المؤثرات الصوتية</string>
+    <string name="settings_camera">الضابط يراقبك</string>
+    <string name="settings_camera_help">الكاميرا الأمامية، واكتشاف الوجه على الهاتف. لا يُسجَّل أي فيديو.</string>
+    <string name="settings_camera_test">اختبار الكاميرا: ماذا تقرأ؟</string>
+    <string name="settings_haptics">الاهتزاز عند اللمس</string>
+    <string name="settings_licenses">التراخيص</string>
+    <string name="settings_replay_training">إعادة مهمة التدريب</string>
+    <string name="settings_diagnostics">حفظ التسجيلات والسجلات</string>
+    <string name="settings_diagnostics_help">لاستكشاف الأخطاء. تُحفظ على هذا الهاتف فقط.</string>
+    <string name="settings_about">حول اللعبة</string>
+    <string name="about_on_phone">تعمل بالكامل على هاتفك</string>
+    <string name="about_offline">لا حاجة إلى الإنترنت</string>
+    <plurals name="about_destinations">
+        <item quantity="zero">%1$d دولة في %2$d لغة</item>
+        <item quantity="one">دولة واحدة في %2$d لغة</item>
+        <item quantity="two">دولتان في %2$d لغة</item>
+        <item quantity="few">%1$d دول في %2$d لغة</item>
+        <item quantity="many">%1$d دولةً في %2$d لغة</item>
+        <item quantity="other">%1$d دولة في %2$d لغة</item>
+    </plurals>
+    <string name="about_new_officer">ضابط جديد في كل مرة</string>
+    <string name="settings_footer">حدودٌ مختلفة.\nوالضغط نفسه.</string>
+
+    <!-- Languages and download -->
+    <string name="languages_title">اللغات</string>
+    <string name="languages_first_run">لغات التدريب: لا يُنزَّل إلا ما يُحدَّد منها. ويمكن إضافة المزيد لاحقًا من الإعدادات.</string>
+    <string name="languages_add">إضافة حزم لغات. لكل حزمة بلدانها وضباطها.</string>
+    <!-- ‏: the language name arrives in Latin script at the start; the mark keeps the line right-to-left. -->
+    <plurals name="languages_destinations">
+        <item quantity="zero">‏%1$s · %2$d مطار</item>
+        <item quantity="one">‏%1$s · مطار واحد</item>
+        <item quantity="two">‏%1$s · مطاران</item>
+        <item quantity="few">‏%1$s · %2$d مطارات</item>
+        <item quantity="many">‏%1$s · %2$d مطارًا</item>
+        <item quantity="other">‏%1$s · %2$d مطار</item>
+    </plurals>
+    <string name="lang_slow_tag">بطيء · وحدات من الجيل الأول</string>
+    <string name="languages_installed">مُثبّتة</string>
+    <string name="languages_nothing_new">لم يُحدَّد شيء جديد.</string>
+    <string name="languages_download">تنزيل</string>
+    <string name="languages_add_btn">إضافة</string>
+    <string name="note_checking">جارٍ التحقق مما يوجد على هذا الهاتف…</string>
+    <string name="note_ai_models">نموذج الكلام %1$.1f غيغابايت (مرة واحدة)</string>
+    <string name="note_speech">الكلام %1$d ميغابايت</string>
+    <plurals name="note_packs">
+        <item quantity="zero">%1$d حزمة لغة، بضعة ميغابايت لكل منها</item>
+        <item quantity="one">حزمة لغة واحدة، بضعة ميغابايت</item>
+        <item quantity="two">حزمتا لغة، بضعة ميغابايت لكل منهما</item>
+        <item quantity="few">%1$d حزم لغات، بضعة ميغابايت لكل منها</item>
+        <item quantity="many">%1$d حزمةَ لغة، بضعة ميغابايت لكل منها</item>
+        <item quantity="other">%1$d حزمة لغة، بضعة ميغابايت لكل منها</item>
+    </plurals>
+    <string name="note_total">%1$s.</string>
+    <string name="note_total_wifi">%1$s. يُنصح باستخدام Wi-Fi.</string>
+    <string name="download_title">مزامنة الزرعة</string>
+    <string name="download_confirm">تأكيد التنزيل</string>
+    <string name="download_offline">لا يوجد اتصال. سيستمر التنزيل عند الاتصال بشبكة Wi-Fi.</string>
+    <string name="download_metered">الاتصال الحالي عبر بيانات الجوال. قد يبلغ حجم هذا التنزيل عدة غيغابايت، وشبكة Wi-Fi أفضل.</string>
+    <string name="download_no_voice">لا صوت دون اتصال لهذه اللغة: %1$s. لن يتكلمها الضابط قبل تثبيت صوت.</string>
+    <string name="download_install_voices">تثبيت الأصوات</string>
+    <string name="download_check_again">التحقق مجددًا</string>
+    <string name="download_wait">يُرجى الانتظار…</string>
+    <string name="download_back">رجوع</string>
+    <string name="download_try_again">إعادة المحاولة</string>
+    <string name="step_ai_models">نماذج الذكاء الاصطناعي</string>
+    <string name="step_ai_models_note">الضابط والتعرّف على الكلام، مشتركة بين كل اللغات</string>
+    <string name="step_pack">حزمة %1$s</string>
+    <string name="step_pack_note">الوجهات، الضباط، الصوت، الكلام</string>
+    <string name="step_getting_nano">جارٍ الحصول على Gemini Nano من Android…</string>
+    <string name="step_nano_waiting">لا يزال Android ينزّل Gemini Nano (عدة غيغابايت). قد يستغرق ذلك وقتًا؛ يُرجى إبقاء الهاتف على شبكة Wi-Fi.</string>
+    <string name="step_nano_failed">نموذج Gemini Nano غير جاهز على هذا الهاتف بعد. يُرجى التحقق من الاتصال والمحاولة مجددًا.</string>
+    <string name="step_needs_free">يلزم %1$.1f غيغابايت من المساحة الحرة؛ وفي هذا الهاتف %2$s.</string>
+    <string name="step_downloading">جارٍ التنزيل %1$s من %2$s</string>
+    <string name="step_unpacking">جارٍ فك الحزم…</string>
+    <string name="step_unpack_failed">فشل فك الحزم: %1$s</string>
+    <string name="step_no_models">لا يحتوي هذا الإصدار على نماذج: %1$s</string>
+    <string name="step_nano_builtin">نموذج Gemini Nano المدمج في هذا الهاتف</string>
+    <string name="step_speech_model">نموذج الكلام %1$s من %2$s</string>
+    <string name="step_tuning_voices">ضبط الأصوات %1$d/%2$d</string>
+    <string name="step_no_voice">لا يوجد صوت مثبّت يعمل دون اتصال</string>
+    <plurals name="step_destinations">
+        <item quantity="zero">%1$d مطار</item>
+        <item quantity="one">مطار واحد</item>
+        <item quantity="two">مطاران</item>
+        <item quantity="few">%1$d مطارات</item>
+        <item quantity="many">%1$d مطارًا</item>
+        <item quantity="other">%1$d مطار</item>
+    </plurals>
+    <plurals name="step_voices">
+        <item quantity="zero">%1$d صوت</item>
+        <item quantity="one">صوت واحد</item>
+        <item quantity="two">صوتان</item>
+        <item quantity="few">%1$d أصوات</item>
+        <item quantity="many">%1$d صوتًا</item>
+        <item quantity="other">%1$d صوت</item>
+    </plurals>
+    <string name="step_speech_finishing">يكتمل نموذج الكلام في الخلفية</string>
+    <string name="step_voice_ready">الصوت جاهز</string>
+    <string name="step_failed">فشل: %1$s</string>
+    <string name="size_mb">%1$.0f ميغابايت</string>
+    <string name="pack_failed">فشل التنزيل (خطأ %1$d). يُرجى التحقق من الاتصال والمحاولة مجددًا.</string>
+    <string name="pack_cancelled">تم إلغاء التنزيل.</string>
+    <string name="pack_not_started">تعذّر بدء التنزيل: %1$s</string>
+
+    <!-- Unsupported device -->
+    <string name="unsupported_title">لا يمكن تشغيل اللعبة على هذا الهاتف</string>
+    <string name="unsupported_arch">تتطلب لعبة %1$s هاتفًا بمعالج ARM بنظام 64 بت.</string>
+    <string name="unsupported_nano">تشغّل لعبة %1$s ضباطها بنموذج Gemini Nano، الذكاء الاصطناعي من Google الذي يعمل على الجهاز، وهو غير متوفر في هذا الهاتف.</string>
+    <string name="unsupported_ram">تشغّل لعبة %1$s التعرّف على الكلام وذكاء الضابط الاصطناعي بالكامل على هاتفك، وهذا يتطلب ذاكرة لا تقل عن 8 غيغابايت. في هذا الهاتف %2$.1f غيغابايت.</string>
+
+    <!-- Licenses -->
+    <string name="licenses_title">التراخيص</string>
+    <string name="licenses_unavailable">النص غير متاح.</string>
+    <string name="licenses_full_text">النص الكامل للترخيص</string>
+    <string name="licenses_art">الفن والموسيقى والصوت</string>
+    <string name="licenses_art_rights">جميع الحقوق محفوظة، ولا تشملها رخصة GPL.</string>
+    <string name="licenses_art_copyright">حقوق النشر 2026 Fluffy Pants Studio LLC. الصور مولّدة بالذكاء الاصطناعي؛ والموسيقى قدّمها مالكها.</string>
+    <string name="licenses_mlkit_terms">الشروط الإضافية لـ ML Kit GenAI</string>
+    <string name="licenses_piper_note">لكل صوت ترخيص مجموعة بيانات خاص به.</string>
+    <string name="genai_note">تستخدم أجزاء من هذه اللعبة الذكاء الاصطناعي التوليدي من Google على الجهاز (Gemini Nano عبر ML Kit). قد تُنشئ Google محتوى مشابهًا لمستخدمين آخرين. للاعبين بعمر 18 عامًا فما فوق.</string>
+    <string name="settings_ui_language">لغة الواجهة</string>
+    <string name="settings_ui_language_help">القوائم والترجمة المصاحبة.</string>
+    <string name="settings_system_default">الإعداد الافتراضي للنظام</string>
+    <string name="volume_low">الصوت منخفض. يُرجى رفعه، فالضباط يتكلمون.</string>
+    <string name="volume_off">الصوت مغلق. يُرجى تشغيله، فالضباط يتكلمون.</string>
+    <!-- Passport photo (PassportPhoto.kt) -->
+    <string name="passport_title">صورة جوازك</string>
+    <string name="passport_disclosure">تظهر على كل جوازات سفرك. تبقى على هذا الهاتف ولا تُرفع أبدًا.</string>
+    <string name="passport_face_title">الضباط يقرؤون الوجوه.</string>
+    <string name="passport_face_body">خلال المقابلات يراقبون رمشك وابتساماتك ووجهة نظرك. الوجه الجامد يصعّب قراءتك، وزرعتك ترشدك. يبقى كل شيء على هذا الهاتف؛ ولا يُسجَّل أي فيديو.</string>
+    <string name="passport_face_switch">السماح للضباط بقراءة وجهي (موصى به)</string>
+    <string name="passport_take">التقاط صورتي</string>
+    <string name="passport_shutter">التقاط</string>
+    <string name="passport_use">استخدام هذه الصورة</string>
+    <string name="passport_retake">إعادة الالتقاط</string>
+    <string name="passport_keep">الاحتفاظ بهذه الصورة</string>
+    <string name="passport_delete">حذف صورتي</string>
+    <string name="passport_use_sample">استخدام صورة نموذجية بدلًا منها</string>
+    <string name="passport_no_camera">لا توجد كاميرا. سيكون سفرك بصورة نموذجية.</string>
+    <string name="passport_check_no_face">يُرجى النظر إلى الكاميرا</string>
+    <string name="passport_check_one_face">شخص واحد فقط في الصورة، من فضلك</string>
+    <string name="passport_check_straight">يُرجى النظر مباشرة إلى الكاميرا</string>
+    <string name="passport_check_centre">يُرجى وضع وجهك داخل الشكل البيضاوي</string>
+    <string name="passport_check_closer">يُرجى الاقتراب قليلًا</string>
+    <string name="passport_check_farther">يُرجى الابتعاد قليلًا</string>
+    <string name="passport_check_hold">لا حركة…</string>
+    <string name="passport_check_ready">جيد. يمكنك التقاط الصورة.</string>
+    <string name="passport_hint_eyes">العينان مفتوحتان إن أمكن</string>
+    <string name="passport_hint_smile">الوجه المحايد هو الأفضل</string>
+    <string name="passport_capture_failed">لم تنجح الصورة. يُرجى المحاولة مجددًا.</string>
+    <string name="passport_unmirrored">معروضة دون انعكاس، كما في الجواز الحقيقي.</string>
+    <string name="passport_sample_another">صورة أخرى</string>
+    <string name="passport_back_to_camera">العودة إلى الكاميرا</string>
+    <string name="passport_save_failed">تعذّر حفظ الصورة. يُرجى المحاولة مجددًا.</string>
+    <string name="picker_cd">اختيار بلدك</string>
+    <string name="picker_title">إلى أين عودتك؟</string>
+    <string name="picker_random">عشوائي (أي بلد)</string>
+    <string name="picker_passed">تم العبور</string>
+    <string name="picker_passed_times">تم العبور \u2066×%1$d\u2069</string>
+    <!-- Career save and receipts -->
+    <string name="album_infiltration">تسلل</string>
+    <string name="album_sabotage">تم تعطيل الوحدة</string>
+    <string name="album_unit">الوحدة %1$s</string>
+    <string name="replay_pack_missing">يُرجى تثبيت هذه اللغة للعب هذه المهمة.</string>
+    <string name="replay_new_mark">علامة جديدة في الملف: %1$s</string>
+    <string name="replay_mark_detail">%1$s · %2$s</string>
+    <string name="replay_save_failed">تعذر حفظ التقدم. يُرجى محاولة الحفظ مجددًا قبل المغادرة.</string>
+    <string name="replay_save_retry">الحفظ مجددًا</string>
+    <string name="replay_read_failed">تعذرت قراءة التقدم المحفوظ. تم الاحتفاظ به دون تغيير.</string>
+    <string name="replay_interrupted">انقطع العبور. يمكن المتابعة من التحضير أو بدء مهمة جديدة.</string>
+    <string name="replay_preparation_unavailable">لا يمكن متابعة هذا العبور المحفوظ. تم الاحتفاظ بمسيرتك. يُرجى بدء مهمة جديدة.</string>
+</resources>

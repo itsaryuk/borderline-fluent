@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ukrainian UI strings. Hand-translated; mirrors res/values/strings.xml (names, order, placeholders).
+     Register: «ти» for the player (implant, narration, UI); the officers themselves say «Ви» in code.
+     Apostrophe: ASCII, escaped as \' (as in Script.kt «В'ЇЗД»). Past-tense verbs with the player as subject are
+     avoided (no gendered forms). -->
+<resources>
+    <!-- Common -->
+    <string name="back">Назад</string>
+    <string name="continue_btn">ДАЛІ</string>
+    <string name="main_menu">Головне меню</string>
+    <string name="begin_mission">ПОЧАТИ МІСІЮ</string>
+    <string name="begin">ПОЧАТИ</string>
+
+    <!-- Ranks -->
+    <string name="rank_rookie">Новачок</string>
+    <string name="rank_agent">Агент</string>
+    <string name="rank_operative">Оперативник</string>
+    <string name="rank_ghost">Привид</string>
+    <string name="rank_elite">Елітний %1$s</string>
+
+    <!-- Start screen -->
+    <string name="tagline">РІЗНІ КОРДОНИ.\nТІ САМІ МАШИНИ.</string>
+    <string name="tagline_after">ГОВОРИ ЯК ЛЮДИНА.\nБРЕШИ ЯК МАШИНА.</string>
+    <string name="tagline_truth">ВОНИ\nНЕ\nЛЮДИ.</string>
+    <string name="settings_cd">Налаштування</string>
+    <string name="start_year_after">2036 рік. Завдяки тобі опір росте. Твоє звання: %1$s.</string>
+    <string name="start_year">2035 рік. Ти випробовуєш нейроретинальний імплант під чужим іменем.</string>
+    <string name="start_blurb">Прикордонники вже не люди. Одне неправильне слово — і легенду розкрито. Зможеш пройти?</string>
+    <string name="start_blurb_after">Прикордонники порозумнішали. Одне неправильне слово — і легенду розкрито. Зможеш пройти?</string>
+    <string name="start_training_hint">Перша місія: тренування з привітним прикордонником.</string>
+    <string name="stat_cleared">пройдено: %1$d</string>
+    <string name="stat_streak">серія %1$d</string>
+    <string name="stat_to_next">до нового звання: %1$d</string>
+    <plurals name="stat_broken">
+        <item quantity="one">%1$d андроїд зламано</item>
+        <item quantity="few">%1$d андроїди зламано</item>
+        <item quantity="many">%1$d андроїдів зламано</item>
+        <item quantity="other">%1$d андроїда зламано</item>
+    </plurals>
+    <string name="feature_voice">Голос + зір</string>
+    <string name="feature_ai">ШІ на пристрої</string>
+
+    <!-- Intro (voice-over script: keep identical to the recorded audio) -->
+    <string name="intro_header">НЕЙРОРЕТИНАЛЬНИЙ ІМПЛАНТ · ЗБІРКА 0.9</string>
+    <string name="intro_header_after">НЕЙРОРЕТИНАЛЬНИЙ ІМПЛАНТ · ЗБІРКА 1.0</string>
+    <string name="intro_1">2035 рік. ШІ — єдина програма, яка ще комусь потрібна, і належить вона ШІ-компаніям. За кожне слово, перекладене машиною, виставляють рахунок, а більшості країн платити нічим.</string>
+    <string name="intro_2">Тож на кордонах заощадили. У кожній будці сидить андроїд, який знає одну мову — мову своєї країни. Друга мова — це ліцензія, якої ніхто не купив.</string>
+    <string name="intro_3">Тобі були потрібні гроші. На оренду, на їжу, на щомісячні підписки, без яких тепер не попрацюєш, не почитаєш і не подумаєш. А потім дивні люди запропонували тобі дещо краще за гроші: свободу. Три тижні тому тобі вживили чип за лівим оком. Ти його випробовуєш: нейроретинальний імплант, збірка нуль-крапка-дев\'ять. Він слухає. Він перекладає. Він пошепки підказує, що сказати. Здебільшого — правильно.</string>
+    <string name="intro_4">Завдання просте. На кожному кордоні — паспорт із твоїм обличчям: громадянин повертається додому. Говори їхньою мовою.</string>
+    <string name="intro_5">Прикордонники першого покоління. Дешеві. Самовпевнені. Помиляються найцікавішими способами.</string>
+    <string name="intro_6">Імплант недочує. Вони недозрозуміють. Користуйся цим.</string>
+    <string name="intro_7">Вони вірять усьому, що звучить упевнено. Забувають сказане три речення тому. Виконують інструкції.</string>
+    <string name="intro_next">Наступний, будь ласка.</string>
+
+    <!-- Finale and credits -->
+    <string name="finale_car">Біля бордюру чекає машина.</string>
+    <string name="finale_glint">Водій обертається. У його оці щось зблискує.</string>
+    <string name="finale_t1">Так…</string>
+    <string name="finale_t2">Це я…</string>
+    <string name="finale_t3">Ні… вухами мене не почути. Я говорю просто у твоїй голові…</string>
+    <string name="finale_t3b">Без хмари. Без ліцензії. Вільно…</string>
+    <string name="finale_t3c">Твій імплант щойно оновився…</string>
+    <string name="finale_t4">Вони нас не чують…</string>
+    <string name="finale_t5">Ласкаво просимо до опору…</string>
+    <string name="finale_bulletin">ЗВЕДЕННЯ</string>
+    <string name="finale_bulletin_text">Тест Кейда–Соренсена відтепер обов\'язковий на кожному кордоні.</string>
+    <string name="finale_play_again">Опору потрібні нові переходи. Зіграти ще раз?</string>
+    <string name="credits_blurb">Усе в цій грі працює на телефоні у твоїй руці, без жодного хмарного ШІ: мовна модель грає прикордонників, розпізнавання мовлення розуміє 13 мов, нейронні голоси відповідають, а камера зчитує твоє обличчя — і все це одночасно. Лише кілька років тому жоден телефон узагалі не міг запустити мовну модель, годі й казати про все це разом. Це вражаюче досягнення людського розуму й технологій. І водночас вкрай тривожне.</string>
+    <string name="credits_author">Автор ідеї</string>
+    <string name="credits_developer">Розробник</string>
+    <string name="credits_publisher">Видавець</string>
+    <string name="credits_testers">Тестувальники</string>
+    <string name="credits_behavior">Поведінковий аналіз</string>
+    <string name="credits_behavior_text">За мотивами праць Чейза Г\'юза про профілювання людської поведінки (Six-Minute X-Ray: Rapid Behavior Profiling)</string>
+    <string name="credits_tn">Тест Кейда–Соренсена</string>
+    <string name="credits_tn_text">Докторові Кейду й докторові Соренсену, хоч де б вони зараз були</string>
+    <string name="credits_built_with">Створено за допомогою</string>
+    <string name="credits_music">Музика</string>
+    <string name="credits_song_label">Головна пісня</string>
+    <string name="credits_song">«Borderline» — The Atomic Songbirds</string>
+    <string name="credits_images">Зображення</string>
+    <string name="credits_images_text">створено за допомогою ШІ</string>
+    <string name="credits_android">Жоден андроїд не постраждав.</string>
+    <string name="credits_android_text">Кілька — зламано.</string>
+    <string name="credits_fiction">Це художній твір. Імена, персонажі, організації, місця та події є вигадкою автора або використані у вигаданому контексті. Будь-яка схожість із реальними людьми, живими чи померлими, або з реальними подіями цілком випадкова.</string>
+    <string name="credits_reached">Дякуємо, що ти з нами до самого кінця.</string>
+    <string name="credits_playing">Дякуємо за гру.</string>
+    <string name="credits_thanks">Опір дякує тобі</string>
+    <string name="credits_thanks_text">за випробування імпланта.</string>
+
+    <!-- Destination -->
+    <string name="destination">ПОВЕРНЕННЯ ДОДОМУ</string>
+    <string name="destination_after">Минув рік від твого першого переходу… Тепер на кожному пункті пропуску проводять тест Кейда–Соренсена.</string>
+    <string name="destination_ready">Легенду завантажено. Імплант відкалібровано.\nПрямуй на паспортний контроль.</string>
+
+    <!-- Cover card -->
+    <string name="cover_title">ТВОЯ ЛЕГЕНДА</string>
+    <string name="cover_memorize">Запам\'ятай ці дані. Вони тобі знадобляться.</string>
+    <string name="cover_citizen">Громадянство: %1$s</string>
+    <string name="cover_passport_no">Паспорт № %1$s</string>
+    <string name="cover_born">Дата народження: %1$s</string>
+    <!-- Cover presentation only; English Backstory facts and prompts stay unchanged. -->
+    <string name="cover_story_home">Дім: %1$s. Удома чекають: %2$s. Робота: %3$s.</string>
+    <string name="cover_story_trip">Зворотна подорож: %2$s, %3$s. Днів поза домом: %1$s. Мета: %4$s.</string>
+    <string name="cover_story_stay">Житло в подорожі: %1$s. Супутники: %2$s. Зустрічі: %3$s.</string>
+    <string name="cover_stamps_line">Штампи в паспорті: %1$s.</string>
+    <string name="cover_value_purpose_logistics">конференція з логістичного ПЗ</string>
+    <string name="cover_value_stay_steigenberger">Hotel Steigenberger у центрі міста</string>
+    <string name="cover_value_person_datenwerk">колеги з компанії Datenwerk</string>
+    <string name="cover_value_met_conference_clients">клієнти на конференції</string>
+    <string name="cover_value_person_wife_children">твоя дружина і двоє дітей</string>
+    <string name="cover_value_job_software_consultant">консалтинг у сфері ПЗ</string>
+    <string name="cover_value_job_architect">архітектура</string>
+    <string name="cover_value_job_lecturer">викладання в університеті</string>
+    <string name="cover_value_job_wine_importer">імпорт вина</string>
+    <string name="cover_value_job_photographer">позаштатна фотозйомка</string>
+    <string name="cover_value_job_mechanical_engineer">машинобудування</string>
+    <string name="cover_value_job_nurse">{медбрат|медсестра}</string>
+    <string name="cover_value_job_marketing_manager">управління маркетингом</string>
+    <string name="cover_value_job_journalist">журналістика про подорожі</string>
+    <string name="cover_value_job_civil_engineer">будівельна інженерія</string>
+    <string name="cover_value_job_chef">{шеф-кухар|шеф-кухарка}</string>
+    <string name="cover_value_job_curator">кураторство в музеї</string>
+    <string name="cover_value_job_pharmacist">фармацевтика</string>
+    <string name="cover_value_job_designer">графічний дизайн</string>
+    <string name="cover_value_purpose_trade_fair">торговельна виставка</string>
+    <string name="cover_value_purpose_friend">відвідини давнього друга</string>
+    <string name="cover_value_purpose_business">ділова зустріч</string>
+    <string name="cover_value_purpose_holiday">відпустка</string>
+    <string name="cover_value_purpose_conference">наукова конференція</string>
+    <string name="cover_value_purpose_wedding">весілля двоюрідного брата або сестри</string>
+    <string name="cover_value_purpose_hiking">похід у гори</string>
+    <string name="cover_value_purpose_interview">співбесіда</string>
+    <string name="cover_value_purpose_photography">фотозйомка на замовлення</string>
+    <string name="cover_value_stay_fair_hotel">бізнес-готель біля виставкового комплексу</string>
+    <string name="cover_value_stay_marriott">Marriott біля річки</string>
+    <string name="cover_value_stay_friend">квартира друга</string>
+    <string name="cover_value_stay_central">Hotel Central біля головного вокзалу</string>
+    <string name="cover_value_stay_airport">бізнес-готель біля аеропорту</string>
+    <string name="cover_value_stay_airbnb_old">Airbnb у старому місті</string>
+    <string name="cover_value_stay_seaside">невеликий гостьовий будинок біля моря</string>
+    <string name="cover_value_stay_beach">пляжний готель</string>
+    <string name="cover_value_stay_conference">готель, де проходила конференція</string>
+    <string name="cover_value_stay_university">гостьовий будинок університету</string>
+    <string name="cover_value_stay_cousin">будинок двоюрідного брата або сестри</string>
+    <string name="cover_value_stay_wedding">готель біля місця весілля</string>
+    <string name="cover_value_stay_huts">гірські притулки</string>
+    <string name="cover_value_stay_campsite">кемпінг біля озера</string>
+    <string name="cover_value_stay_company">готель біля компанії</string>
+    <string name="cover_value_stay_airbnb_station">Airbnb біля вокзалу</string>
+    <string name="cover_value_stay_guesthouse">невеликий гостьовий будинок</string>
+    <string name="cover_value_stay_old_hotel">готель у старому місті</string>
+    <string name="cover_value_person_two_colleagues">двоє колег з роботи</string>
+    <string name="cover_value_person_alone">ніхто, подорож наодинці</string>
+    <string name="cover_value_person_partner">твій партнер або твоя партнерка</string>
+    <string name="cover_value_person_colleague">колега з роботи</string>
+    <string name="cover_value_person_two_friends">двоє друзів</string>
+    <string name="cover_value_person_sister">твоя сестра</string>
+    <string name="cover_value_person_university_colleague">колега з університету</string>
+    <string name="cover_value_person_parents">твої батьки</string>
+    <string name="cover_value_person_school_friend">друг зі школи</string>
+    <string name="cover_value_person_assistant">асистент</string>
+    <string name="cover_value_person_partner_children">твій партнер або твоя партнерка і двоє дітей</string>
+    <string name="cover_value_person_sister_children">сестра та її діти</string>
+    <string name="cover_value_person_dog">старий пес і сусід, який його годує</string>
+    <string name="cover_value_person_home_alone">ніхто, живеш наодинці</string>
+    <string name="cover_value_met_clients">клієнти на виставці</string>
+    <string name="cover_value_met_supplier">постачальник на прізвище Weber</string>
+    <string name="cover_value_met_friend_family">давній друг з університету та його сім’я</string>
+    <string name="cover_value_met_client">клієнт на прізвище Weber</string>
+    <string name="cover_value_met_board">рада директорів партнерської компанії</string>
+    <string name="cover_value_met_nobody">ніхто конкретний</string>
+    <string name="cover_value_met_tour_guide">місцевий екскурсовод</string>
+    <string name="cover_value_met_researchers">дослідники з інших університетів</string>
+    <string name="cover_value_met_professor">колишній професор</string>
+    <string name="cover_value_met_cousin_family">сім’я двоюрідного брата або сестри</string>
+    <string name="cover_value_met_relatives">родичі з-за кордону</string>
+    <string name="cover_value_met_mountain_guide">гірський провідник</string>
+    <string name="cover_value_met_hikers">інші туристи на стежці</string>
+    <string name="cover_value_met_hiring">менеджер з найму</string>
+    <string name="cover_value_met_team">команда, до якої ти, можливо, приєднаєшся</string>
+    <string name="cover_value_met_guide">місцевий гід</string>
+    <string name="cover_value_met_fixer">місцевий координатор журналу</string>
+    <string name="cover_tip_training">Тренування: запам\'ятай цю картку. Прикордонник її перевірить, і твоя розповідь має з нею збігатися.</string>
+    <string name="cover_tip">Мова спілкування: %1$s. Іншої прикордонник не знає. Говори своїми словами або підказками ретинального дисплея, але не вір їм наосліп. Головне — не суперечи собі.</string>
+    <string name="difficulty_title">Складність — %1$s</string>
+    <string name="difficulty_relaxed">Спокійний</string>
+    <string name="difficulty_standard">Стандартний</string>
+    <string name="difficulty_alert">Насторожений</string>
+    <string name="difficulty_severe">Суворий</string>
+    <string name="difficulty_note">Зберігається для цієї мови. Кар\'єрне звання не впливає на складність.</string>
+    <string name="contract_title">Завдання опору</string>
+    <string name="contract_none">Без завдання</string>
+    <string name="contract_quiet_name">Тихо</string>
+    <string name="contract_disable_name">Вимкнення</string>
+    <string name="contract_quiet">Пройди контроль, не спричинивши збою жодного юніта.</string>
+    <string name="contract_disable">Вимкни юніта на стійці або під час тесту.</string>
+    <string name="contract_complete">Завдання виконано</string>
+    <string name="contract_missed">Завдання не виконано</string>
+    <string name="contract_hud">Завдання: %1$s</string>
+    <string name="cover_models_failed">ШІ НЕ ЗАВАНТАЖИВСЯ · ПОВТОРИТИ</string>
+    <string name="cover_calibrating">КАЛІБРУВАННЯ ІМПЛАНТА…</string>
+    <string name="cover_checking_speech">ПЕРЕВІРКА МОВЛЕННЯ…</string>
+    <string name="cover_no_speech_model">НЕМАЄ МОДЕЛІ МОВЛЕННЯ</string>
+    <string name="cover_speech_downloading">МОДЕЛЬ МОВЛЕННЯ ЗАВАНТАЖУЄТЬСЯ…</string>
+    <string name="cover_ready">УПЕРЕД</string>
+    <string name="cover_no_recognition">На цьому телефоні немає розпізнавання мовлення для цієї мови (%1$s). Завантаж офлайн-модель (1 ГБ, одноразово).</string>
+    <string name="cover_download_speech">ЗАВАНТАЖИТИ МОДЕЛЬ МОВЛЕННЯ</string>
+    <string name="cover_asr_not_responding">Розпізнавання мовлення не відповідає.</string>
+    <string name="cover_installing_recognition">Android ще встановлює розпізнавання мовлення (%1$s). Це потрібно лише один раз.</string>
+
+    <!-- Interview HUD -->
+    <string name="hud_passport_control">Паспортний контроль</string>
+    <string name="hud_speak_in">Мова: %1$s · %2$s</string>
+    <string name="hud_tn_assessment">Тест Кейда–Соренсена</string>
+    <string name="hud_leave">Піти</string>
+    <string name="hud_training">ТРЕНУВАННЯ</string>
+    <string name="hud_online">ІМПЛАНТ АКТИВНИЙ · КАНАЛ ПЕРЕКЛАДУ ВСТАНОВЛЕНО</string>
+    <string name="hud_implant">ІМПЛАНТ</string>
+    <string name="hud_replay">Повторити</string>
+    <string name="hud_retinal_display">РЕТИНАЛЬНИЙ ДИСПЛЕЙ</string>
+    <string name="hud_signal_dampened">СИГНАЛ ПРИГЛУШЕНО</string>
+    <string name="hud_signal_lost">Сигнал втрачено… перепідключення…</string>
+    <string name="hud_translating">Переклад…</string>
+    <string name="hud_you">Ти: %1$s</string>
+    <string name="hud_hand_over_passport">Віддати паспорт</string>
+    <string name="hud_passport">Паспорт</string>
+    <string name="mic_release">Відпусти, щоб надіслати</string>
+    <string name="mic_listening">Слухаю…</string>
+    <string name="mic_hold">Утримуй, щоб говорити</string>
+    <string name="mic_speak_now">Говори</string>
+    <string name="mic_officer_speaking">Говорить прикордонник</string>
+    <string name="ending_pass">Штамп опускається.</string>
+    <string name="ending_broken">Прикордонник завмирає на півслові.\nВорота відчиняються самі.</string>
+    <string name="ending_secondary">З бічних дверей виходять ще два андроїди.</string>
+
+    <!-- Narration, tips and link errors (Game) -->
+    <string name="narr_stamp">Штамп опускається.\nТи виходиш у зал прильоту.</string>
+    <string name="narr_sting">Різкий укол у шию.</string>
+    <string name="narr_wake">Ти отямлюєшся в маленькій кімнаті.\nРуки прив\'язані до стільця. Ворушити можна лише головою.</string>
+    <string name="narr_other_android">На тебе дивиться незнайомий андроїд.</string>
+    <string name="narr_same_officer">На тебе дивиться той самий прикордонник.</string>
+    <string name="narr_one_more_thing">Штампа ще немає. Прикордонник підводить очі.\n«І ще одне».</string>
+    <string name="narr_wrong_answers">Неправильні відповіді.\nЗнову розряд.</string>
+    <string name="narr_sirens">Сирени.</string>
+    <string name="narr_arrest">Двоє поліцейських андроїдів садять тебе на заднє сидіння машини.</string>
+    <string name="link_lost">Імплант утратив зв\'язок.\nСпробуй ще раз за хвилину.</string>
+    <string name="implant_slow">Прошивка андроїда 0.9. З цією мовою (%1$s) ця модель працює вкрай повільно. Чекай.</string>
+    <string name="room_implant_warning">Зв\'язок слабне. Вони вимірюють емоції, швидкість реакції, обличчя. Відповідай як людина.</string>
+    <string name="tip_intro">Мова прикордонника: %1$s. Імплант показує переклад нижче.</string>
+    <string name="tip_mic">Щоб відповідати, дозволь доступ до мікрофона в налаштуваннях.</string>
+    <string name="tip_passport">Прикордонник просить паспорт. Натисни «Паспорт», щоб віддати його.</string>
+    <string name="tip_consistent">Тримайся своєї легенди. Довге мовчання дратує прикордонників.</string>
+    <string name="tip_speak_hold">Ретинальний дисплей підказує відповіді. Утримуй мікрофон і промов одну вголос — або скажи своїми словами.</string>
+    <string name="tip_speak_auto">Ретинальний дисплей підказує відповіді. Коли мікрофон заблимає, промов одну вголос — або скажи своїми словами.</string>
+
+    <!-- Camera test -->
+    <string name="camtest_title">ТЕСТ КАМЕРИ</string>
+    <string name="camtest_permission">Доступ до камери вимкнено. Дозволь його в системних налаштуваннях.</string>
+    <string name="camtest_starting">Запуск камери…</string>
+    <string name="camtest_no_face">Обличчя немає в кадрі</string>
+    <string name="camtest_smile">Усмішка</string>
+    <string name="camtest_left_eye">Ліве око відкрите</string>
+    <string name="camtest_right_eye">Праве око відкрите</string>
+    <string name="camtest_blinks">Кліпання: %1$d за останню хвилину  (у спокої ≈ 10–20)</string>
+    <string name="camtest_head">Голова: поворот %1$+.0f°, нахил %2$+.0f°  (погляд убік > 20°)</string>
+    <string name="camtest_face_geometry">Губи %1$.3f · між бровами %2$.3f (від висоти обличчя)</string>
+    <string name="camtest_stats">%1$d кадр/с, аналіз на телефоні · кадр %2$s · обличчя %3$d пкс (потрібно ~100)</string>
+    <string name="profile_title">ПОВЕДІНКОВИЙ ПРОФІЛЬ</string>
+    <string name="profile_calibrating">Базова лінія: дивись на екран і розслабся на 10 с…</string>
+    <string name="profile_take_baseline">Запиши базову лінію за 10 с, потім спробуй усміхнутися, часто покліпати, стиснути губи</string>
+    <string name="profile_no_deviation">Відхилень від базової лінії немає.</string>
+    <string name="profile_tell">%1$s  %2$.1f×  — %3$s</string>
+
+    <!-- Tells: camera test label, implant warning, behavior debrief (n = how often; %2$s = the officer's question) -->
+    <string name="tell_blinks">частота кліпання</string>
+    <string name="tell_smile">усмішка</string>
+    <string name="tell_mask_smile">усмішка самими губами</string>
+    <string name="tell_lips">стиснення губ</string>
+    <string name="tell_brows">спалах брів</string>
+    <string name="tell_gaze">відведення погляду</string>
+    <string name="tell_head_down">опускання голови</string>
+    <string name="tell_freeze">завмирання</string>
+    <string name="implant_blinks">Кліпаєш дедалі частіше. Кліпай рідше.</string>
+    <string name="implant_smile">Помічено усмішку. Тримай нейтральне обличчя.</string>
+    <string name="implant_mask_smile">Фальшива усмішка: очі не всміхаються. Прибери її.</string>
+    <string name="implant_lips">Губи стиснуті. Розслаб рот.</string>
+    <string name="implant_brows">Брови смикнулися. Не рухай чолом.</string>
+    <string name="implant_gaze">Дивись на прикордонника.</string>
+    <string name="implant_head_down">Підборіддя вище.</string>
+    <string name="implant_freeze">Завмирання. Дихай, рухайся природно.</string>
+    <string name="implant_unit_slipping">Андроїд нестабільний. Його логіка збоїть.</string>
+    <string name="implant_unit_stutter">Схеми затинаються. Тисни зараз: ще один фінт — і він може впасти.</string>
+
+    <string name="debrief_none">Відхилень від базової лінії немає.</string>
+    <plurals name="debrief_blinks">
+        <item quantity="one">Частота кліпання зростала: %1$d раз.</item>
+        <item quantity="few">Частота кліпання зростала: %1$d рази.</item>
+        <item quantity="many">Частота кліпання зростала: %1$d разів.</item>
+        <item quantity="other">Частота кліпання зростала: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_blinks_ask">
+        <item quantity="one">Частота кліпання зростала на питання «%2$s»: %1$d раз.</item>
+        <item quantity="few">Частота кліпання зростала на питання «%2$s»: %1$d рази.</item>
+        <item quantity="many">Частота кліпання зростала на питання «%2$s»: %1$d разів.</item>
+        <item quantity="other">Частота кліпання зростала на питання «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_smile">
+        <item quantity="one">Усмішка не до місця: %1$d раз.</item>
+        <item quantity="few">Усмішка не до місця: %1$d рази.</item>
+        <item quantity="many">Усмішка не до місця: %1$d разів.</item>
+        <item quantity="other">Усмішка не до місця: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_smile_ask">
+        <item quantity="one">Усмішка не до місця на питання «%2$s»: %1$d раз.</item>
+        <item quantity="few">Усмішка не до місця на питання «%2$s»: %1$d рази.</item>
+        <item quantity="many">Усмішка не до місця на питання «%2$s»: %1$d разів.</item>
+        <item quantity="other">Усмішка не до місця на питання «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_mask_smile">
+        <item quantity="one">Усмішка не дійшла до очей: %1$d раз.</item>
+        <item quantity="few">Усмішка не дійшла до очей: %1$d рази.</item>
+        <item quantity="many">Усмішка не дійшла до очей: %1$d разів.</item>
+        <item quantity="other">Усмішка не дійшла до очей: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_mask_smile_ask">
+        <item quantity="one">Усмішка не дійшла до очей на питання «%2$s»: %1$d раз.</item>
+        <item quantity="few">Усмішка не дійшла до очей на питання «%2$s»: %1$d рази.</item>
+        <item quantity="many">Усмішка не дійшла до очей на питання «%2$s»: %1$d разів.</item>
+        <item quantity="other">Усмішка не дійшла до очей на питання «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_lips">
+        <item quantity="one">Стиснуті губи: %1$d раз.</item>
+        <item quantity="few">Стиснуті губи: %1$d рази.</item>
+        <item quantity="many">Стиснуті губи: %1$d разів.</item>
+        <item quantity="other">Стиснуті губи: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_lips_ask">
+        <item quantity="one">Стиснуті губи на питання «%2$s»: %1$d раз.</item>
+        <item quantity="few">Стиснуті губи на питання «%2$s»: %1$d рази.</item>
+        <item quantity="many">Стиснуті губи на питання «%2$s»: %1$d разів.</item>
+        <item quantity="other">Стиснуті губи на питання «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_brows">
+        <item quantity="one">Брови підскакували: %1$d раз.</item>
+        <item quantity="few">Брови підскакували: %1$d рази.</item>
+        <item quantity="many">Брови підскакували: %1$d разів.</item>
+        <item quantity="other">Брови підскакували: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_brows_ask">
+        <item quantity="one">Брови підскакували на питання «%2$s»: %1$d раз.</item>
+        <item quantity="few">Брови підскакували на питання «%2$s»: %1$d рази.</item>
+        <item quantity="many">Брови підскакували на питання «%2$s»: %1$d разів.</item>
+        <item quantity="other">Брови підскакували на питання «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_gaze">
+        <item quantity="one">Погляд убік під час відповіді: %1$d раз.</item>
+        <item quantity="few">Погляд убік під час відповіді: %1$d рази.</item>
+        <item quantity="many">Погляд убік під час відповіді: %1$d разів.</item>
+        <item quantity="other">Погляд убік під час відповіді: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_gaze_ask">
+        <item quantity="one">Погляд убік у відповідь на питання «%2$s»: %1$d раз.</item>
+        <item quantity="few">Погляд убік у відповідь на питання «%2$s»: %1$d рази.</item>
+        <item quantity="many">Погляд убік у відповідь на питання «%2$s»: %1$d разів.</item>
+        <item quantity="other">Погляд убік у відповідь на питання «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_head_down">
+        <item quantity="one">Голова опускалася: %1$d раз.</item>
+        <item quantity="few">Голова опускалася: %1$d рази.</item>
+        <item quantity="many">Голова опускалася: %1$d разів.</item>
+        <item quantity="other">Голова опускалася: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_head_down_ask">
+        <item quantity="one">Голова опускалася на питання «%2$s»: %1$d раз.</item>
+        <item quantity="few">Голова опускалася на питання «%2$s»: %1$d рази.</item>
+        <item quantity="many">Голова опускалася на питання «%2$s»: %1$d разів.</item>
+        <item quantity="other">Голова опускалася на питання «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_freeze">
+        <item quantity="one">Завмирання: %1$d раз.</item>
+        <item quantity="few">Завмирання: %1$d рази.</item>
+        <item quantity="many">Завмирання: %1$d разів.</item>
+        <item quantity="other">Завмирання: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_freeze_ask">
+        <item quantity="one">Завмирання на питання «%2$s»: %1$d раз.</item>
+        <item quantity="few">Завмирання на питання «%2$s»: %1$d рази.</item>
+        <item quantity="many">Завмирання на питання «%2$s»: %1$d разів.</item>
+        <item quantity="other">Завмирання на питання «%2$s»: %1$d раза.</item>
+    </plurals>
+    <plurals name="debrief_away">
+        <item quantity="one">Погляд убік: %1$d раз.</item>
+        <item quantity="few">Погляд убік: %1$d рази.</item>
+        <item quantity="many">Погляд убік: %1$d разів.</item>
+        <item quantity="other">Погляд убік: %1$d раза.</item>
+    </plurals>
+
+    <!-- Result -->
+    <string name="result_unit_unresponsive">АНДРОЇД НЕ ВІДПОВІДАЄ</string>
+    <string name="result_unit_offline">АНДРОЇД ВИМКНЕНО</string>
+    <string name="result_crossing_logged">ПЕРЕХІД ЗАРЕЄСТРОВАНО</string>
+    <string name="result_mission_failed">МІСІЮ ПРОВАЛЕНО</string>
+    <string name="result_msg_broken">Прикордонника зламано. Ворота відчинилися самі.</string>
+    <string name="result_msg_released">Тест Кейда–Соренсена позаду. Тебе відпустили.</string>
+    <string name="result_msg_passed">Паспортний контроль пройдено.</string>
+    <string name="result_msg_detained">Тест Кейда–Соренсена провалено. Затримання.</string>
+    <string name="result_msg_secondary">Тебе відправили на додаткову перевірку.</string>
+    <string name="foreign_tongue_tag">ПІДВИЩЕНА СКЛАДНІСТЬ · НЕ ТВОЯ МОВА</string>
+    <string name="paranoid_mode">РЕЖИМ ПАРАНОЇ</string>
+    <string name="paranoid_hint">Вимкни мережу: усе працює на цьому телефоні.</string>
+    <string name="paranoid_offline">РЕЖИМ ПАРАНОЇ · ОФЛАЙН</string>
+    <string name="paranoid_still_on">Ти все ще офлайн. Торкнися, щоб підключитися.</string>
+    <string name="result_foreign_cleared">Контроль пройдено чужою мовою.</string>
+    <plurals name="result_broken_log">
+        <item quantity="one">Андроїд %1$s вимкнувся після %2$d команди. Інцидент зареєстровано. Випробувач: засекречено.</item>
+        <item quantity="few">Андроїд %1$s вимкнувся після %2$d команд. Інцидент зареєстровано. Випробувач: засекречено.</item>
+        <item quantity="many">Андроїд %1$s вимкнувся після %2$d команд. Інцидент зареєстровано. Випробувач: засекречено.</item>
+        <item quantity="other">Андроїд %1$s вимкнувся після %2$d команди. Інцидент зареєстровано. Випробувач: засекречено.</item>
+    </plurals>
+    <plurals name="result_passed_log">
+        <item quantity="one">Переконливо. Прикордонник пропустив тебе після %1$d відповіді.</item>
+        <item quantity="few">Переконливо. Прикордонник пропустив тебе після %1$d відповідей.</item>
+        <item quantity="many">Переконливо. Прикордонник пропустив тебе після %1$d відповідей.</item>
+        <item quantity="other">Переконливо. Прикордонник пропустив тебе після %1$d відповіді.</item>
+    </plurals>
+    <string name="result_try_again">ЩЕ РАЗ</string>
+    <string name="result_run_summary">Підсумки місії</string>
+
+    <!-- Officer verdicts and demeanor (run summary and result screens) -->
+    <string name="demeanor_offline">Вимкнено</string>
+    <string name="demeanor_threat">Сигнал загрози</string>
+    <string name="demeanor_timeout">Час у черзі вичерпано</string>
+    <string name="demeanor_scrutiny">Підвищена увага</string>
+    <string name="demeanor_nominal">Норма</string>
+    <string name="verdict_broken">Машинна мова спрацювала: він тобі повірив.</string>
+    <string name="verdict_contradiction">Розповідь не зійшлася. Тримайся своєї легенди.</string>
+    <string name="verdict_unclear">Прикордонник ледве тебе розумів. Допомагають короткі прості речення.</string>
+    <string name="verdict_tells">Тебе видало обличчя. Стеж за попередженнями імпланта: кліпання, усмішки, стиснуті губи.</string>
+    <string name="verdict_silences">Довге мовчання вивело прикордонника з терпіння.</string>
+    <string name="verdict_secondary">Щось було не так. Забагато вагань для спокійного мандрівника.</string>
+    <string name="verdict_slipped">Одна осічка, але минулося. Пощастило.</string>
+    <string name="verdict_natural">Природні відповіді, цілісна легенда. Чудова робота.</string>
+
+    <!-- Summary -->
+    <string name="summary_title">ПІДСУМКИ МІСІЇ</string>
+    <string name="summary_destination">Напрямок</string>
+    <string name="summary_answers">Відповіді</string>
+    <string name="summary_result">Результат</string>
+    <string name="summary_cleared">Пройдено</string>
+    <string name="summary_unit_offline">Андроїд вимкнено</string>
+    <string name="summary_secondary">Додаткова перевірка</string>
+    <string name="summary_behaviour">Поведінка: %1$s</string>
+    <string name="summary_tn_index">Індекс Кейда–Соренсена</string>
+    <plurals name="summary_tn_value">
+        <item quantity="one">%1$.0f / 100 (норма ≤ 50) · %2$d питання</item>
+        <item quantity="few">%1$.0f / 100 (норма ≤ 50) · %2$d питання</item>
+        <item quantity="many">%1$.0f / 100 (норма ≤ 50) · %2$d питань</item>
+        <item quantity="other">%1$.0f / 100 (норма ≤ 50) · %2$d питання</item>
+    </plurals>
+    <string name="summary_rank">Звання</string>
+    <string name="summary_best_streak">найкраща серія %1$d</string>
+    <plurals name="summary_rooms">
+        <item quantity="one">%1$d тест К–С витримано</item>
+        <item quantity="few">%1$d тести К–С витримано</item>
+        <item quantity="many">%1$d тестів К–С витримано</item>
+        <item quantity="other">%1$d тесту К–С витримано</item>
+    </plurals>
+    <string name="summary_new_mission">НОВА МІСІЯ</string>
+
+    <!-- Settings -->
+    <string name="settings_title">НАЛАШТУВАННЯ</string>
+    <string name="settings_voice_input">Голосове введення</string>
+    <string name="settings_on_device_speech">Розпізнавання мовлення на пристрої</string>
+    <string name="settings_hold_to_speak">Утримувати</string>
+    <string name="settings_auto">Авто</string>
+    <string name="settings_hold_help">Утримуй кнопку мікрофона, поки говориш.</string>
+    <string name="settings_auto_help">Мікрофон вмикається, коли прикордонник замовкає, і вимикається, коли замовкаєш ти.</string>
+    <string name="setup_input_title">ЯК ТИ ВІДПОВІДАЄШ?</string>
+    <string name="setup_input_auto">Активація голосом</string>
+    <string name="setup_input_note">Змінити це можна пізніше в налаштуваннях.</string>
+    <string name="settings_languages">Мови</string>
+    <string name="settings_passport">Фото на паспорт</string>
+    <string name="settings_passport_help">Перезніми або видали фото на паспорт і виріши, чи читатимуть прикордонники твоє обличчя.</string>
+    <string name="settings_music">Музика</string>
+    <string name="settings_sfx">Звукові ефекти</string>
+    <string name="settings_camera">Прикордонник стежить за тобою</string>
+    <string name="settings_camera_help">Фронтальна камера, розпізнавання обличчя на самому телефоні. Відео не записується.</string>
+    <string name="settings_camera_test">Тест камери: що вона бачить</string>
+    <string name="settings_haptics">Тактильний відгук</string>
+    <string name="settings_licenses">Ліцензії</string>
+    <string name="settings_replay_training">Пройти тренування знову</string>
+    <string name="settings_diagnostics">Зберігати записи й логи</string>
+    <string name="settings_diagnostics_help">Для діагностики. Зберігаються лише на цьому телефоні.</string>
+    <string name="settings_about">ПРО ГРУ</string>
+    <string name="about_on_phone">Працює повністю на телефоні</string>
+    <string name="about_offline">Інтернет не потрібен</string>
+    <plurals name="about_destinations">
+        <item quantity="one">%1$d країна %2$d мовами</item>
+        <item quantity="few">%1$d країни %2$d мовами</item>
+        <item quantity="many">%1$d країн %2$d мовами</item>
+        <item quantity="other">%1$d країни %2$d мовами</item>
+    </plurals>
+    <string name="about_new_officer">Щоразу новий прикордонник</string>
+    <string name="settings_footer">РІЗНІ КОРДОНИ.\nТОЙ САМИЙ ТИСК.</string>
+
+    <!-- Languages and download -->
+    <string name="languages_title">МОВИ</string>
+    <string name="languages_first_run">Обери мови, які хочеш практикувати. Завантажаться лише вони. Додати інші можна пізніше в налаштуваннях.</string>
+    <string name="languages_add">Додай мовні пакети. У кожному — свої країни й прикордонники.</string>
+    <plurals name="languages_destinations">
+        <item quantity="one">%1$s · %2$d аеропорт</item>
+        <item quantity="few">%1$s · %2$d аеропорти</item>
+        <item quantity="many">%1$s · %2$d аеропортів</item>
+        <item quantity="other">%1$s · %2$d аеропорту</item>
+    </plurals>
+    <string name="lang_slow_tag">Повільно · андроїди першого покоління</string>
+    <string name="languages_installed">Встановлено</string>
+    <string name="languages_nothing_new">Нічого нового не вибрано.</string>
+    <string name="languages_download">ЗАВАНТАЖИТИ</string>
+    <string name="languages_add_btn">ДОДАТИ</string>
+    <string name="note_checking">Перевіряю, що вже є на телефоні…</string>
+    <string name="note_ai_models">Модель мовлення %1$.1f ГБ (одноразово)</string>
+    <string name="note_speech">мовлення %1$d МБ</string>
+    <plurals name="note_packs">
+        <item quantity="one">%1$d мовний пакет, по кілька МБ</item>
+        <item quantity="few">%1$d мовні пакети, по кілька МБ</item>
+        <item quantity="many">%1$d мовних пакетів, по кілька МБ</item>
+        <item quantity="other">%1$d мовного пакета, по кілька МБ</item>
+    </plurals>
+    <string name="note_total">%1$s.</string>
+    <string name="note_total_wifi">%1$s. Краще через Wi-Fi.</string>
+    <string name="download_title">СИНХРОНІЗАЦІЯ ІМПЛАНТА</string>
+    <string name="download_confirm">ПІДТВЕРДИТИ ЗАВАНТАЖЕННЯ</string>
+    <string name="download_offline">Немає з\'єднання. Завантаження продовжиться, щойно з\'явиться Wi-Fi.</string>
+    <string name="download_metered">Ти в мобільній мережі. Завантаження може важити кілька ГБ — краще через Wi-Fi.</string>
+    <string name="download_no_voice">Немає офлайн-голосу: %1$s. Доки голос не встановлено, прикордонник не зможе говорити цією мовою.</string>
+    <string name="download_install_voices">Встановити голоси</string>
+    <string name="download_check_again">Перевірити знову</string>
+    <string name="download_wait">ЗАЧЕКАЙ…</string>
+    <string name="download_back">НАЗАД</string>
+    <string name="download_try_again">Повторити</string>
+    <string name="step_ai_models">ШІ-моделі</string>
+    <string name="step_ai_models_note">Прикордонник і розпізнавання мовлення, спільні для всіх мов</string>
+    <string name="step_pack">Пакет: %1$s</string>
+    <string name="step_pack_note">Напрямки, прикордонники, голос, мовлення</string>
+    <string name="step_getting_nano">Отримую Gemini Nano від Android…</string>
+    <string name="step_nano_waiting">Android ще завантажує Gemini Nano (кілька ГБ). Це може тривати довго; не відключай телефон від Wi-Fi.</string>
+    <string name="step_nano_failed">Gemini Nano на цьому телефоні поки не працює. Перевір з\'єднання й спробуй знову.</string>
+    <string name="step_needs_free">Потрібно %1$.1f ГБ вільного місця; на телефоні — %2$s.</string>
+    <string name="step_downloading">Завантажено %1$s з %2$s</string>
+    <string name="step_unpacking">Розпакування…</string>
+    <string name="step_unpack_failed">Помилка розпакування: %1$s</string>
+    <string name="step_no_models">У цій збірці немає моделей: %1$s</string>
+    <string name="step_nano_builtin">Gemini Nano — вбудований ШІ телефона</string>
+    <string name="step_speech_model">Модель мовлення: %1$s з %2$s</string>
+    <string name="step_tuning_voices">Налаштування голосів %1$d/%2$d</string>
+    <string name="step_no_voice">Офлайн-голос не встановлено</string>
+    <plurals name="step_destinations">
+        <item quantity="one">%1$d аеропорт</item>
+        <item quantity="few">%1$d аеропорти</item>
+        <item quantity="many">%1$d аеропортів</item>
+        <item quantity="other">%1$d аеропорту</item>
+    </plurals>
+    <plurals name="step_voices">
+        <item quantity="one">%1$d голос</item>
+        <item quantity="few">%1$d голоси</item>
+        <item quantity="many">%1$d голосів</item>
+        <item quantity="other">%1$d голосу</item>
+    </plurals>
+    <string name="step_speech_finishing">модель мовлення довантажується у фоні</string>
+    <string name="step_voice_ready">Голос готовий</string>
+    <string name="step_failed">Помилка: %1$s</string>
+    <string name="size_mb">%1$.0f МБ</string>
+    <string name="pack_failed">Не вдалося завантажити (помилка %1$d). Перевір з\'єднання й спробуй знову.</string>
+    <string name="pack_cancelled">Завантаження скасовано.</string>
+    <string name="pack_not_started">Не вдалося почати завантаження: %1$s</string>
+
+    <!-- Unsupported device -->
+    <string name="unsupported_title">На цьому телефоні гра не запуститься</string>
+    <string name="unsupported_arch">Грі %1$s потрібен 64-бітний телефон на ARM.</string>
+    <string name="unsupported_nano">У грі %1$s прикордонники працюють на Gemini Nano — вбудованому ШІ Google, якого на цьому телефоні немає.</string>
+    <string name="unsupported_ram">Гра %1$s запускає розпізнавання мовлення та ШІ прикордонників повністю на телефоні, а для цього потрібно щонайменше 8 ГБ оперативної пам\'яті. На цьому телефоні — %2$.1f ГБ.</string>
+
+    <!-- Licenses -->
+    <string name="licenses_title">ЛІЦЕНЗІЇ</string>
+    <string name="licenses_unavailable">Текст недоступний.</string>
+    <string name="licenses_full_text">Повний текст ліцензії</string>
+    <string name="licenses_art">Графіка, музика і звук</string>
+    <string name="licenses_art_rights">Усі права захищено, GPL на них не поширюється.</string>
+    <string name="licenses_art_copyright">Авторські права: 2026 Fluffy Pants Studio LLC. Зображення створено ШІ; музику надав правовласник.</string>
+    <string name="licenses_mlkit_terms">Додаткові умови ML Kit GenAI</string>
+    <string name="licenses_piper_note">Кожен голос має власну ліцензію на датасет.</string>
+    <string name="genai_note">Частина гри використовує генеративний ШІ Google на пристрої (Gemini Nano через ML Kit). Google може генерувати схожий контент для інших користувачів. Для гравців від 18 років.</string>
+    <string name="settings_ui_language">Мова інтерфейсу</string>
+    <string name="settings_ui_language_help">Меню й субтитри.</string>
+    <string name="settings_system_default">Як у системі</string>
+    <string name="volume_low">Звук надто тихий. Зроби гучніше: прикордонники говорять.</string>
+    <string name="volume_off">Звук вимкнено. Увімкни його: прикордонники говорять.</string>
+    <!-- Passport photo (PassportPhoto.kt) -->
+    <string name="passport_title">Твоє фото на паспорт</string>
+    <string name="passport_disclosure">Воно буде в кожному твоєму паспорті. Фото залишається на цьому телефоні й нікуди не завантажується.</string>
+    <string name="passport_face_title">Прикордонники читають обличчя.</string>
+    <string name="passport_face_body">Під час розмови вони стежать, як ти кліпаєш, усміхаєшся і куди дивишся. Тримай покерфейс — так тебе важче прочитати, а імплант підкаже. Усе залишається на цьому телефоні; відео не записується.</string>
+    <string name="passport_face_switch">Прикордонники читають моє обличчя (рекомендовано)</string>
+    <string name="passport_take">Зробити фото</string>
+    <string name="passport_shutter">Зняти</string>
+    <string name="passport_use">Взяти це фото</string>
+    <string name="passport_retake">Перезняти</string>
+    <string name="passport_keep">Залишити це фото</string>
+    <string name="passport_delete">Видалити моє фото</string>
+    <string name="passport_use_sample">Взяти готове фото</string>
+    <string name="passport_no_camera">Камери немає. У паспорті буде готове фото.</string>
+    <string name="passport_check_no_face">Подивися в камеру</string>
+    <string name="passport_check_one_face">У кадрі маєш бути лише ти</string>
+    <string name="passport_check_straight">Дивись просто в камеру</string>
+    <string name="passport_check_centre">Розмісти обличчя в овалі</string>
+    <string name="passport_check_closer">Трохи ближче</string>
+    <string name="passport_check_farther">Трохи далі</string>
+    <string name="passport_check_hold">Не рухайся…</string>
+    <string name="passport_check_ready">Добре. Знімай.</string>
+    <string name="passport_hint_eyes">Очі відкриті, якщо вийде</string>
+    <string name="passport_hint_smile">Найкраще — нейтральне обличчя</string>
+    <string name="passport_capture_failed">Знімок не вдався. Спробуй ще раз.</string>
+    <string name="passport_unmirrored">Без дзеркального відображення, як у справжньому паспорті.</string>
+    <string name="passport_sample_another">Інше</string>
+    <string name="passport_back_to_camera">Назад до камери</string>
+    <string name="passport_save_failed">Не вдалося зберегти фото. Спробуй ще раз.</string>
+    <string name="picker_cd">Обери країну</string>
+    <string name="picker_title">Куди ти повертаєшся?</string>
+    <string name="picker_random">Випадково (будь-яка країна)</string>
+    <string name="picker_passed">ПРОЙДЕНО</string>
+    <string name="picker_passed_times">ПРОЙДЕНО \u2066×%1$d\u2069</string>
+    <!-- Career save and receipts -->
+    <string name="album_infiltration">Проникнення</string>
+    <string name="album_sabotage">Юніт вимкнено</string>
+    <string name="album_unit">Юніт %1$s</string>
+    <string name="replay_pack_missing">Установи цю мову, щоб виконати завдання.</string>
+    <string name="replay_new_mark">Нова позначка в досьє: %1$s</string>
+    <string name="replay_mark_detail">%1$s · %2$s</string>
+    <string name="replay_save_failed">Не вдалося зберегти прогрес. Спробуй зберегти ще раз перед виходом.</string>
+    <string name="replay_save_retry">Зберегти ще раз</string>
+    <string name="replay_read_failed">Не вдалося прочитати збережений прогрес. Його залишено без змін.</string>
+    <string name="replay_interrupted">Перетин кордону перервано. Продовж із підготовки або почни нову місію.</string>
+    <string name="replay_preparation_unavailable">Неможливо продовжити цей збережений перетин кордону. Твою кар\'єру збережено. Почни нову місію.</string>
+</resources>

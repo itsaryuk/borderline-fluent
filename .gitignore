@@ -1,0 +1,23 @@
+build/
+.gradle/
+.kotlin/
+.idea/
+*.iml
+local.properties
+/tools/
+# Generated art sources (285 MB of PNGs; the shipped WebPs live in packs/ and app/src/main/assets).
+/art/raw/
+/art/*.log
+/art/*.pid
+# Release-only: scripts/stage-models.sh copies GBs of models here. Only the placeholders are tracked.
+/packs/core_*/src/main/assets/models/*
+!/packs/core_*/src/main/assets/models/PLACEHOLDER.txt
+# Release-only: scripts/fetch-models.sh downloads the Piper voices and espeak-ng-data into the language packs.
+/packs/lang_*/src/main/assets/tts/
+# Release secrets and the auth action's credential recipe.
+*.jks
+gha-creds-*.json
+.env
+.env.*
+# Raw device captures for the store screenshots (status bar shows personal notifications); art/screens.sh builds from them.
+/play/listing/screenshots/raw/

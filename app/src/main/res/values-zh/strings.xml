@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Simplified Chinese (mainland) UI strings. The player is addressed as 你; officers keep 您 in their own lines.
+     Kade-Sorensen = 凯德-索伦森 (as in Tn.kt). -->
+<resources>
+    <!-- Common -->
+    <string name="back">返回</string>
+    <string name="continue_btn">继续</string>
+    <string name="main_menu">主菜单</string>
+    <string name="begin_mission">开始任务</string>
+    <string name="begin">开始</string>
+
+    <!-- Ranks -->
+    <string name="rank_rookie">新手</string>
+    <string name="rank_agent">特工</string>
+    <string name="rank_operative">干员</string>
+    <string name="rank_ghost">幽灵</string>
+    <string name="rank_elite">精英%1$s</string>
+
+    <!-- Start screen -->
+    <string name="tagline">国境各异。\n机器如一。</string>
+    <string name="tagline_after">像人一样说话。\n像机器一样撒谎。</string>
+    <string name="tagline_truth">他们\n不是\n人类。</string>
+    <string name="settings_cd">设置</string>
+    <string name="start_year_after">2036年。多亏了你，抵抗组织正在壮大。你的级别：%1$s。</string>
+    <string name="start_year">2035年。你正以假身份测试一枚神经视网膜植入体。</string>
+    <string name="start_blurb">边检官早已不是人类。说错一个词，你就会暴露。你能过关吗？</string>
+    <string name="start_blurb_after">边检官变聪明了。说错一个词，你就会暴露。你能过关吗？</string>
+    <string name="start_training_hint">第一个任务：和一位友善的边检官进行训练。</string>
+    <string name="stat_cleared">通关%1$d次</string>
+    <string name="stat_streak">连胜%1$d</string>
+    <string name="stat_to_next">距下一级别还差%1$d</string>
+    <plurals name="stat_broken">
+        <item quantity="other">弄坏了%1$d台单元</item>
+    </plurals>
+    <string name="feature_voice">语音＋视觉</string>
+    <string name="feature_ai">端侧AI</string>
+
+    <!-- Intro (voice-over script: keep identical to the recorded audio) -->
+    <string name="intro_header">神经视网膜植入体 · 版本0.9</string>
+    <string name="intro_header_after">神经视网膜植入体 · 版本1.0</string>
+    <string name="intro_1">2035年。人们需要的软件只剩下AI，而AI归AI公司所有。机器翻译的每一个词都要收费，大多数国家付不起。</string>
+    <string name="intro_2">于是边境开始省钱。每个岗亭里都有一台只会一种语言的仿生人：本国的语言。第二语言是一张没人买的许可证。</string>
+    <string name="intro_3">你需要钱。付房租，买吃的，还要付如今工作、阅读、思考都离不开的月费订阅。后来，一些奇怪的人给了你比钱更好的东西：自由。三周前，他们在你的左眼后面植入了一枚芯片。你正在测试它：神经视网膜植入体，版本零点九。它会听。它会翻译。它会低声告诉你该说什么。大多数时候，它是对的。</string>
+    <string name="intro_4">任务很简单。每到一处边境，都有一本印着你照片的护照：你是一名回国的公民。说他们的语言。</string>
+    <string name="intro_5">边检官是第一代产品。廉价。自信。错起来花样百出。</string>
+    <string name="intro_6">你的植入体会听错。他们会误解。利用这一点。</string>
+    <string name="intro_7">听起来笃定的话，他们都信。你三句话之前说过什么，他们转头就忘。他们服从指令。</string>
+    <string name="intro_next">下一位。</string>
+
+    <!-- Finale and credits -->
+    <string name="finale_car">路边有一辆车在等着。</string>
+    <string name="finale_glint">司机转过头。他的眼睛里有什么一闪而过。</string>
+    <string name="finale_t1">是的……</string>
+    <string name="finale_t2">是我……</string>
+    <string name="finale_t3">不……你听到的不是声音。我在直接对你的大脑说话……</string>
+    <string name="finale_t3b">没有云。没有许可证。自由……</string>
+    <string name="finale_t3c">你的植入体刚刚升级了……</string>
+    <string name="finale_t4">他们听不见我们……</string>
+    <string name="finale_t5">欢迎加入抵抗组织……</string>
+    <string name="finale_bulletin">快讯</string>
+    <string name="finale_bulletin_text">凯德-索伦森评估现已在所有边境强制实施。</string>
+    <string name="finale_play_again">抵抗组织需要更多人越境。再玩一次？</string>
+    <string name="credits_blurb">这个游戏的一切都在你手中的手机上运行，不借助任何云端AI：语言模型扮演边检官，语音识别理解13种语言，神经网络语音作出回答，摄像头读取你的面容，所有这一切都在同时进行。就在短短几年前，还没有一部手机能运行语言模型，更不用说同时完成这一切了。这是人类智慧与技术的惊人成就。这同时也令人极度不安。</string>
+    <string name="credits_author">创意</string>
+    <string name="credits_developer">开发</string>
+    <string name="credits_publisher">发行</string>
+    <string name="credits_testers">测试</string>
+    <string name="credits_behavior">行为分析</string>
+    <string name="credits_behavior_text">灵感来自蔡斯·休斯关于人类行为画像的研究（Six-Minute X-Ray: Rapid Behavior Profiling）</string>
+    <string name="credits_tn">凯德-索伦森评估</string>
+    <string name="credits_tn_text">献给凯德博士和索伦森博士，无论他们如今身在何处</string>
+    <string name="credits_built_with">使用的技术</string>
+    <string name="credits_music">音乐</string>
+    <string name="credits_song_label">主题曲</string>
+    <string name="credits_song">The Atomic Songbirds《Borderline》</string>
+    <string name="credits_images">图像</string>
+    <string name="credits_images_text">由AI生成</string>
+    <string name="credits_android">没有仿生人在制作中受到伤害。</string>
+    <string name="credits_android_text">倒是弄坏了几台。</string>
+    <string name="credits_fiction">本作纯属虚构。名称、人物、组织、地点和事件均为作者想象的产物或经过虚构处理。如与真实人物（无论在世或已故）或真实事件雷同，纯属巧合。</string>
+    <string name="credits_reached">感谢你一路走到这里。</string>
+    <string name="credits_playing">感谢游玩。</string>
+    <string name="credits_thanks">抵抗组织向你致谢</string>
+    <string name="credits_thanks_text">感谢你测试了这枚植入体。</string>
+
+    <!-- Destination -->
+    <string name="destination">归国目的地</string>
+    <string name="destination_after">距你第一次过关已经一年了……如今每个口岸都配备了凯德-索伦森评估。</string>
+    <string name="destination_ready">掩护身份已载入。植入体已校准。\n前往护照查验处。</string>
+
+    <!-- Cover card -->
+    <string name="cover_title">你的掩护身份</string>
+    <string name="cover_memorize">记住这些信息。你会用到的。</string>
+    <string name="cover_citizen">国籍：%1$s</string>
+    <string name="cover_passport_no">护照号 %1$s</string>
+    <string name="cover_born">出生日期 %1$s</string>
+    <!-- Cover presentation only; English Backstory facts and prompts stay unchanged. -->
+    <string name="cover_story_home">住处：%1$s。家中等候者：%2$s。职业：%3$s。</string>
+    <string name="cover_story_trip">返程出发地：%2$s，%3$s。离家天数：%1$s。目的：%4$s。</string>
+    <string name="cover_story_stay">住宿：%1$s。同行者：%2$s。见过的人：%3$s。</string>
+    <string name="cover_stamps_line">护照印章：%1$s。</string>
+    <string name="cover_value_purpose_logistics">物流软件会议</string>
+    <string name="cover_value_stay_steigenberger">市中心的Hotel Steigenberger</string>
+    <string name="cover_value_person_datenwerk">Datenwerk公司的同事</string>
+    <string name="cover_value_met_conference_clients">会议上的客户</string>
+    <string name="cover_value_person_wife_children">你的妻子和两个孩子</string>
+    <string name="cover_value_job_software_consultant">软件顾问</string>
+    <string name="cover_value_job_architect">建筑师</string>
+    <string name="cover_value_job_lecturer">大学讲师</string>
+    <string name="cover_value_job_wine_importer">葡萄酒进口商</string>
+    <string name="cover_value_job_photographer">自由摄影师</string>
+    <string name="cover_value_job_mechanical_engineer">机械工程师</string>
+    <string name="cover_value_job_nurse">护士</string>
+    <string name="cover_value_job_marketing_manager">市场营销经理</string>
+    <string name="cover_value_job_journalist">旅行记者</string>
+    <string name="cover_value_job_civil_engineer">土木工程师</string>
+    <string name="cover_value_job_chef">主厨</string>
+    <string name="cover_value_job_curator">博物馆策展人</string>
+    <string name="cover_value_job_pharmacist">药剂师</string>
+    <string name="cover_value_job_designer">平面设计师</string>
+    <string name="cover_value_purpose_trade_fair">贸易展会</string>
+    <string name="cover_value_purpose_friend">探望老朋友</string>
+    <string name="cover_value_purpose_business">商务会议</string>
+    <string name="cover_value_purpose_holiday">度假</string>
+    <string name="cover_value_purpose_conference">学术会议</string>
+    <string name="cover_value_purpose_wedding">表亲或堂亲的婚礼</string>
+    <string name="cover_value_purpose_hiking">徒步旅行</string>
+    <string name="cover_value_purpose_interview">求职面试</string>
+    <string name="cover_value_purpose_photography">摄影任务</string>
+    <string name="cover_value_stay_fair_hotel">展会场地附近的商务酒店</string>
+    <string name="cover_value_stay_marriott">河边的Marriott酒店</string>
+    <string name="cover_value_stay_friend">朋友的公寓</string>
+    <string name="cover_value_stay_central">中央车站附近的Hotel Central</string>
+    <string name="cover_value_stay_airport">机场旁的商务酒店</string>
+    <string name="cover_value_stay_airbnb_old">老城区的Airbnb</string>
+    <string name="cover_value_stay_seaside">海边的小旅馆</string>
+    <string name="cover_value_stay_beach">海滨酒店</string>
+    <string name="cover_value_stay_conference">会议酒店</string>
+    <string name="cover_value_stay_university">大学招待所</string>
+    <string name="cover_value_stay_cousin">举办婚礼的表亲或堂亲家</string>
+    <string name="cover_value_stay_wedding">婚礼场地附近的酒店</string>
+    <string name="cover_value_stay_huts">山间小屋</string>
+    <string name="cover_value_stay_campsite">湖边的露营地</string>
+    <string name="cover_value_stay_company">公司附近的酒店</string>
+    <string name="cover_value_stay_airbnb_station">车站附近的Airbnb</string>
+    <string name="cover_value_stay_guesthouse">小旅馆</string>
+    <string name="cover_value_stay_old_hotel">老城区的酒店</string>
+    <string name="cover_value_person_two_colleagues">两位同事</string>
+    <string name="cover_value_person_alone">无，独自旅行</string>
+    <string name="cover_value_person_partner">你的伴侣</string>
+    <string name="cover_value_person_colleague">一位同事</string>
+    <string name="cover_value_person_two_friends">两位朋友</string>
+    <string name="cover_value_person_sister">你的姐妹</string>
+    <string name="cover_value_person_university_colleague">大学同事</string>
+    <string name="cover_value_person_parents">你的父母</string>
+    <string name="cover_value_person_school_friend">学生时代的朋友</string>
+    <string name="cover_value_person_assistant">一位助理</string>
+    <string name="cover_value_person_partner_children">你的伴侣和两个孩子</string>
+    <string name="cover_value_person_sister_children">一位姐妹和她的孩子</string>
+    <string name="cover_value_person_dog">一只老狗和喂它的邻居</string>
+    <string name="cover_value_person_home_alone">没有人，你独自居住</string>
+    <string name="cover_value_met_clients">展会上的客户</string>
+    <string name="cover_value_met_supplier">一位名叫Weber的供应商</string>
+    <string name="cover_value_met_friend_family">大学时代的老朋友和他的家人</string>
+    <string name="cover_value_met_client">一位名叫Weber的客户</string>
+    <string name="cover_value_met_board">合作公司的董事会成员</string>
+    <string name="cover_value_met_nobody">没有特定的人</string>
+    <string name="cover_value_met_tour_guide">当地导游</string>
+    <string name="cover_value_met_researchers">其他大学的研究人员</string>
+    <string name="cover_value_met_professor">以前的教授</string>
+    <string name="cover_value_met_cousin_family">举办婚礼的表亲或堂亲的家人</string>
+    <string name="cover_value_met_relatives">国外的亲戚</string>
+    <string name="cover_value_met_mountain_guide">登山向导</string>
+    <string name="cover_value_met_hikers">路上的其他徒步者</string>
+    <string name="cover_value_met_hiring">招聘经理</string>
+    <string name="cover_value_met_team">你可能加入的团队</string>
+    <string name="cover_value_met_guide">当地向导</string>
+    <string name="cover_value_met_fixer">杂志的当地协调人</string>
+    <string name="cover_tip_training">训练：记住这张卡片。边检官会考你，你的说法必须和卡片一致。</string>
+    <string name="cover_tip">使用语言：%1$s。边检官只会说这一种语言。你可以用自己的话，也可以用视网膜显示屏的建议，但别盲目相信它。保持前后一致就行。</string>
+    <string name="difficulty_title">%1$s难度</string>
+    <string name="difficulty_relaxed">轻松</string>
+    <string name="difficulty_standard">标准</string>
+    <string name="difficulty_alert">警惕</string>
+    <string name="difficulty_severe">严厉</string>
+    <string name="difficulty_note">为此语言保存。生涯军衔不会改变难度。</string>
+    <string name="contract_title">抵抗组织委托</string>
+    <string name="contract_none">无委托</string>
+    <string name="contract_quiet_name">低调</string>
+    <string name="contract_disable_name">停用</string>
+    <string name="contract_quiet">通过检查，不让任何单位崩溃。</string>
+    <string name="contract_disable">在柜台或评估中停用单位。</string>
+    <string name="contract_complete">委托已完成</string>
+    <string name="contract_missed">委托未完成</string>
+    <string name="contract_hud">委托：%1$s</string>
+    <string name="cover_models_failed">AI加载失败 · 重试</string>
+    <string name="cover_calibrating">正在校准植入体…</string>
+    <string name="cover_checking_speech">正在检查语音识别…</string>
+    <string name="cover_no_speech_model">无语音模型</string>
+    <string name="cover_speech_downloading">正在下载语音模型…</string>
+    <string name="cover_ready">我准备好了</string>
+    <string name="cover_no_recognition">这部手机没有以下语言的语音识别：%1$s。请下载离线版（1 GB，仅需一次）。</string>
+    <string name="cover_download_speech">下载语音模型</string>
+    <string name="cover_asr_not_responding">语音识别没有响应。</string>
+    <string name="cover_installing_recognition">Android仍在安装语音识别（%1$s）。只会安装这一次。</string>
+
+    <!-- Interview HUD -->
+    <string name="hud_passport_control">护照查验</string>
+    <string name="hud_speak_in">使用语言：%1$s · %2$s</string>
+    <string name="hud_tn_assessment">凯德-索伦森评估</string>
+    <string name="hud_leave">离开</string>
+    <string name="hud_training">训练</string>
+    <string name="hud_online">植入体在线 · 翻译链路已建立</string>
+    <string name="hud_implant">植入体</string>
+    <string name="hud_replay">重听</string>
+    <string name="hud_retinal_display">视网膜显示屏</string>
+    <string name="hud_signal_dampened">信号衰减</string>
+    <string name="hud_signal_lost">信号丢失……正在重试……</string>
+    <string name="hud_translating">正在翻译…</string>
+    <string name="hud_you">你：%1$s</string>
+    <string name="hud_hand_over_passport">递交护照</string>
+    <string name="hud_passport">护照</string>
+    <string name="mic_release">松开发送</string>
+    <string name="mic_listening">正在聆听…</string>
+    <string name="mic_hold">按住说话</string>
+    <string name="mic_speak_now">请说话</string>
+    <string name="mic_officer_speaking">边检官正在说话</string>
+    <string name="ending_pass">印章落下。</string>
+    <string name="ending_broken">边检官话说到一半，僵住了。\n闸门自己打开了。</string>
+    <string name="ending_secondary">侧门里又走出两台单元。</string>
+
+    <!-- Narration, tips and link errors (Game) -->
+    <string name="narr_stamp">印章落下。\n你走进了到达大厅。</string>
+    <string name="narr_sting">脖子一阵刺痛。</string>
+    <string name="narr_wake">你在一个小房间里醒来。\n双手被绑在椅子上，只有头还能动。</string>
+    <string name="narr_other_android">一台你从未见过的仿生人正注视着你。</string>
+    <string name="narr_same_officer">还是那个边检官，正注视着你。</string>
+    <string name="narr_one_more_thing">还没盖章。边检官抬起头。\n“还有一件事。”</string>
+    <string name="narr_wrong_answers">答错了。\n又是一次电击。</string>
+    <string name="narr_sirens">警笛声。</string>
+    <string name="narr_arrest">两台警用单元把你塞进了车后座。</string>
+    <string name="link_lost">植入体断开了连接。\n请一分钟后再试。</string>
+    <string name="implant_slow">单元固件0.9。该型号处理这种语言极其缓慢：%1$s。耐心等它。</string>
+    <string name="room_implant_warning">链路不稳。他们在测量情绪、反应速度和你的脸。像人一样回答。</string>
+    <string name="tip_intro">边检官的语言：%1$s。植入体会在下方显示英文。</string>
+    <string name="tip_mic">请在设置中允许使用麦克风，才能回答。</string>
+    <string name="tip_passport">边检官要你的护照。点按“护照”递交。</string>
+    <string name="tip_consistent">与掩护身份保持一致。长时间沉默会让边检官不耐烦。</string>
+    <string name="tip_speak_hold">视网膜显示屏会给出回答建议。按住麦克风读出其中一句，或者用你自己的话回答。</string>
+    <string name="tip_speak_auto">视网膜显示屏会给出回答建议。麦克风闪动时读出其中一句，或者用你自己的话回答。</string>
+
+    <!-- Camera test -->
+    <string name="camtest_title">相机测试</string>
+    <string name="camtest_permission">相机权限已关闭。请在系统设置中允许。</string>
+    <string name="camtest_starting">正在启动相机…</string>
+    <string name="camtest_no_face">画面中没有人脸</string>
+    <string name="camtest_smile">微笑</string>
+    <string name="camtest_left_eye">左眼睁开</string>
+    <string name="camtest_right_eye">右眼睁开</string>
+    <string name="camtest_blinks">眨眼：最近一分钟%1$d次（平静时 ≈ 10–20）</string>
+    <string name="camtest_head">头部：转动 %1$+.0f°，倾斜 %2$+.0f°（看向别处 > 20°）</string>
+    <string name="camtest_face_geometry">嘴唇 %1$.3f · 眉距 %2$.3f（占脸部高度）</string>
+    <string name="camtest_stats">手机端每秒分析%1$d帧 · 画面 %2$s · 人脸 %3$d px（需约100）</string>
+    <string name="profile_title">行为画像</string>
+    <string name="profile_calibrating">采集基准：看着屏幕，放松10秒…</string>
+    <string name="profile_take_baseline">先采集10秒基准，然后试试微笑、快速眨眼、抿嘴</string>
+    <string name="profile_no_deviation">与基准无偏差。</string>
+    <string name="profile_tell">%1$s  %2$.1f×  — %3$s</string>
+
+    <!-- Tells: camera test label, implant warning, behavior debrief (n = how often; %2$s = the officer's question) -->
+    <string name="tell_blinks">眨眼频率</string>
+    <string name="tell_smile">微笑</string>
+    <string name="tell_mask_smile">皮笑肉不笑</string>
+    <string name="tell_lips">抿嘴</string>
+    <string name="tell_brows">挑眉</string>
+    <string name="tell_gaze">目光躲闪</string>
+    <string name="tell_head_down">低头</string>
+    <string name="tell_freeze">僵住</string>
+    <string name="implant_blinks">眨眼频率上升。眨慢点。</string>
+    <string name="implant_smile">检测到微笑。保持面无表情。</string>
+    <string name="implant_mask_smile">假笑：眼睛没在笑。收起来。</string>
+    <string name="implant_lips">嘴唇抿紧了。放松嘴巴。</string>
+    <string name="implant_brows">眉毛跳了一下。额头别动。</string>
+    <string name="implant_gaze">看着边检官。</string>
+    <string name="implant_head_down">抬起下巴。</string>
+    <string name="implant_freeze">你僵住了。呼吸，自然一点。</string>
+    <string name="implant_unit_slipping">单元不稳定。它的逻辑在松动。</string>
+    <string name="implant_unit_stutter">电路在卡顿。现在加压：再绕一下，它可能就崩了。</string>
+
+    <string name="debrief_none">与基准没有任何偏差。</string>
+    <plurals name="debrief_blinks">
+        <item quantity="other">你的眨眼频率升高了%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_blinks_ask">
+        <item quantity="other">被问到“%2$s”时，你的眨眼频率升高了%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_smile">
+        <item quantity="other">你在不合时宜的时候笑了%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_smile_ask">
+        <item quantity="other">被问到“%2$s”时，你不合时宜地笑了%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_mask_smile">
+        <item quantity="other">你有%1$d次皮笑肉不笑。</item>
+    </plurals>
+    <plurals name="debrief_mask_smile_ask">
+        <item quantity="other">被问到“%2$s”时，你有%1$d次皮笑肉不笑。</item>
+    </plurals>
+    <plurals name="debrief_lips">
+        <item quantity="other">你抿紧嘴唇%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_lips_ask">
+        <item quantity="other">被问到“%2$s”时，你抿紧嘴唇%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_brows">
+        <item quantity="other">你的眉毛跳动了%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_brows_ask">
+        <item quantity="other">被问到“%2$s”时，你的眉毛跳动了%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_gaze">
+        <item quantity="other">回答时你移开视线%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_gaze_ask">
+        <item quantity="other">被问到“%2$s”时，你在回答中移开视线%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_head_down">
+        <item quantity="other">你低头%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_head_down_ask">
+        <item quantity="other">被问到“%2$s”时，你低头%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_freeze">
+        <item quantity="other">你僵住了%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_freeze_ask">
+        <item quantity="other">被问到“%2$s”时，你僵住了%1$d次。</item>
+    </plurals>
+    <plurals name="debrief_away">
+        <item quantity="other">你移开视线%1$d次。</item>
+    </plurals>
+
+    <!-- Result -->
+    <string name="result_unit_unresponsive">单元无响应</string>
+    <string name="result_unit_offline">单元离线</string>
+    <string name="result_crossing_logged">通关已记录</string>
+    <string name="result_mission_failed">任务失败</string>
+    <string name="result_msg_broken">你把边检官弄坏了。闸门自己打开了。</string>
+    <string name="result_msg_released">通过凯德-索伦森评估后获释。</string>
+    <string name="result_msg_passed">你通过了护照查验。</string>
+    <string name="result_msg_detained">你没有通过凯德-索伦森评估。已被拘留。</string>
+    <string name="result_msg_secondary">你被带去二次检查。</string>
+    <string name="foreign_tongue_tag">高难度 · 不是你的语言</string>
+    <string name="paranoid_mode">偏执模式</string>
+    <string name="paranoid_hint">断网也能玩：一切都在这台手机上运行。</string>
+    <string name="paranoid_offline">偏执模式 · 离线</string>
+    <string name="paranoid_still_on">仍处于离线状态。点按以重新联网。</string>
+    <string name="result_foreign_cleared">你用一门不属于你的语言通过了查验。</string>
+    <plurals name="result_broken_log">
+        <item quantity="other">单元%1$s在%2$d条指令后离线。事件已记录。测试员：机密。</item>
+    </plurals>
+    <plurals name="result_passed_log">
+        <item quantity="other">很有说服力。回答%1$d次后，边检官放你通过了。</item>
+    </plurals>
+    <string name="result_try_again">再试一次</string>
+    <string name="result_run_summary">本局总结</string>
+
+    <!-- Officer verdicts and demeanor (run summary and result screens) -->
+    <string name="demeanor_offline">离线</string>
+    <string name="demeanor_threat">触发威胁警报</string>
+    <string name="demeanor_timeout">排队超时</string>
+    <string name="demeanor_scrutiny">加强审查</string>
+    <string name="demeanor_nominal">正常</string>
+    <string name="verdict_broken">你像对机器一样跟它说话。它信了。</string>
+    <string name="verdict_contradiction">你的说法前后矛盾。要与掩护身份保持一致。</string>
+    <string name="verdict_unclear">边检官很难听懂你的话。句子短一点、简单一点会有帮助。</string>
+    <string name="verdict_tells">你的脸出卖了你。留意植入体的警告：眨眼、微笑、抿嘴。</string>
+    <string name="verdict_silences">长时间的沉默让边检官失去了耐心。</string>
+    <string name="verdict_secondary">有些不对劲。作为一个从容的旅客，你犹豫得太多了。</string>
+    <string name="verdict_slipped">你失误了一次，但挽回了。运气不错。</string>
+    <string name="verdict_natural">回答自然，前后一致。干得好。</string>
+
+    <!-- Summary -->
+    <string name="summary_title">本局总结</string>
+    <string name="summary_destination">目的地</string>
+    <string name="summary_answers">回答</string>
+    <string name="summary_result">结果</string>
+    <string name="summary_cleared">已通关</string>
+    <string name="summary_unit_offline">单元离线</string>
+    <string name="summary_secondary">二次检查</string>
+    <string name="summary_behaviour">%1$s的状态</string>
+    <string name="summary_tn_index">凯德-索伦森指数</string>
+    <plurals name="summary_tn_value">
+        <item quantity="other">%1$.0f / 100（≤ 50 为通过）· %2$d个问题</item>
+    </plurals>
+    <string name="summary_rank">级别</string>
+    <string name="summary_best_streak">最佳连胜%1$d</string>
+    <plurals name="summary_rooms">
+        <item quantity="other">挺过%1$d次K-S测试</item>
+    </plurals>
+    <string name="summary_new_mission">新任务</string>
+
+    <!-- Settings -->
+    <string name="settings_title">设置</string>
+    <string name="settings_voice_input">语音输入</string>
+    <string name="settings_on_device_speech">设备端语音识别</string>
+    <string name="settings_hold_to_speak">按住说话</string>
+    <string name="settings_auto">自动</string>
+    <string name="settings_hold_help">说话时按住麦克风按钮。</string>
+    <string name="settings_auto_help">边检官说完后麦克风自动打开，你说完后自动关闭。</string>
+    <string name="setup_input_title">你怎么回答？</string>
+    <string name="setup_input_auto">语音激活</string>
+    <string name="setup_input_note">之后可以在设置中更改。</string>
+    <string name="settings_languages">语言</string>
+    <string name="settings_passport">护照照片</string>
+    <string name="settings_passport_help">重拍或删除你的护照照片，并选择是否让边检官读取你的面部。</string>
+    <string name="settings_music">音乐</string>
+    <string name="settings_sfx">音效</string>
+    <string name="settings_camera">边检官观察你</string>
+    <string name="settings_camera_help">使用前置摄像头，人脸检测在手机上完成。不会录制视频。</string>
+    <string name="settings_camera_test">相机测试：看看它读到了什么</string>
+    <string name="settings_haptics">触感反馈</string>
+    <string name="settings_licenses">许可证</string>
+    <string name="settings_replay_training">重玩训练任务</string>
+    <string name="settings_diagnostics">保存录音和日志</string>
+    <string name="settings_diagnostics_help">用于排查问题。仅保存在这部手机上。</string>
+    <string name="settings_about">关于</string>
+    <string name="about_on_phone">完全在你的手机上运行</string>
+    <string name="about_offline">无需联网</string>
+    <plurals name="about_destinations">
+        <item quantity="other">%1$d个国家，%2$d种语言</item>
+    </plurals>
+    <string name="about_new_officer">每次都是新的边检官</string>
+    <string name="settings_footer">国境各异。\n压力如一。</string>
+
+    <!-- Languages and download -->
+    <string name="languages_title">语言</string>
+    <string name="languages_first_run">选择你想练习的语言。只会下载这些语言。之后可以在设置中添加更多。</string>
+    <string name="languages_add">添加语言包。每个语言包都有自己的国家和边检官。</string>
+    <plurals name="languages_destinations">
+        <item quantity="other">%1$s · %2$d座机场</item>
+    </plurals>
+    <string name="lang_slow_tag">慢速 · 第一代单元</string>
+    <string name="languages_installed">已安装</string>
+    <string name="languages_nothing_new">没有选择新的语言。</string>
+    <string name="languages_download">下载</string>
+    <string name="languages_add_btn">添加</string>
+    <string name="note_checking">正在检查这部手机上已有的内容…</string>
+    <string name="note_ai_models">语音模型 %1$.1f GB（仅需一次）</string>
+    <string name="note_speech">语音 %1$d MB</string>
+    <plurals name="note_packs">
+        <item quantity="other">%1$d个语言包，每个几MB</item>
+    </plurals>
+    <string name="note_total">%1$s。</string>
+    <string name="note_total_wifi">%1$s。建议使用Wi-Fi。</string>
+    <string name="download_title">植入体同步中</string>
+    <string name="download_confirm">确认下载</string>
+    <string name="download_offline">没有网络连接。连上Wi-Fi后会继续下载。</string>
+    <string name="download_metered">你正在使用移动数据。此次下载可能有几GB，最好使用Wi-Fi。</string>
+    <string name="download_no_voice">以下语言没有离线语音：%1$s。安装语音之前，边检官无法说这种语言。</string>
+    <string name="download_install_voices">安装语音</string>
+    <string name="download_check_again">重新检查</string>
+    <string name="download_wait">请稍候…</string>
+    <string name="download_back">返回</string>
+    <string name="download_try_again">重试</string>
+    <string name="step_ai_models">AI模型</string>
+    <string name="step_ai_models_note">边检官与语音识别，所有语言共用</string>
+    <string name="step_pack">语言包：%1$s</string>
+    <string name="step_pack_note">目的地、边检官、声音、语音识别</string>
+    <string name="step_getting_nano">正在从Android获取Gemini Nano…</string>
+    <string name="step_nano_waiting">Android仍在下载Gemini Nano（几GB）。这可能需要一段时间，请让手机保持连接Wi-Fi。</string>
+    <string name="step_nano_failed">这部手机上的Gemini Nano尚未就绪。请检查网络连接后重试。</string>
+    <string name="step_needs_free">需要%1$.1f GB可用空间；这部手机有%2$s。</string>
+    <string name="step_downloading">正在下载 %1$s / %2$s</string>
+    <string name="step_unpacking">正在解压…</string>
+    <string name="step_unpack_failed">解压失败：%1$s</string>
+    <string name="step_no_models">此版本不含模型：%1$s</string>
+    <string name="step_nano_builtin">Gemini Nano，手机内置</string>
+    <string name="step_speech_model">语音模型 %1$s / %2$s</string>
+    <string name="step_tuning_voices">正在调校语音 %1$d/%2$d</string>
+    <string name="step_no_voice">未安装离线语音</string>
+    <plurals name="step_destinations">
+        <item quantity="other">%1$d座机场</item>
+    </plurals>
+    <plurals name="step_voices">
+        <item quantity="other">%1$d种语音</item>
+    </plurals>
+    <string name="step_speech_finishing">语音模型正在后台完成安装</string>
+    <string name="step_voice_ready">语音已就绪</string>
+    <string name="step_failed">失败：%1$s</string>
+    <string name="size_mb">%1$.0f MB</string>
+    <string name="pack_failed">下载失败（错误 %1$d）。请检查网络连接后重试。</string>
+    <string name="pack_cancelled">下载已取消。</string>
+    <string name="pack_not_started">无法开始下载：%1$s</string>
+
+    <!-- Unsupported device -->
+    <string name="unsupported_title">这部手机无法运行本游戏</string>
+    <string name="unsupported_arch">%1$s需要64位ARM手机。</string>
+    <string name="unsupported_nano">%1$s的边检官由Gemini Nano（Google的端侧AI）驱动，而这部手机没有它。</string>
+    <string name="unsupported_ram">%1$s的语音识别和边检官AI完全在手机上运行，至少需要8 GB内存。这部手机只有%2$.1f GB。</string>
+
+    <!-- Licenses -->
+    <string name="licenses_title">许可证</string>
+    <string name="licenses_unavailable">文本不可用。</string>
+    <string name="licenses_full_text">许可证全文</string>
+    <string name="licenses_art">美术、音乐与音效</string>
+    <string name="licenses_art_rights">保留所有权利，不受GPL约束。</string>
+    <string name="licenses_art_copyright">版权所有 2026 Fluffy Pants Studio LLC。图像由AI生成；音乐由所有者提供。</string>
+    <string name="licenses_mlkit_terms">ML Kit GenAI附加条款</string>
+    <string name="licenses_piper_note">每个语音都有各自的数据集许可证。</string>
+    <string name="genai_note">本游戏的部分内容使用了Google的端侧生成式AI（通过ML Kit调用的Gemini Nano）。Google可能会为其他用户生成类似内容。适合18岁及以上玩家。</string>
+    <string name="settings_ui_language">界面语言</string>
+    <string name="settings_ui_language_help">菜单和字幕。</string>
+    <string name="settings_system_default">跟随系统</string>
+    <string name="volume_low">音量太低。调大一点：边检官会说话。</string>
+    <string name="volume_off">声音已关闭。打开声音：边检官会说话。</string>
+    <!-- Passport photo (PassportPhoto.kt) -->
+    <string name="passport_title">你的护照照片</string>
+    <string name="passport_disclosure">它会出现在你持有的每一本护照上。照片只保存在这部手机上，绝不会上传。</string>
+    <string name="passport_face_title">边检官会读脸。</string>
+    <string name="passport_face_body">面谈时，他们会观察你的眨眼、微笑和视线方向。保持扑克脸，就更难被看穿——你的植入体会指导你。一切都留在这部手机上，不会录制视频。</string>
+    <string name="passport_face_switch">允许边检官读取我的面部（推荐）</string>
+    <string name="passport_take">拍摄我的照片</string>
+    <string name="passport_shutter">拍照</string>
+    <string name="passport_use">使用这张照片</string>
+    <string name="passport_retake">重拍</string>
+    <string name="passport_keep">保留这张照片</string>
+    <string name="passport_delete">删除我的照片</string>
+    <string name="passport_use_sample">改用示例照片</string>
+    <string name="passport_no_camera">没有相机。你将使用示例照片出行。</string>
+    <string name="passport_check_no_face">请看镜头</string>
+    <string name="passport_check_one_face">画面中只能有你一个人</string>
+    <string name="passport_check_straight">请直视镜头</string>
+    <string name="passport_check_centre">请把脸移到椭圆框内</string>
+    <string name="passport_check_closer">请再靠近一点</string>
+    <string name="passport_check_farther">请稍微后退</string>
+    <string name="passport_check_hold">别动…</string>
+    <string name="passport_check_ready">很好。拍照吧。</string>
+    <string name="passport_hint_eyes">尽量睁开眼睛</string>
+    <string name="passport_hint_smile">面无表情效果最好</string>
+    <string name="passport_capture_failed">拍照失败。请重试。</string>
+    <string name="passport_unmirrored">与真实护照一样，以非镜像方式显示。</string>
+    <string name="passport_sample_another">换一张</string>
+    <string name="passport_back_to_camera">返回相机</string>
+    <string name="passport_save_failed">无法保存照片。请重试。</string>
+    <string name="picker_cd">选择你的国家</string>
+    <string name="picker_title">你要回哪个国家？</string>
+    <string name="picker_random">随机（任意国家）</string>
+    <string name="picker_passed">已通关</string>
+    <string name="picker_passed_times">已通关 \u2066×%1$d\u2069</string>
+    <!-- Career save and receipts -->
+    <string name="album_infiltration">潜入</string>
+    <string name="album_sabotage">单位已停用</string>
+    <string name="album_unit">单位 %1$s</string>
+    <string name="replay_pack_missing">请安装此语言以游玩这项任务。</string>
+    <string name="replay_new_mark">档案新增标记：%1$s</string>
+    <string name="replay_mark_detail">%1$s · %2$s</string>
+    <string name="replay_save_failed">无法保存进度。请在离开前重试保存。</string>
+    <string name="replay_save_retry">重新保存</string>
+    <string name="replay_read_failed">无法读取已保存的进度。数据已原样保留。</string>
+    <string name="replay_interrupted">通关中断。请从准备阶段继续，或开始新任务。</string>
+    <string name="replay_preparation_unavailable">无法继续这次已保存的通关。你的生涯已保留。请开始新任务。</string>
+</resources>

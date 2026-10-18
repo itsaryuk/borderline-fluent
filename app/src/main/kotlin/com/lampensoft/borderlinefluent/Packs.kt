@@ -34,6 +34,9 @@ object Packs {
     /** A language pack's Piper voices (assets/tts), if the pack is installed and carries any. */
     fun ttsDir(ctx: Context, lang: String): File? = mgr(ctx).getPackLocation(lang(lang))?.assetsPath()?.let { File(it, "tts") }?.takeIf { it.isDirectory }
 
+    /** A language pack's music file (assets/music/[name].ogg), if the pack is installed and carries it. */
+    fun musicFile(ctx: Context, lang: String, name: String): File? = mgr(ctx).getPackLocation(lang(lang))?.assetsPath()?.let { File(it, "music/$name.ogg") }?.takeIf { it.isFile }
+
     fun freeBytes(ctx: Context) = StatFs(ctx.filesDir.path).availableBytes
 
     /** Free space [packs] still need. Blocks. */

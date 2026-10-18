@@ -31,7 +31,7 @@ fun committedMarks(state: CareerSave?, saving: Boolean): List<NewMark> =
 /** Only the acknowledged receipt describes the contract result; pending or failed saves show nothing. */
 fun contractResult(state: CareerSave?, saving: Boolean): Pair<Contract, Boolean>? =
     if (saving) null else (state as? CareerSave.Saved)?.receipt?.let { receipt ->
-        Contract.fromId(receipt.contract)?.let { it to evaluateContract(it, receipt.outcome) }
+        Contract.fromId(receipt.contract)?.let { it to receipt.contractMet }
     }
 
 /** A unit unlock and its country sabotage unlock describe the same event. Keep the more specific mark. */
@@ -40,6 +40,9 @@ fun displayMarks(marks: List<NewMark>): List<NewMark> = marks.distinct().filterN
 }
 fun displayUnit(id: String): String = id.uppercase(java.util.Locale.ROOT)
 
-/** Old acknowledged history still displays one clear while its migration is waiting to commit. */
+/**
+ * Machine-test clears of [country] (the picker's PASSED badge); only migrated history without a count shows one. A desk
+ * pass is not a clear, and neither is the act-1 home desk, which also lands the home country in the history.
+ */
 fun passedCount(snapshot: CareerSnapshot?, country: String): Int =
-    snapshot?.album?.clears?.get(country) ?: if (country in passedCountries(snapshot)) 1 else 0
+    snapshot?.album?.let { it.clears[country] ?: if (country in it.historicalCleared && country != snapshot.identity?.nationality?.id) 1 else 0 } ?: 0

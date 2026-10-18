@@ -72,9 +72,17 @@ command -v zenity >/dev/null || problem "zenity is missing (it asks the owner fo
 [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ] || problem "no DISPLAY/WAYLAND_DISPLAY: the zenity password dialog can't open"
 for t in java jarsigner keytool; do [ -x "$JAVA_HOME/bin/$t" ] || problem "$JAVA_HOME/bin/$t is missing"; done
 [ -f "$BT" ] || problem "$BT is missing (it reads the bundle's manifest)"
+# The suggestion-report URL comes from BF_REPORT_URL or bfReportUrl in gradle.properties, resolved as app/build.gradle.kts
+# does; a Play build must have one (empty would silently ship a copy-only dialog).
+report=${BF_REPORT_URL:-}; [[ "$report" =~ [^[:space:]] ]] ||
+  report=$(sed -n 's/^bfReportUrl[[:space:]]*=//p' "${GRADLE_USER_HOME:-$HOME/.gradle}/gradle.properties" 2>/dev/null | tail -1)
+report=${report#"${report%%[![:space:]]*}"}; report=${report%"${report##*[![:space:]]}"}
+if scripts/check-report-url.sh "$report" >/dev/null; then
+  scripts/check-report-url.sh "$report" live "$v" || problem "the report URL does not answer 200 with the dialog's query: $report"
+else problem "no valid report URL: set BF_REPORT_URL or bfReportUrl in ~/.gradle/gradle.properties (https, printable ASCII)"; fi
 command -v zip >/dev/null && command -v unzip >/dev/null || problem "zip and unzip are needed to strip the debug signature"
 
-# Disk estimate, MB. MODELS: staged Whisper turbo int8 (~1.1 GB from its 0.54 GB pinned archive) + 20 Piper voices
+# Disk estimate, MB. MODELS: staged Whisper turbo int8 (~1.1 GB from its 0.54 GB pinned archive) + 17 Piper voices
 # (0.4 GB of pinned archives) with espeak-ng-data. BUNDLE: the models plus ~0.1 GB of app. Peak is the Gradle step:
 # the staged models + two model copies in the asset-pack/bundle intermediates + the AAB + ~2 GB of non-model release
 # intermediates (app/build of a debug build measured 1.9 GB) + margin. Fetching (~2.7 GB peak) and signing (unsigned
@@ -122,17 +130,15 @@ cleanup() {
 echo "release-local: disk before: $(free_mb .) MB free"
 clean_staged   # stale models/voices from an interrupted run must never ship
 trap cleanup EXIT
-env PACKS=packs scripts/fetch-models.sh "$work" 9>&-   # PACKS is the only variable it reads; force the repo's packs
+# PACKS and HELD_BACK are the only variables it reads: force the repo's packs and gradle.properties' held-back list.
+env -u HELD_BACK PACKS=packs scripts/fetch-models.sh "$work" 9>&-
 env -u UPLOAD_KEYSTORE -u UPLOAD_STORE_PASSWORD -u UPLOAD_KEY_PASSWORD \
   ./gradlew :app:testDebugUnitTest :app:bundleRelease -PversionCode="$code" -PversionName="$v" 9>&-
 mkdir -p "$OUT"
 mv app/build/outputs/bundle/release/app-release.aab "$UNSIGNED"
 
-# No network, ever: the manifest removes INTERNET and ML Kit's Clearcut backend; check the shipped bundle.
-m=$("$JAVA_HOME/bin/java" -jar "$BT" dump manifest --bundle "$UNSIGNED") || die "bundletool could not read the manifest of $UNSIGNED"
-! grep -q 'android.permission.INTERNET' <<<"$m" || die "the bundle's manifest has android.permission.INTERNET; $UNSIGNED is not shippable"
-! grep -q 'CctBackendFactory' <<<"$m" || die "the bundle's manifest registers CctBackendFactory; $UNSIGNED is not shippable"
-echo "release-local: bundle manifest: no INTERNET, no CctBackendFactory"
+scripts/check-manifest.sh "$UNSIGNED" "$BT" || die "manifest check failed"
+scripts/check-report-url.sh "$report" aab "$UNSIGNED" || die "the bundle does not carry the report URL"
 trap - EXIT; cleanup; set -e
 
 # Strip the debug signature (top-level META-INF only; base/root/META-INF is app content), as release.yml does.

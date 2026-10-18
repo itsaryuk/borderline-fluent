@@ -54,10 +54,3 @@ fun destinationAvailable(destination: Destination, officerId: String, enabledLan
         officerId in destination.airport.officers && "officer_${officerId}_sheet" in packArt
 
 fun airportCount(lang: String): Int = Country.all.sumOf { c -> c.airports.count { it.lang == lang } }
-
-data class PickerCountry(val country: Country, val passed: Boolean)
-data class DestinationPicker(val countries: List<PickerCountry>)
-
-/** Nationality rows; readiness comes from the current pack inventory. */
-fun destinationPicker(enabledLanguages: Set<String>, packArt: Set<String>, passed: Set<String>): DestinationPicker =
-    DestinationPicker(playableCountries(enabledLanguages, packArt).map { PickerCountry(it, it.id in passed) })

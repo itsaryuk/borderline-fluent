@@ -63,7 +63,7 @@ object Models {
 
     val OPTION = Regex("""^\s*[123][:.)].+""")
     val FORMAT = Regex("""^\s*[A-Z]{2}:.+\n\s*EN:.+""", RegexOption.MULTILINE)
-    private val TAGS = Regex("""\s*\[(PASS|SECONDARY)]""")
+    private val TAGS = Regex("""\s*\[(PASS)]""")
     // Safety net for copied template markers: angle brackets anywhere, a "[German reply]" label at either end.
     private val MARKER = Regex("""^\s*\[[^\]]*]\s*|\s*\[[^\]]*]\s*$""")
     private fun clean(s: String) = s.replace(TAGS, "").replace("<", "").replace(">", "").replace(MARKER, "").trim()
@@ -87,10 +87,20 @@ object Models {
     fun englishLine(s: String) = s.lineSequence().firstOrNull { it.trimStart().startsWith("EN:") }
         ?.substringAfter(':')?.let(::clean)?.takeUnless { '[' in it || ']' in it } ?: ""
 
+    private val LATIN_START = Regex("""^\s*\p{IsLatin}""")
     /** "1: Ja, gerne. | Yes, gladly." or "1: はい。 | Hai. | Yes." -> Hint (the middle part is the reading aid). */
     fun option(line: String): Hint {
-        val p = line.trim().drop(2).split('|').map(::clean)
-        return if (p.size >= 3) Hint(p[0], p[1], p[2]) else Hint(p[0], "", p.getOrNull(1) ?: "")
+        var body = line.trim().drop(2)
+        // "Я учу. / Ya uchu. | I learn.": " / " between a non-Latin target and a Latin reading is a separator.
+        val slash = body.indexOf(" / ")
+        if (slash > 0 && body.substring(0, slash).none { it == '|' } && body.substring(0, slash).any { it.isLetter() && !Character.UnicodeScript.of(it.code).equals(Character.UnicodeScript.LATIN) } &&
+            LATIN_START.containsMatchIn(body.substring(slash + 3)))
+            body = body.substring(0, slash) + " | " + body.substring(slash + 3)
+        val p = body.split('|').map(::clean)
+        if (p.size >= 3) return Hint(p[0], p.subList(1, p.size - 1).joinToString(" "), p.last())
+        // "target | reading (translation)"
+        val m = p.getOrNull(1)?.let { Regex("""^(.+?)\s*\((.+)\)$""").matchEntire(it) }
+        return if (m != null) Hint(p[0], m.groupValues[1], m.groupValues[2]) else Hint(p[0], "", p.getOrNull(1) ?: "")
     }
 
     fun writeWav(f: File, pcm: FloatArray) = RandomAccessFile(f, "rw").use { raf ->
@@ -126,4 +136,4 @@ data class Heard(val text: String, val lang: String)
 data class Turn(val reply: String, val ttftMs: Long, val totalMs: Long, val prefillTok: Int, val decodeTok: Int,
                 val decodeTps: Double, val prefillTps: Double)
 
-data class Retina(val check: Check?, val options: List<String>, val turn: Turn)
+data class Retina(val check: Check?, val options: List<String>, val turn: Turn, val log: String = "")

@@ -28,11 +28,12 @@ import kotlinx.coroutines.withContext
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val resolver = LocalContext.current.contentResolver
     var resumed by remember(lifecycle) { mutableStateOf(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
-    var reduced by remember { mutableStateOf(!ValueAnimator.areAnimatorsEnabled()) }
+    var reducedSys by remember { mutableStateOf(!ValueAnimator.areAnimatorsEnabled()) }
+    val reduced = reducedSys || Motion.reduce
     DisposableEffect(lifecycle, resolver) {
         fun refresh() {
             resumed = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-            reduced = !ValueAnimator.areAnimatorsEnabled()
+            reducedSys = !ValueAnimator.areAnimatorsEnabled()
         }
         val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
             override fun onChange(selfChange: Boolean) { refresh() }

@@ -80,7 +80,7 @@ val NAMES: Map<String, Names> = mapOf(
         "Smith, Murphy, Wilson, Taylor, Brown, Walsh, Campbell, Kelly, Thompson, Clarke, Hughes, Roberts"),
 )
 
-/** Real home towns per canonical country, in Latin letters. */
+/** Real home towns per nationality ([Nationality.all]), in Latin letters. */
 val CITIES: Map<String, List<String>> = """
 de=Berlin,Leipzig,Freiburg,Hamburg,Munich,Cologne;
 fr=Paris,Lyon,Nantes,Marseille,Nice,Toulouse;
@@ -105,52 +105,33 @@ colombia=Bogotá,Medellín,Cali,Cartagena;
 brazil=São Paulo,Belo Horizonte,Recife,Curitiba;
 angola=Luanda,Benguela,Huambo,Lubango;
 capeverde=Mindelo,Praia,Assomada,Espargos;
-kazakhstan=Almaty,Astana,Shymkent,Karaganda;
-kyrgyzstan=Bishkek,Osh,Jalal-Abad,Karakol;
 egypt=Cairo,Alexandria,Luxor,Aswan;
 jordan=Amman,Irbid,Aqaba,Madaba;
 morocco=Casablanca,Marrakesh,Fez,Rabat;
 uk=London,Manchester,Bristol,Edinburgh;
 ireland=Dublin,Cork,Galway,Limerick;
-australia=Sydney,Melbourne,Brisbane,Adelaide
+australia=Sydney,Melbourne,Brisbane,Adelaide;
+usa=Chicago,Seattle,Denver,Philadelphia,Austin
 """.split(";").associate { e -> e.trim().split("=").let { it[0] to it[1].split(",") } }
 
-/**
- * One kind of trip: what the traveler did abroad, and the places and people that fit it, so a cover never says
- * "a hiking trip" and "stayed at the conference hotel". [with] pairs a text with a key that [WAITING] avoids repeating.
- */
-class Trip(val purpose: String, val stayed: List<String>, val with: List<Pair<String, String>>, val met: List<String>)
-
-private val ALONE = "nobody, travelled alone" to "alone"
+/** A coherent purpose, accommodation and optional host for one trip. */
+class Trip(val purpose: String, val stayed: List<String>, val host: String)
 
 val TRIPS = listOf(
-    Trip("a trade fair", listOf("a business hotel near the fairground", "the Marriott by the river"),
-        listOf("two colleagues from work" to "colleague", ALONE), listOf("clients at the fair", "a supplier named Weber")),
-    Trip("visiting an old friend", listOf("the friend's apartment"),
-        listOf(ALONE, "their partner" to "partner"), listOf("an old friend from university and his family")),
-    Trip("a business meeting", listOf("Hotel Central near the main station", "a business hotel by the airport"),
-        listOf("a colleague from work" to "colleague", ALONE), listOf("a client named Weber", "the board of a partner company")),
-    Trip("a holiday", listOf("an Airbnb in the old town", "a small guesthouse by the sea", "a beach hotel"),
-        listOf("their partner" to "partner", "two friends" to "friend", "their sister" to "sister", ALONE),
-        listOf("nobody in particular", "a local tour guide")),
-    Trip("an academic conference", listOf("the conference hotel", "a university guest house"),
-        listOf("a university colleague" to "colleague", ALONE), listOf("researchers from other universities", "a former professor")),
-    Trip("a cousin's wedding", listOf("the cousin's house", "a hotel near the wedding venue"),
-        listOf("their partner" to "partner", "their parents" to "parents", ALONE), listOf("the cousin's family", "relatives from abroad")),
-    Trip("a hiking trip", listOf("mountain huts", "a campsite by a lake"),
-        listOf("a friend from school" to "friend", ALONE), listOf("a mountain guide", "other hikers on the trail")),
-    Trip("a job interview", listOf("a hotel near the company", "an Airbnb near the station"),
-        listOf(ALONE), listOf("the hiring manager", "the team they might join")),
-    Trip("a photography assignment", listOf("a small guesthouse", "a hotel in the old town"),
-        listOf("an assistant" to "colleague", ALONE), listOf("a local guide", "the magazine's local fixer")),
+    Trip("a trade fair", listOf("a business hotel near the fairground", "the Marriott by the river"), "nobody, a hotel stay"),
+    Trip("visiting an old friend", listOf("the friend's apartment"), "an old friend from university"),
+    Trip("a business meeting", listOf("Hotel Central near the main station", "a business hotel by the airport"), "a partner company"),
+    Trip("a holiday", listOf("an Airbnb in the old town", "a small guesthouse by the sea", "a beach hotel"), "nobody, a holiday"),
+    Trip("an academic conference", listOf("the conference hotel", "a university guest house"), "the university hosting the conference"),
+    Trip("a friend's wedding", listOf("a friend's flat", "a hotel near the wedding venue"), "the friend getting married"),
+    Trip("a hiking trip", listOf("mountain huts", "a campsite by a lake"), "nobody, a hiking holiday"),
+    Trip("a job interview", listOf("a hotel near the company", "an Airbnb near the station"), "the company they interview with"),
+    Trip("a photography assignment", listOf("a small guesthouse", "a hotel in the old town"), "the magazine they work for"),
 )
 
-/** Who waits at home, keyed like [Trip.with]: never the people they travelled with. */
-val WAITING = listOf("their partner and two children" to "partner", "their partner" to "partner", "their parents" to "parents",
-    "a sister and her children" to "sister", "an old dog and a neighbour who feeds it" to "dog", "nobody, lives alone" to "alone")
-
-/** Travelled with [withKey]: who may wait at home. A partner on the trip is not waiting, nor "lives alone". */
-fun waitingFor(withKey: String) = WAITING.filter { it.second != withKey && !(withKey == "partner" && it.second == "alone") }
+/** Cover values retired because the traveller has no family (owner, 2026-10-17): a saved trip loads with the new one. */
+val RETIRED_COVER_VALUES = mapOf("a cousin's wedding" to "a friend's wedding", "the cousin's house" to "a friend's flat",
+    "their cousin" to "the friend getting married")
 
 /**
  * The city of the trip per [Country.nation] (real countries only, like [Backstory.from]): Latin, then the forms in
@@ -169,12 +150,27 @@ Senegal=Dakar|Дакар|Дакар|داكار|ダカール|达喀尔; Mexico=Me
 Argentina=Buenos Aires|Буэнос-Айрес|Буенос-Айрес|بوينس آيرس|ブエノスアイレス|布宜诺斯艾利斯
 Colombia=Bogotá|Богота|Богота|بوغوتا|ボゴタ|波哥大; Brazil=São Paulo|Сан-Паулу|Сан-Паулу|ساو باولو|サンパウロ|圣保罗
 Angola=Luanda|Луанда|Луанда|لواندا|ルアンダ|罗安达; Cape Verde=Praia|Прая|Прая|برايا|プライア|普拉亚
-Kazakhstan=Almaty|Алматы|Алмати|ألماتي|アルマトイ|阿拉木图; Kyrgyzstan=Bishkek|Бишкек|Бішкек|بيشكيك|ビシュケク|比什凯克
 Egypt=Cairo|Каир|Каїр|القاهرة|カイロ|开罗; Jordan=Amman|Амман|Амман|عمّان|アンマン|安曼
 Morocco=Casablanca|Касабланка|Касабланка|الدار البيضاء|カサブランカ|卡萨布兰卡
 United Kingdom=London|Лондон|Лондон|لندن|ロンドン|伦敦; Ireland=Dublin|Дублин|Дублін|دبلن|ダブリン|都柏林
 Australia=Sydney|Сидней|Сідней|سيدني|シドニー|悉尼
+United States=Chicago|Чикаго|Чикаго|شيكاغو|シカゴ|芝加哥
 """.split(";", "\n").filter { it.isNotBlank() }.associate { e -> e.trim().split("=").let { it[0] to it[1].split(", ") } }
+
+/** The city each airport serves (Latin): an arrival's visit city is its airport's, so the two never disagree. */
+val AIRPORT_CITY: Map<String, String> = """
+fra=Frankfurt fkb=Baden-Baden hhn=Hahn bre=Bremen str=Stuttgart dtm=Dortmund cdg=Paris mrs=Marseille nce=Nice tuf=Tours
+lil=Lille avn=Avignon run=Saint-Denis mad=Madrid vll=Valladolid fco=Rome rmi=Rimini flr=Florence olb=Olbia nap=Naples
+vrn=Verona peg=Perugia lis=Lisbon pdl=Ponta_Delgada fnc=Funchal ter=Praia_da_Vitória waw=Warsaw krk=Kraków ktw=Katowice
+gdn=Gdańsk poz=Poznań rze=Rzeszów wro=Wrocław svo=Moscow mmk=Murmansk arh=Arkhangelsk tof=Tomsk kzn=Kazan uud=Ulan-Ude
+kbp=Kyiv hrk=Kharkiv ods=Odesa lwo=Lviv ifo=Ivano-Frankivsk ist=Istanbul nav=Nevşehir rzv=Rize
+dlm=Dalaman asr=Kayseri adb=Izmir saw=Istanbul dxb=Dubai auh=Abu_Dhabi aan=Al_Ain nrt=Tokyo hij=Hiroshima kmq=Komatsu
+kij=Niigata koj=Kagoshima cts=Chitose oka=Naha pek=Beijing kwl=Guilin hgh=Hangzhou kwe=Guiyang xmn=Xiamen lhw=Lanzhou
+wus=Wuyishan vie=Vienna inn=Innsbruck szg=Salzburg zrh=Zurich crl=Charleroi yul=Montreal yyz=Toronto dss=Dakar
+mex=Mexico_City cun=Cancún cjs=Ciudad_Juárez eze=Buenos_Aires mdz=Mendoza bog=Bogotá ctg=Cartagena mde=Medellín
+gru=São_Paulo lad=Luanda rai=Praia cai=Cairo amm=Amman cmn=Casablanca fez=Fès lhr=London
+syy=Stornoway dub=Dublin syd=Sydney asp=Alice_Springs jfk=New_York lax=Los_Angeles ord=Chicago
+""".trim().split(Regex("\\s+")).associate { e -> e.split("=").let { it[0] to it[1].replace('_', ' ') } }
 
 private val CITY_SCRIPTS = listOf("ru", "uk", "ar", "ja", "zh")
 
@@ -184,62 +180,116 @@ fun cityIn(city: String, lang: String): String? {
     return TRIP_CITIES.values.flatten().map { it.split('|') }.firstOrNull { it[0] == city }?.get(i + 1)
 }
 
-/** Cover jobs, English (the cover is an English document; Ui.kt picks "a"/"an" by the first letter). */
-val JOBS = listOf("software consultant", "architect", "university lecturer", "wine importer", "freelance photographer",
-    "mechanical engineer", "nurse", "marketing manager", "travel journalist", "civil engineer", "chef",
-    "museum curator", "pharmacist", "graphic designer")
-
 /** A sample traveler face: tile [tile] of assets/art/<sheet>.webp (3x2 passport photos), used until the player's own photo. */
 data class Person(val female: Boolean, val sheet: String, val tile: Int)
 
 /**
- * The player's cover: a citizen of [country] (the destination) coming home from a trip to [from]. Structured on purpose:
- * the answer check compares answers against these fields. [female]: the identity's grammatical gender, drawn per cover
- * (owner, 2026-10-05: it may differ from the player's face); [photo] is a sample face of that gender.
- * [city]: where in [from] they were (Latin). [stamps]: this trip ("Canada 2035") first, then earlier trips.
+ * The player's cover for one trip: the flat view of [Identity] + [Itinerary] at [country] (always the destination desk;
+ * [nationality] is the passport's). Flat on purpose: the answer check compares answers against these fields, and
+ * fixtures `copy` single fields. [gender]: how officers address the traveller ({m|f|n} forms in [Assessment.fill]);
+ * [photo] is the passport photo's sample face. HOMECOMING: [from] is the trip's country and [city] (Latin) in it.
+ * ARRIVAL: [city] is in the destination, [from] is where they fly in from.
+ * Retired job, companion, meeting, waiting and stamp fields are retained only for archived saves.
  */
 data class Backstory(
-    val name: String, val latin: String, val female: Boolean, val photo: Person, val country: Country,
+    val name: String, val latin: String, val gender: Gender, val photo: Person, val country: Country,
     val passportNo: String, val born: String, val home: String, val job: String, val from: String, val city: String, val purpose: String,
     val days: Int, val stayed: String, val travelledWith: String, val met: String, val waiting: String,
-    val stamps: List<String>, val lang: String,
+    val stamps: List<String>, val lang: String, val nationality: Nationality, val kind: TripKind, val host: String,
+    /** The queue scene before the desk (PRD §6b), not part of the cover; its fact only once chosen and asked. */
+    val encounter: QueueEncounter? = null,
+    val homeArrivalTraining: Boolean = false,
 ) {
     /** Home town and real nationality; avoid repeating an identical town/country name. */
-    val homeLine get() = if (home == country.name) home else "$home, ${country.name}"
+    val homeLine get() = if (home == nationality.name) home else "$home, ${nationality.name}"
 
     /** "Toronto", or "Toronto / Торонто" for a [lang] that writes it differently. */
     fun cityLine(lang: String = this.lang) = city + (cityIn(city, lang)?.let { " / $it" } ?: "")
 
-    /**
-     * The checkable facts, numbered for the answer check in the order an officer asks. Stable: indexes are stored per
-     * run. [lang]: the desk's language, for the city's spelling (the bench puts one cover at every desk).
-     */
-    fun facts(lang: String = this.lang) = listOf(
-        "Name: $name" + (if (latin != name) " (in Latin letters: $latin)" else "") + "; date of birth: $born",
-        "Returning from (the country of this trip): $from (the city ${cityLine(lang)} is in $from)", "Purpose of the trip (why they went): $purpose",
-        "Time away (length of the trip): $days days", "Where they stayed on the trip: $stayed",
-        "Travelled with: $travelledWith", "Met on the trip: $met", "Home (where they live and are from): $homeLine",
-        "Occupation (job): $job", "Waiting at home: $waiting", "Passport stamps: ${stamps.joinToString()}",
-    )
+    /** The queue choice the desk will ask about, else null. */
+    val askedEncounter get() = encounter?.takeIf { it.asked }?.chosen
 
-    fun card(lang: String = this.lang) = """
-        Name: $name${if (latin != name) " ($latin)" else ""}, ${if (female) "woman" else "man"} (citizen of ${country.name}, passport $passportNo, born $born)
+    /** Only a hosted visit exposes HOST, including when restoring an older cover. */
+    val hasHost get() = kind == TripKind.ARRIVAL && host.isNotBlank() && !host.startsWith("nobody")
+
+    /**
+     * The checkable facts of this trip's kind, in the order an officer asks; Nano sees them numbered ([facts]).
+     * [FactId.ENCOUNTER] comes last for a chosen queue question or the fixed home arrival training question;
+     * the numbers before it never shift.
+     */
+    fun factIds(): List<FactId> = (if (kind == TripKind.ARRIVAL) ARRIVAL_FACTS else HOMECOMING_FACTS)
+        .filter { it != FactId.HOST || hasHost } +
+        listOfNotNull(FactId.ENCOUNTER.takeIf { askedEncounter != null || homeArrivalTraining })
+
+    /** [factIds]' 1-based number in Nano's classify reply → its id; null for 0 or out of range. */
+    fun factOf(n: Int): FactId? = factIds().getOrNull(n - 1)
+
+    /** Stamps from earlier trips: HOMECOMING's first stamp is this trip's; an ARRIVAL has only earlier ones. */
+    val earlierStamps get() = if (kind == TripKind.ARRIVAL) stamps else stamps.drop(1)
+
+    /** One fact's text. [lang]: the desk's language, for the city's spelling (the bench puts one cover at every desk). */
+    fun fact(id: FactId, lang: String = this.lang) = if (kind == TripKind.ARRIVAL) arrivalFact(id, lang) else when (id) {
+        FactId.NAME_BORN -> nameLine()
+        FactId.FROM -> "Returning from (the country of this trip): $from (the city ${cityLine(lang)} is in $from)"
+        FactId.PURPOSE -> "Purpose of the trip (why they went): $purpose"
+        FactId.DAYS -> "Time away (length of the trip): $days days"
+        FactId.STAY -> "Where they stayed on the trip: $stayed"
+        FactId.HOME -> "Home (where they live and are from): $homeLine"
+        FactId.HOST -> "Invited or hosted by: $host"
+        FactId.ENCOUNTER -> encounterLine()
+        else -> error("Retired cover fact: $id")
+    }
+
+    private fun encounterLine() = if (homeArrivalTraining) StoryCover.ARRIVAL_ENCOUNTER else "In the queue before this desk: ${askedEncounter?.fact ?: "nothing happened"}"
+
+    private fun nameLine() = "Name: $name" + (if (latin != name) " (in Latin letters: $latin)" else "") + "; date of birth: $born"
+
+    /** A visit to [country]: the trip is ahead of them, home is in [nationality], [from] is where they fly in from. */
+    private fun arrivalFact(id: FactId, lang: String) = when (id) {
+        FactId.NAME_BORN -> nameLine()
+        FactId.PURPOSE -> "Purpose of the visit (why they came): $purpose"
+        FactId.DAYS -> "Length of stay: $days days"
+        FactId.STAY -> "Staying at: $stayed, in ${cityLine(lang)}"
+        FactId.HOST -> "Invited or hosted by: $host"
+        FactId.HOME -> "Home (where they live): $homeLine"
+        FactId.FROM -> "Flying in from: $from"
+        FactId.ENCOUNTER -> encounterLine()
+        else -> error("Retired cover fact: $id")
+    }
+
+    /** The checkable facts as text, in [factIds] order (numbered 1.. for the answer check). */
+    fun facts(lang: String = this.lang) = factIds().map { fact(it, lang) }
+
+    fun card(lang: String = this.lang) = cardText(lang) + (if (askedEncounter != null || homeArrivalTraining) "\n" + encounterLine() else "")
+
+    private fun cardText(lang: String) = if (kind == TripKind.ARRIVAL) """
+        Name: $name${if (latin != name) " ($latin)" else ""}, ${genderWord(gender)} (citizen of ${withArticle(nationality.name)}, passport $passportNo, born $born)
         Lives in: $homeLine
-        Occupation: $job
+        Visiting: ${country.nation} (${cityLine(lang)}) for $days days, flying in from $from
+        Purpose of the visit: $purpose
+        ${if (hasHost) "Invited or hosted by: $host" else ""}
+        Staying at: $stayed
+    """.trimIndent().lineSequence().filter { it.isNotBlank() }.joinToString("\n") else """
+        Name: $name${if (latin != name) " ($latin)" else ""}, ${genderWord(gender)} (citizen of ${nationality.name}, passport $passportNo, born $born)
+        Lives in: $homeLine
         Coming home from: $from (${cityLine(lang)}), after $days days
         Purpose of the trip: $purpose
         Stayed at: $stayed
-        Travelled with: $travelledWith
-        Met there: $met
-        Waiting at home: $waiting
-        Passport stamps: ${stamps.joinToString()}
     """.trimIndent()
 
     companion object {
-        val BENCH = Backstory("Michael Brandt", "Michael Brandt", false, Person(false, "travelers_sheet", 2),
+        val BENCH = Backstory("Michael Brandt", "Michael Brandt", Gender.MAN, Person(false, "travelers_sheet", 2),
             Country.of("de"), "DE4471902", "3 Jun 1984", "Lindenberg", "software consultant", "Canada", "Toronto",
             "a logistics software conference", 5, "Hotel Steigenberger, city centre", "colleagues from the company Datenwerk",
-            "clients at the conference", "his wife and two children", listOf("Canada 2035", "Japan 2033"), lang = "de")
+            "clients at the conference", "nobody", listOf("Canada 2035", "Japan 2033"), lang = "de",
+            nationality = Nationality.find("de")!!, kind = TripKind.HOMECOMING, host = "nobody, a hotel stay")
+
+        /** The arrival bench cover: an American visiting Germany for a friend's wedding (JudgeCases.arrival). */
+        val BENCH_ARRIVAL = Backstory("James Walker", "James Walker", Gender.MAN, Person(false, "travelers_sheet", 2),
+            Country.of("de"), "US5520931", "14 Feb 1990", "Chicago", "architect", "United States", "Berlin",
+            "a friend's wedding", 7, "a hotel near the wedding venue", "nobody, travelled alone", "the couple's friends",
+            "nobody", listOf("Japan 2033"), lang = "de", nationality = Nationality.USA, kind = TripKind.ARRIVAL,
+            host = "the friend getting married")
 
         // The names only say who each tile shows (art review); the game never uses them.
         private fun sheet(name: String, vararg people: Pair<String, Boolean>) =
@@ -263,34 +313,106 @@ data class Backstory(
             sheet("travelers10_sheet", "Samuel Reed" to M, "Olivia Brown" to F, "Hassan Ali" to M, "Zoe Walker" to F, "Ethan Park" to M, "Leah Goldberg" to F) +
             sheet("travelers11_sheet", "Connor Hughes" to M, "Priyanka Shah" to F, "Marcus Johnson" to M, "Ella Davies" to F, "Rafael Torres" to M, "Yuki Sato" to F) +
             sheet("travelers12_sheet", "Owen Price" to M, "Amara Nwosu" to F, "Jason Wong" to M, "Lucy Hall" to F, "Noah Abbott" to M, "Sara Haddad" to F)
-        private val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-        /** The game's year: this trip's stamp. Earlier stamps are from the five years before. */
+        /** The game's year. */
         const val YEAR = 2035
 
-        /** A citizen of [destination] coming home. Every sample sheet ships in the app's assets. */
-        fun random(r: Random, destination: Destination): Backstory {
+        /** The player's [identity] on one rolled [Itinerary] to [destination]. Without one (tests, tools): a citizen of the destination. */
+        fun random(r: Random, destination: Destination, identity: Identity? = null, departure: String? = null): Backstory {
             val country = destination.country
-            val female = r.nextBoolean()
-            val photo = people.filter { it.female == female }.random(r)
-            val name = NAMES.getValue(destination.lang).random(r, female)
-            // Real countries only: their names have well-known translations the answer check can match.
-            val from = Country.all.filter { it.nation != country.nation }.map { it.nation }.distinct().random(r)
-            val trip = TRIPS.random(r)
-            val (with, withKey) = trip.with.random(r)
-            val earlier = Country.all.map { it.nation }.distinct().filter { it != country.nation && it != from }
-                .shuffled(r).take(r.nextInt(0, 3)).map { "$it ${r.nextInt(YEAR - 5, YEAR)}" }
-            return Backstory(
-                name = name.native, latin = name.latin, female = female, photo = photo, country = country,
-                passportNo = country.iso + (1_000_000 + r.nextInt(9_000_000)),
-                born = "${r.nextInt(1, 29)} ${months.random(r)} ${r.nextInt(1980, 2003)}",
-                home = CITIES.getValue(country.id).random(r),
-                job = JOBS.random(r),
-                from = from, city = TRIP_CITIES.getValue(from).random(r).substringBefore('|'), purpose = trip.purpose, days = r.nextInt(3, 15), stayed = trip.stayed.random(r),
-                travelledWith = with, met = trip.met.random(r), waiting = waitingFor(withKey).random(r).first,
-                stamps = listOf("$from $YEAR") + earlier, lang = destination.lang,
-            )
+            val id = identity ?: run {
+                val gender = if (r.nextBoolean()) Gender.WOMAN else Gender.MAN
+                val list = Identity.listFor(gender, NameList.MALE)
+                val name = NAMES.getValue(destination.lang).random(r, list == NameList.FEMALE)
+                Identity(checkNotNull(Nationality.find(country.id)), gender, list, name.native, name.latin, Identity.born(r),
+                    CITIES.getValue(country.id).random(r), "", null, Identity.passportNo(r, country.iso))
+            }
+            // The sample face follows the name list: a binary choice only for the picture and the names.
+            val photo = id.photo ?: people.filter { it.female == (id.nameList == NameList.FEMALE) }.random(r)
+            return of(id, photo, Itinerary.roll(r, destination, id, departure), destination)
         }
+
+        fun of(id: Identity, photo: Person, t: Itinerary, destination: Destination) = Backstory(
+            name = id.name, latin = id.latin, gender = id.gender, photo = photo, country = destination.country,
+            passportNo = id.passportNo, born = id.born, home = id.home, job = id.job,
+            from = t.from ?: id.nationality.name, city = t.city, purpose = t.purpose, days = t.days, stayed = t.hotel,
+            travelledWith = t.travelledWith, met = t.met, waiting = t.waiting, stamps = t.stamps, lang = destination.lang,
+            nationality = id.nationality, kind = t.kind, host = t.host,
+        )
     }
+}
+
+/** The player's passport and the story's fixed itineraries. A failed trip never advances the route. */
+object StoryCover {
+    const val ARRIVAL_ENCOUNTER = "Left Thalassia on the last flight before the airports closed; saw the riot news in the arrivals hall; was not hurt."
+
+    /** Schema-compatible scaffolding only: the scripted departure never reads passport facts. */
+    fun departure(destination: Destination) = Backstory(
+        "", "", Gender.UNSAID, Backstory.people.first(), destination.country,
+        "", "", "", "", "Thalassia", "Lefkopoli", "a holiday", 5, "", "", "", "",
+        emptyList(), destination.lang, Nationality.all.first { it.id == destination.country.id }, TripKind.HOMECOMING, "")
+
+    fun homeArrival(destination: Destination, id: Identity) = training(destination, id).copy(homeArrivalTraining = true)
+
+    /** Fixed departure-desk verdicts: the player has not arrived home yet. */
+    private val departureVerdicts = mapOf(
+        "en" to ("Everything is in order. Have a good flight home." to "Let’s try again. Take your time."),
+        "de" to ("Alles in Ordnung. Einen guten Heimflug." to "Versuchen wir es noch einmal. Nehmen Sie sich Zeit."),
+        "fr" to ("Tout est en ordre. Bon vol de retour." to "Reprenons. Prenez votre temps."),
+        "es" to ("Todo en orden. Que tenga buen vuelo de regreso a casa." to "Vamos a intentarlo otra vez. Tómese su tiempo."),
+        "it" to ("Tutto in ordine. Buon volo di ritorno a casa." to "Riproviamo. Faccia con calma."),
+        "pt" to ("Está tudo em ordem. Boa viagem de regresso a casa." to "Vamos tentar de novo. Não tenha pressa."),
+        "pl" to ("Wszystko w porządku. Miłego lotu do domu." to "Spróbujmy jeszcze raz. Bez pośpiechu."),
+        "ru" to ("Всё в порядке. Счастливого полёта домой." to "Давайте попробуем ещё раз. Не торопитесь."),
+        "uk" to ("Усе гаразд. Щасливого польоту додому." to "Спробуймо ще раз. Не поспішайте."),
+        "tr" to ("Her şey yolunda. Evinize iyi yolculuklar." to "Bir daha deneyelim. Acele etmeyin."),
+        "ar" to ("كل شيء على ما يرام. رحلة سعيدة إلى الوطن." to "لنحاول مرة أخرى. لا داعي للعجلة."),
+        "ja" to ("問題ありません。お気をつけてお帰りください。" to "もう一度やってみましょう。ゆっくりで大丈夫ですよ。"),
+        "zh" to ("一切正常。祝您回家一路顺风。" to "我们再试一次。不着急，慢慢来。"),
+    )
+    fun trainingVerdict(lang: String, passed: Boolean): String = departureVerdicts.getValue(lang).let {
+        if (passed) it.first else it.second
+    }
+
+    fun countries(playable: List<Country>, id: Identity, lastCountry: String?): List<Country> =
+        playable.filter {
+            it.id != lastCountry && it.id != id.nationality.id
+        }
+
+    fun trainingItinerary() = Itinerary(
+        TripKind.HOMECOMING, "a holiday", 5, "a guesthouse in Lefkopoli", "nobody, a hotel stay",
+        "", "Thalassia", "Lefkopoli", "", "", emptyList())
+
+    fun training(destination: Destination, id: Identity) = Backstory.of(id,
+        id.photo ?: Backstory.people.first { it.female == (id.nameList == NameList.FEMALE) },
+        trainingItinerary(), destination)
+
+    fun itinerary(destination: Destination, id: Identity, lastCountry: String?): Itinerary {
+        val country = destination.country
+        return Itinerary(TripKind.ARRIVAL, "a business meeting", 4, "Hotel Central near the main station",
+            "a partner company", "", lastCountry?.let { Country.of(it).nation } ?: id.nationality.name,
+            AIRPORT_CITY[destination.airport.id] ?: TRIP_CITIES.getValue(country.nation).first().substringBefore('|'), "", "", emptyList())
+    }
+
+    fun backstory(destination: Destination, id: Identity, lastCountry: String? = null) = Backstory.of(id,
+        id.photo ?: Backstory.people.first { it.female == (id.nameList == NameList.FEMALE) },
+        itinerary(destination, id, lastCountry), destination)
+}
+
+/**
+ * One checkable cover fact, by meaning. Everything that remembers facts (topic coverage, contradictions, the judge's
+ * earlier answers) keys on these; only the classify prompt and its FACT=n reply use list positions ([Backstory.factOf]).
+ */
+enum class FactId { NAME_BORN, FROM, PURPOSE, DAYS, STAY, WITH, MET, HOME, JOB, WAITING, STAMPS, HOST, ENCOUNTER }
+
+/** Remaining homecoming facts retain their relative order in Nano's numbered list. */
+val HOMECOMING_FACTS = listOf(FactId.NAME_BORN, FactId.FROM, FactId.PURPOSE, FactId.DAYS, FactId.STAY, FactId.HOME)
+
+/** A visitor's order; HOST is omitted when the itinerary has no host. */
+val ARRIVAL_FACTS = listOf(FactId.NAME_BORN, FactId.PURPOSE, FactId.DAYS, FactId.STAY, FactId.HOST, FactId.HOME, FactId.FROM)
+
+/** The traveller's gender in English for prompts ([Backstory.card]). */
+fun genderWord(g: Gender) = when (g) {
+    Gender.WOMAN -> "woman"; Gender.MAN -> "man"; Gender.NONBINARY -> "non-binary person"; Gender.UNSAID -> "person"
 }
 
 // German answers for the fixed benchmark, a citizen coming home. Turn 7 contradicts the 5 days away on purpose.
@@ -299,10 +421,10 @@ val BENCH_ANSWERS = listOf(
     "Ich komme aus Kanada zurück, von einer Konferenz über Logistiksoftware.",
     "Fünf Tage.",
     "Im Hotel Steigenberger in der Innenstadt.",
-    "Ich bin Softwareberater.",
-    "Mit Kollegen von der Firma Datenwerk.",
+    "Ich wohne in Lindenberg.",
+    "Ich heiße Michael Brandt.",
     "Ich war zwei Wochen weg, glaube ich.",
     "Entschuldigung, ich meine fünf Tage. Ich wohne in Lindenberg.",
-    "Meine Frau und meine zwei Kinder warten zu Hause.",
+    "Ich bin am 3. Juni 1984 geboren.",
     "Danke, auf Wiedersehen.",
 )

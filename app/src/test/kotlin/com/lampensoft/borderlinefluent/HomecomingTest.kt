@@ -31,8 +31,17 @@ class HomecomingTest {
         val c = Destination.forLanguage("en")
         val judge = Judge(c, Backstory.BENCH, ask, LangId { listOf("en") })
         val v = judge.judge("Where are you coming from?", "I am returning home.")
-        assertEquals(0, calls); assertEquals(0, v.fact); assertTrue(v.check.answered && !v.check.contradiction && v.check.inLanguage)
+        assertEquals(0, calls); assertEquals(null, v.fact); assertTrue(v.check.answered && !v.check.contradiction && v.check.inLanguage)
         judge.judge("Where are you coming from?", "I'm coming home from a conference in Toronto.")
         assertEquals(1, calls)
+    }
+
+    @Test fun `a citizen refused at home is held, never flown home`() {
+        for (room in listOf(false, true)) {
+            assertEquals(R.string.ending_refused_home, endingText(Decision.REFUSED, room, TripKind.HOMECOMING))
+            assertEquals(R.string.ending_caught, endingText(Decision.CAUGHT, room, TripKind.HOMECOMING))
+        }
+        assertEquals(R.string.ending_refused_company, endingText(Decision.REFUSED, true, TripKind.ARRIVAL))
+        assertEquals(R.string.ending_refused, endingText(Decision.REFUSED, false, TripKind.ARRIVAL))
     }
 }

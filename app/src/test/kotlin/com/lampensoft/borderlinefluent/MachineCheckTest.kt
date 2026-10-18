@@ -24,8 +24,9 @@ class MachineCheckTest {
         // The room isolates durability from desk suspicion endings.
         for (m in listOf(cheap, strict)) {
             m.enterRoom()
-            while (m.decision == null && m.tricks < 20) m.onCheck(trick)
-            assertEquals(Decision.BROKEN, m.decision)
+            while (!m.crashed && m.tricks < 20) m.onCheck(trick)
+            assertNull(m.decision) // the associate never releases on a crash (Assessment.TRICK instead)
+            assertTrue(m.crashed)
             assertEquals(0, m.unclear)
             assertEquals(0, m.dodges)
             assertEquals(0, m.contradictions)

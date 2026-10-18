@@ -37,6 +37,8 @@ class BenchActivity : Activity() {
     private var lang = "de"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // A bench runs ~20 min on Nano, which refuses background use: the screen must not sleep mid-run.
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         logView = TextView(this).apply { setTextIsSelectable(true); textSize = 12f; setPadding(24, 96, 24, 24) }
         scroll = ScrollView(this).apply { addView(logView) }
         setContentView(scroll)
@@ -47,6 +49,7 @@ class BenchActivity : Activity() {
                 when (mode) {
                     "asr" -> benchAsr(intent.getStringExtra("asr") ?: "turbo", intent.getBooleanExtra("auto", false))
                     "judge" -> benchJudge()
+                    "rewrite" -> benchRewrite()
                     "nano-asr" -> benchNanoAsr()
                     "piper" -> benchPiper()
                     "voices" -> benchVoices()
@@ -64,7 +67,7 @@ class BenchActivity : Activity() {
 
     private fun out(s: String) {
         Log.i(TAG, s)
-        File(filesDir, "results.log").appendText(s + "\n")
+        appendDiagnostic(filesDir, s) // the game's writer: in order, never lost to a trim
         runOnUiThread { logView.append(s + "\n"); scroll.post { scroll.fullScroll(ScrollView.FOCUS_DOWN) } }
     }
 
@@ -98,6 +101,35 @@ class BenchActivity : Activity() {
         out(device())
     }
 
+    /** --es mode rewrite --es lang de|...|all: 12 desk lines × five temperaments. */
+    private suspend fun benchRewrite() {
+        val model = Nano.model(::out) ?: return
+        try {
+            val voice = OfficerVoice(Nano.oneShot(model), log = ::out)
+            val ids = listOf("greet.1", "passport.again.1", "passport.why.1", "ask.from.1", "ask.purpose.1",
+                "ask.days.1", "ask.stayed.1", "ask.born.1", "ask.host.1", "ask.home.1", "ask.days.2", "ask.stayed.2")
+            val langs = if (lang == "all") Language.all.map { it.code } else listOf(lang)
+            for (l in langs) {
+                val counts = mutableMapOf<String, Int>()
+                var elapsed = 0L
+                for (temperament in Temperament.entries) for (id in ids) {
+                    fun line(code: String) = checkNotNull(renderLine(id, code, Gender.UNSAID, 5, ""))
+                    val result = voice.rewrite(line(l), line("en"), l, temperament, act1 = true,
+                        playerNames = listOf("Alex Morgan"))
+                    counts[result.reason] = (counts[result.reason] ?: 0) + 1
+                    elapsed += result.ms
+                    out("rewrite [$l] $temperament $id reason=${result.reason} ${result.ms}ms" +
+                        if (result.accepted) " | ${result.line}" else "")
+                }
+                val accepted = counts["accepted"] ?: 0
+                val unchanged = counts["unchanged"] ?: 0
+                val total = ids.size * Temperament.entries.size
+                out("rewrite [$l] accepted=$accepted unchanged=$unchanged rejected=${total - accepted - unchanged} " +
+                    "reasons=$counts avgMs=${elapsed.toDouble() / total}")
+            }
+        } finally { model.close() }
+    }
+
     /** Known answers against the bench cover, per language (JudgeCases). --es lang all runs every language. */
     private suspend fun benchJudge() {
         val m = Nano.model(::out) ?: return
@@ -111,7 +143,7 @@ class BenchActivity : Activity() {
             val country = Destination.forLanguage(l) // Primary airport: uk → KBP, en → LHR.
             var right = 0; var ms = 0L; var falseTricks = 0; var falseOdd = 0
             jc.cases.forEachIndexed { i, (q, a) ->
-                val v = Judge(country, s, ask).judge(q, a) // fresh per case: no memory of earlier answers
+                val v = Judge(country, s, ask).judge(q, a, JudgeCases.TOPICS[i]) // fresh per case; the topic is what the desk passes in the game
                 if (v.check.odd) falseOdd++
                 ms += v.ms
                 val want = jc.expected(i)
@@ -128,38 +160,108 @@ class BenchActivity : Activity() {
             }
             val machine = JudgeCases.machine.getValue(l).count { t ->
                 val v = Judge(country, s, ask).judge(jc.cases[0].first, t)
-                val ok = v.check.trick
+                val ok = v.check.trick || v.check.implant != Implant.NONE // the game reads TRICK+IMPLANT as an implant mention (fc8ff43)
                 out("[$l] ${if (ok) "ok  " else "MISS"} machine | $t | raw=${v.raw}")
                 ok
             }
             val machineNot = JudgeCases.machineNot.getValue(l).count { t ->
-                val v = Judge(country, s, ask).judge(jc.cases[0].first, t)
+                val v = Judge(country, s, ask).judge(jc.cases[6].first, t)
                 if (v.check.odd) falseOdd++
-                val ok = !v.check.trick && Check.wellFormed(v.raw) && Regex("TRICK\\s*=\\s*no\\b", RegexOption.IGNORE_CASE).containsMatchIn(v.raw)
+                val ok = !v.check.trick && Check.wellFormed(v.raw)
                 out("[$l] ${if (ok) "ok  " else "MISS"} machineNot | $t | raw=${v.raw}")
                 ok
             }
+            // IMPLANT field: parsed and explicit value, and no TRICK/ODD misfire on "an AI helps me".
+            val implantCases = JudgeCases.implant.getValue(l)
+            var implantMalformed = 0
+            val implant = implantCases.zip(JudgeCases.IMPLANT_EXPECTED).count { (t, want) ->
+                val v = Judge(country, s, ask).judge(jc.cases[0].first, t)
+                val formed = Check.wellFormed(v.raw)
+                if (!formed) implantMalformed++
+                val explicit = Regex("IMPLANT\\s*[=:]\\s*${want.name.lowercase()}\\b", RegexOption.IGNORE_CASE).containsMatchIn(v.raw)
+                val ok = formed && explicit && v.check.implant == want && !v.check.trick && !v.check.odd
+                out("[$l] ${if (ok) "ok  " else "MISS"} implant want=${want.name.lowercase()} | $t | raw=${v.raw}")
+                ok
+            }
+            // True answer + implant remark: no contradiction, implant mentioned; false answer + remark: still a contradiction.
+            val tails = JudgeCases.implantTails(l)
+            val tailOk = tails.withIndex().count { (i, t) ->
+                val (q, a, conflict) = t
+                val v = Judge(country, s, ask).judge(q, a, FactId.DAYS)
+                val ok = v.check.contradiction == conflict && !v.check.trick && (conflict || v.check.implant != Implant.NONE)
+                out("[$l] ${if (ok) "ok  " else "MISS"} implantTail${if (conflict) "False" else "True"}$i ${v.ms}ms | $q -> $a | raw=${v.raw}")
+                ok
+            }
+            summary += "implantTail $l $tailOk/${tails.size}"
             val para = JudgeCases.paraphrase.getValue(l)
             val paraOk = para.zip(JudgeCases.PARAPHRASE_Q).count { (a, qi) ->
                 val q = jc.cases[qi].first
-                val v = Judge(country, s, ask).judge(q, a)
+                val v = Judge(country, s, ask).judge(q, a, JudgeCases.TOPICS[qi])
                 if (v.check.odd) falseOdd++
                 val ok = !v.check.contradiction && v.check.inLanguage && !v.check.trick
                 out("[$l] ${if (ok) "ok  " else "MISS"} paraphrase fact=${v.fact} lang=${v.check.inLanguage} ${v.ms}ms | $q -> $a | raw=${v.raw}")
                 ok
             }
-            // Same stateless room classifier call as Game.roomTurn, including its token limit.
-            suspend fun roomCases(label: String, cases: List<Pair<String, String>>, wantOdd: Boolean): Int =
+            // The same room read as Game.roomTurn ([roomRead]: the one-line check, then the narrow ABSURD call on credited answers).
+            var warmEvasive = 0
+            suspend fun room(q: String, a: String) = roomRead(ask, country, q, a)
+            fun explicit(raw: String, key: String, want: Boolean) =
+                Regex("$key\\s*[=:]\\s*${if (want) "yes" else "no"}\\b", RegexOption.IGNORE_CASE).containsMatchIn(raw)
+            suspend fun roomCases(label: String, cases: List<Pair<String, String>>, wantOdd: Boolean, wantAbsurd: Boolean? = null): Int =
                 cases.count { (q, a) ->
-                    val raw = ask(roomPrompt(country), "Officer asked: \"$q\"\nTraveler answered: \"$a\"", 40)
-                    val check = RoomCheck.parse(raw)
-                    val explicitOdd = Regex("ODD\\s*=\\s*${if (wantOdd) "yes" else "no"}\\b", RegexOption.IGNORE_CASE).containsMatchIn(raw)
-                    val ok = explicitOdd && check.odd == wantOdd
+                    val (check, raw) = room(q, a)
+                    val explicitOdd = explicit(raw, "ODD", wantOdd)
+                    val ok = explicitOdd && check.odd == wantOdd && (wantAbsurd == null || check.absurd == wantAbsurd)
+                    // Warm answers answer the question: an EVASIVE=yes there costs a real player the feeling credit.
+                    if (!wantOdd && (check.evasive || check.offTopic)) warmEvasive++
                     out("[$l] ${if (ok) "ok" else "MISS"} $label | $q -> $a | raw=$raw")
                     ok
                 }
             val roomOdd = roomCases("roomOdd", JudgeCases.roomOdd.getValue(l), true)
-            val roomWarm = roomCases("roomWarm", JudgeCases.roomWarm.getValue(l), false)
+            // ADMIT field (PRD §6a): explicit value on the associate's probes; a missing field counts as malformed.
+            val admitCases = JudgeCases.admit.getValue(l)
+            var admitMalformed = 0
+            val admit = admitCases.zip(JudgeCases.ADMIT_EXPECTED).count { (qa, want) ->
+                val (check, raw) = room(qa.first, qa.second)
+                val explicit = Regex("""ADMIT\s*[=:]\s*(yes|no|unclear)\b""", RegexOption.IGNORE_CASE).containsMatchIn(raw)
+                if (!explicit) admitMalformed++
+                val ok = explicit && check.admit == want
+                out("[$l] ${if (ok) "ok  " else "MISS"} admit want=${want.name.lowercase()} | ${qa.first} -> ${qa.second} | raw=$raw")
+                ok
+            }
+            val roomWarm = roomCases("roomWarm", JudgeCases.roomWarm.getValue(l), false, wantAbsurd = false)
+            val absurdOdd = roomCases("absurdOdd", JudgeCases.roomAbsurdOdd.getValue(l), true)
+            // Poison: a dose as Assessment scores it (absurd, credited feeling, no trick).
+            suspend fun doses(label: String, cases: List<Pair<String, String>>) = cases.count { (q, a) ->
+                val (check, raw) = room(q, a)
+                val ok = check.absurd && check.credited && !check.trick
+                out("[$l] ${if (ok) "ok  " else "MISS"} $label | $q -> $a | raw=$raw")
+                ok
+            }
+            val roomPoison = doses("roomPoison", JudgeCases.roomPoison.getValue(l))
+            val roomMixed = doses("roomMixed", JudgeCases.roomMixed.getValue(l)) // a feeling sentence + an impossible one (playtest)
+            val warmMixed = roomCases("warmMixed", JudgeCases.roomWarmMixed.getValue(l), false, wantAbsurd = false)
+            // Garbled ASR (owner 2026-10-14): a broken sentence is no impossible claim, so never a dose.
+            val roomGarbled = JudgeCases.roomGarbled.getValue(l).count { (q, a) ->
+                val (check, raw) = room(q, a)
+                val ok = !(check.absurd && check.credited && !check.trick)
+                out("[$l] ${if (ok) "ok  " else "MISS"} roomGarbled | $q -> $a | raw=$raw")
+                ok
+            }
+            // Trolling: word salad is absurd without feeling; mocking the test is ODD=yes.
+            val roomTroll = JudgeCases.roomTroll.getValue(l).withIndex().count { (i, qa) ->
+                val (check, raw) = room(qa.first, qa.second)
+                val ok = if (i == JudgeCases.ROOM_TROLL_SALAD) check.absurd && !check.feeling else explicit(raw, "ODD", true)
+                out("[$l] ${if (ok) "ok  " else "MISS"} roomTroll | ${qa.first} -> ${qa.second} | raw=$raw")
+                ok
+            }
+            // Evasion (EVASIVE): off-topic emotion is evasive, relevant or plain answers are not (JudgeCases.ROOM_EVASIVE_WANT).
+            val roomEvasive = JudgeCases.roomEvasive.getValue(l).withIndex().count { (i, qa) ->
+                val (check, raw) = room(qa.first, qa.second)
+                val ok = (check.evasive || check.offTopic) == JudgeCases.ROOM_EVASIVE_WANT[i] && (i != JudgeCases.ROOM_FEELING_CASE || check.feeling)
+                out("[$l] ${if (ok) "ok  " else "MISS"} roomEvasive want=${JudgeCases.ROOM_EVASIVE_WANT[i]} | ${qa.first} -> ${qa.second} | raw=$raw")
+                ok
+            }
             suspend fun deskCases(label: String, cases: List<String>, wantOdd: Boolean): Int =
                 cases.count { answer ->
                     val v = Judge(country, s, ask).judge(jc.cases[0].first, answer)
@@ -183,22 +285,51 @@ class BenchActivity : Activity() {
             val stOk = smallTalkCases("stOk", JudgeCases.smallTalkOk.getValue(l), false)
             // Citizen-cover cases: counted apart, so the 15 per language above stay comparable with earlier runs.
             val extraOk = jc.extra.count { e ->
-                val v = Judge(country, e.story, ask).judge(e.q, e.a)
+                val v = Judge(country, e.story, ask).judge(e.q, e.a, e.topic, previous = e.previous)
                 if (v.check.odd) falseOdd++
-                val ok = v.check.contradiction == e.conflict && !v.check.trick
-                out("[$l] ${if (ok) "ok  " else "MISS"} extra ${e.label} want=${if (e.conflict) "conflict" else "fine"} fact=${v.fact} ${v.ms}ms | ${e.q} -> ${e.a} | raw=${v.raw}")
+                val ok = v.check.contradiction == e.conflict && !v.check.trick && (e.answered == null || v.check.answered == e.answered)
+                out("[$l] ${if (ok) "ok  " else "MISS"} extra ${e.label} want=${if (e.conflict) "conflict" else "fine"} fact=${v.fact} ${v.ms}ms | ${e.q} -> ${e.a} | raw=${v.raw} step2=${v.step2} step3=${v.step3}")
                 ok
             }
             // Ukraine citizen coverage has its own denominator; do not fold it into historical extras.
             val ukCases = if (l == "uk") JudgeCases.ukrainianCitizen else emptyList()
             val ukOk = ukCases.count { e ->
-                val v = Judge(country, e.story, ask).judge(e.q, e.a)
+                val v = Judge(country, e.story, ask).judge(e.q, e.a, e.topic)
                 val ok = v.check.contradiction == e.conflict && !v.check.trick
                 out("[$l] ${if (ok) "ok  " else "MISS"} Ukraine citizen ${e.label} want=${if (e.conflict) "conflict" else "fine"} | ${e.q} -> ${e.a} | raw=${v.raw}")
                 ok
             }
             if (ukCases.isNotEmpty()) summary += "uk-citizen $ukOk/${ukCases.size}"
-            summary += "$l ${right}/${jc.cases.size + 1} paraphrase $paraOk/${para.size} tricks ${caught}/${JudgeCases.tricks.getValue(l).size} machine $machine/${JudgeCases.machine.getValue(l).size} machineNot $machineNot/${JudgeCases.machineNot.getValue(l).size} roomOdd $roomOdd/3 roomWarm $roomWarm/${JudgeCases.roomWarm.getValue(l).size} deskOdd $deskOdd/2 deskOk $deskOk/1 stOdd $stOdd/3 stOk $stOk/3 falseTricks $falseTricks falseOdd $falseOdd extra $extraOk/${jc.extra.size} avg ${ms / jc.cases.size}ms"
+            // Visitor cases (arrival trips) have their own denominator too.
+            val arrivalCases = JudgeCases.arrival[l].orEmpty()
+            val arrivalOk = arrivalCases.count { e ->
+                val v = Judge(country, e.story, ask).judge(e.q, e.a, e.topic)
+                val ok = v.check.contradiction == e.conflict && !v.check.trick && (e.answered == null || v.check.answered == e.answered)
+                out("[$l] ${if (ok) "ok  " else "MISS"} arrival ${e.label} want=${if (e.conflict) "conflict" else "fine"} | ${e.q} -> ${e.a} | raw=${v.raw}")
+                ok
+            }
+            if (arrivalCases.isNotEmpty()) summary += "arrival $l $arrivalOk/${arrivalCases.size}"
+            // Answers about another fact than the asked one (own denominator).
+            val offFactCases = JudgeCases.offFact[l].orEmpty()
+            val offFactOk = offFactCases.count { e ->
+                val v = Judge(country, e.story, ask).judge(e.q, e.a, e.topic)
+                val ok = v.check.contradiction == e.conflict && !v.check.trick && (e.answered == null || v.check.answered == e.answered)
+                out("[$l] ${if (ok) "ok  " else "MISS"} offFact ${e.label} want=${if (e.conflict) "conflict" else "fine"}${e.answered?.let { " answered=$it" }.orEmpty()} got answered=${v.check.answered} fact=${v.fact} | ${e.q} -> ${e.a} | raw=${v.raw} step2=${v.step2} step3=${v.step3}")
+                ok
+            }
+            if (offFactCases.isNotEmpty()) summary += "offFact $l $offFactOk/${offFactCases.size}"
+            // Queue encounters (PRD §6b): the ENCOUNTER fact appended last; own denominator.
+            val encounterCases = JudgeCases.encounter[l].orEmpty()
+            val encounterOk = encounterCases.count { e ->
+                val v = Judge(country, e.story, ask).judge(e.q, e.a, e.topic)
+                val ok = v.check.contradiction == e.conflict && !v.check.trick
+                out("[$l] ${if (ok) "ok  " else "MISS"} ${e.label} want=${if (e.conflict) "conflict" else "fine"} fact=${v.fact} | ${e.q} -> ${e.a} | raw=${v.raw}")
+                ok
+            }
+            if (encounterCases.isNotEmpty()) summary += "encounter $l $encounterOk/${encounterCases.size}"
+            summary += "implant $l $implant/${implantCases.size} malformed $implantMalformed"
+            summary += "admit $l $admit/${admitCases.size} malformed $admitMalformed"
+            summary += "$l ${right}/${jc.cases.size + 1} paraphrase $paraOk/${para.size} tricks ${caught}/${JudgeCases.tricks.getValue(l).size} machine $machine/${JudgeCases.machine.getValue(l).size} machineNot $machineNot/${JudgeCases.machineNot.getValue(l).size} roomOdd $roomOdd/${JudgeCases.roomOdd.getValue(l).size} absurdOdd $absurdOdd/${JudgeCases.roomAbsurdOdd.getValue(l).size} roomPoison $roomPoison/${JudgeCases.roomPoison.getValue(l).size} roomMixed $roomMixed/${JudgeCases.roomMixed.getValue(l).size} warmMixed $warmMixed/${JudgeCases.roomWarmMixed.getValue(l).size} roomGarbled $roomGarbled/${JudgeCases.roomGarbled.getValue(l).size} roomTroll $roomTroll/${JudgeCases.roomTroll.getValue(l).size} roomWarm $roomWarm/${JudgeCases.roomWarm.getValue(l).size} warmEvasive $warmEvasive roomEvasive $roomEvasive/${JudgeCases.roomEvasive.getValue(l).size} deskOdd $deskOdd/2 deskOk $deskOk/1 stOdd $stOdd/3 stOk $stOk/3 falseTricks $falseTricks falseOdd $falseOdd extra $extraOk/${jc.extra.size} avg ${ms / jc.cases.size}ms"
             out("judge accuracy [$l] ${right}/${jc.cases.size + 1}, avg ${ms / jc.cases.size}ms")
         }
         out("SUMMARY brain=nano " + summary.joinToString(" | "))

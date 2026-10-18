@@ -11,15 +11,15 @@ PACKS=${PACKS:-packs}
 # Piper voices (sherpa-onnx tts-models, int8), chosen by measured pitch (BenchActivity `voices`, male < ~165 Hz).
 # One row per officer voice: lang gender release-name sha256 speaker-id. Languages or genders without a row use the
 # system voice (no Piper voice of that gender in the measured candidates; ja has none at all). sid != 0 -> speaker.txt.
+# Licences: NOTICE.md. Not redistributable, so dropped (2026-10-15): en_US-lessac (research-only dataset), ru_RU-irina
+# and ar_JO-kareem (no licence stated); those officers speak with the system voice.
 # Each language pack also gets espeak-ng-data minus the other languages' *_dict (the voice's espeak.voice decides which).
 PIPER_URL=https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models
 VOICES='
-ar m ar_JO-kareem-medium 215910431bbe8236b77242b19d869a4eda6073e9cd424bec45b6d4a59a790d82 0
 ar f ar_JO-SA_dii-high 02f6f990b31323b7f36c8c68c3a5dc7f7c9f3db555c632310693cf7d82b9540e 0
 de m de_DE-thorsten-medium 07e240b7b9c1fc9211d5a69512f8cbe11b3286c2ed79c15c076ac6ed427fdf13 0
 de f de_DE-kerstin-low bcd8039667940cf2efc939b844f4b33d0823096572fcc1a8caaa2faa77f3379c 0
 en m en_US-ryan-medium 376eb489d42e98cb49f0e13a633e8d88580bd247ed8aacc298a733210404f771 0
-en f en_US-lessac-medium f1c6d0295cf16087b05f80fdca5b44daca5cd78e2c425d419a42ba34929805f9 0
 es m es_ES-davefx-medium 8bb8ac1cefb727caec9bd9c6c3185c673c8b42c53bd29bb25d5a7715dac37125 0
 es f es_ES-sharvard-medium bf5507cbdedea650365bd6175b3164a8ecca5847533ddf97afcba9d76ea599d1 1
 fr m fr_FR-tom-medium b158f884eb4231b8dddd372c3dc506949630c992a8e48ca692a90323e8bb4e09 0
@@ -30,15 +30,18 @@ pl m pl_PL-darkman-medium 0ec47b7d591e48913da887ea7e81287f4ef621d9c5aa1848700d2d
 pl f pl_PL-gosia-medium 72acac4c4b031725c41a61b3af0314a3d30e1ec2cd83ee410ea5f9e6d2d9d4fb 0
 pt m pt_BR-faber-medium dbc8b1d7d729fd417ea78a350ed35696c928770ac93513d3f507bd4e88eee3fd 0
 pt f pt_PT-dii-high 7fc966c08bea9acd6b89f356e3070bf0217e0f8bcca81e40c70076cf2d5d7c66 0
-ru f ru_RU-irina-medium b0000a509f7551a80742eed5c43b8eb03f469cb9f0a42f6feee96ce0da0ebab8 0
 tr m tr_TR-dfki-medium 6cda7bc029b7d5549a80439c51beb4c40c42df4b4614f01a8c61deb2fc859aa2 0
 tr f tr_TR-fettah-medium 4374bfdabb88ada0f3edf9bd46eacf1c5391a8a93bdce364196495891e5bc323 0
 uk m uk_UA-ukrainian_tts-medium 9e3e20f311e3c486d989c3d481d9537741deb7beaeed1aa63c737574498b1e75 1
 uk f uk_UA-ukrainian_tts-medium 9e3e20f311e3c486d989c3d481d9537741deb7beaeed1aa63c737574498b1e75 2
 '
+# Held-back languages (heldBackLanguages in gradle.properties, the release switch) have no pack in the bundle: their
+# rows stay above for the day they come back, but nothing is fetched for them (HELD_BACK= in the environment fetches all).
+HELD_BACK=${HELD_BACK-$(sed -n 's/^heldBackLanguages=//p' gradle.properties | tr ',' ' ')}
 fetch_voices() {
   echo "$VOICES" | while read -r lang g name sha sid; do
     [ -n "$lang" ] || continue
+    case " $HELD_BACK " in *" $lang "*) echo "fetch-models: skipping $name ($lang is held back)"; continue ;; esac
     t="$w/$name.tar.bz2"; d="$PACKS/lang_$lang/src/main/assets/tts"
     curl -fL --retry 3 -o "$t" "$PIPER_URL/vits-piper-$name-int8.tar.bz2"
     echo "$sha  $t" | sha256sum -c

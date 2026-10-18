@@ -13,7 +13,9 @@ fun generatedLanguageOk(text: String, lang: String, candidates: List<String>, wo
     }
     if (!allowed.containsAll(scripts - Character.UnicodeScript.COMMON - Character.UnicodeScript.INHERITED)) return false
     fun codes(c: List<String>) = c.map { it.substringBefore('-') }
-    return codes(candidates).firstOrNull() == lang && words.all { c ->
+    // ru/uk share Cyrillic and ML Kit's top pick for a short phrase is often bg/mk/uk: a short text only needs lang among the candidates.
+    val short = lang in setOf("ru", "uk") && text.split(Regex("""\s+""")).count { it.any(Char::isLetter) } < 4
+    return (codes(candidates).firstOrNull() == lang || short && lang in codes(candidates)) && words.all { c ->
         val tags = codes(c)
         tags.isEmpty() || "und" in tags || lang in tags
     }

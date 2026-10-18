@@ -38,7 +38,10 @@ private class GlitchFrame(val split: Float, val shift: Float, val tears: List<Tr
  * horizontal tearing and a sideways jolt. Pass a short idle for something that is visibly breaking.
  */
 fun Modifier.glitch(idleMs: LongRange = 1500L..4000L, strength: Float = 1f): Modifier =
-    glitchWhen(strength, 3..7, 40L..90L) { delay(Random.nextLong(idleMs.first, idleMs.last + 1)) }
+    glitchWhen(strength, 3..7, 40L..90L) { delay(Random.nextLong(idleMs.first, idleMs.last + 1).coerceAtLeast(MIN_GLITCH_GAP_MS)) }
+
+/** Photosensitivity (WCAG 2.3.1): at most 2 frames of at least 60 ms per burst, bursts at least 1 s apart, none when animations are off. */
+private const val MIN_GLITCH_GAP_MS = 1000L
 
 // --- Menu beat sync: tune these by ear -------------------------------------------------------------
 // ponytail: tuned by ear; measured phase ≈ 60 ms, measured tempo ≈ 130 vs the owner's 120 — adjust if the glitch drifts off the beat.
@@ -62,16 +65,17 @@ fun Modifier.glitchOnBeat(
     everyBeats: List<Int> = listOf(4, 8, 16), strength: Float = 1f,
 ): Modifier = glitchWhen(strength, 3..4, 40L..80L) { // 4 x 80 = 320 ms < a 500 ms beat
     val p = position()
-    if (p == null) delay(Random.nextLong(3000, 8000)) else delay(msToNextGlitch(p, offsetMs, beatMs, everyBeats.random()))
+    if (p == null) delay(Random.nextLong(3000, 8000)) else delay(msToNextGlitch(p, offsetMs, beatMs, everyBeats.random()).coerceAtLeast(MIN_GLITCH_GAP_MS)) // a looped track can wrap to ~60 ms
 }
 
 private fun Modifier.glitchWhen(strength: Float, frames: IntRange, frameMs: LongRange, wait: suspend () -> Unit): Modifier = composed {
     var frame by remember { mutableStateOf<GlitchFrame?>(null) }
-    LaunchedEffect(strength) {
-        while (true) {
+    val animate = Motion.allowed()
+    LaunchedEffect(strength, animate) {
+        while (animate) {
             frame = null
             wait()
-            repeat(Random.nextInt(frames.first, frames.last + 1)) { frame = GlitchFrame.random(strength); delay(Random.nextLong(frameMs.first, frameMs.last + 1)) }
+            repeat(minOf(Random.nextInt(frames.first, frames.last + 1), 2)) { frame = GlitchFrame.random(strength); delay(Random.nextLong(frameMs.first, frameMs.last + 1).coerceAtLeast(60L)) }
         }
     }
     drawWithContent {
@@ -82,7 +86,7 @@ private fun Modifier.glitchWhen(strength: Float, frames: IntRange, frameMs: Long
         for ((tint, dx) in listOf(Color.Red to -f.split, Color.Cyan to f.split)) {
             drawIntoCanvas {
                 it.saveLayer(Rect(Offset.Zero, size), Paint().apply {
-                    colorFilter = ColorFilter.tint(tint, BlendMode.Modulate); blendMode = BlendMode.Screen; alpha = 0.6f
+                    colorFilter = ColorFilter.tint(tint, BlendMode.Modulate); blendMode = BlendMode.Screen; alpha = 0.35f
                 })
             }
             translate((f.shift + dx) * w) { this@drawWithContent.drawContent() }
@@ -94,6 +98,11 @@ private fun Modifier.glitchWhen(strength: Float, frames: IntRange, frameMs: Long
             translate(dx * w) { this@drawWithContent.drawContent() }
         }
     }
+}
+
+/** The associate's flicker jam on a suggestion ([Jam.FLICKER]); none when the phone's animations are off (reduced motion). */
+fun Modifier.jamFlicker(on: Boolean): Modifier = composed {
+    if (on && Motion.allowed()) glitch(idleMs = 200L..900L, strength = 2.5f) else Modifier
 }
 
 /** CRT scanlines over the content. */

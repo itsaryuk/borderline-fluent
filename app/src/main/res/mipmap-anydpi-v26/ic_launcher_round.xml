@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The glitching entry stamp (art/raw/icon_4_stamp.png, owner's pick 2026-10-05) over the same navy. -->
+<!-- The mirrored ivory B, cyan border line, red F (art/icon_bf.py, owner's pick 2026-10-14) over the same navy;
+     the monochrome layer serves Android's themed icons. -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@color/ic_launcher_bg" />
     <foreground android:drawable="@mipmap/ic_launcher_fg" />
+    <monochrome android:drawable="@mipmap/ic_launcher_mono" />
 </adaptive-icon>

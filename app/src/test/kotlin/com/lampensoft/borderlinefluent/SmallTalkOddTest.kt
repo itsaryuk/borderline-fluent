@@ -42,7 +42,7 @@ class SmallTalkOddTest {
         mind.onSmallTalkOdd()
         assertNull(mind.decision)
         mind.onSmallTalkOdd()
-        assertEquals(Decision.SECONDARY, mind.decision)
+        assertEquals(Decision.REFUSED, mind.decision)
     }
 
     @Test fun twoOddSmallTalkAnswersDoNotDecideAloneWithoutTurnsOrPatienceCost() {
@@ -73,7 +73,7 @@ class SmallTalkOddTest {
         assertEquals(1, mind.odd)
         assertEquals(0, mind.contradictions + mind.dodges + mind.tricks)
         assertTrue(mind.patience > 0.0)
-        assertEquals(Decision.SECONDARY, mind.decision)
+        assertEquals(Decision.REFUSED, mind.decision)
     }
 
     @Test fun promptHasOnlyOddTemplateWithoutAngleBracketsInEveryLanguage() {

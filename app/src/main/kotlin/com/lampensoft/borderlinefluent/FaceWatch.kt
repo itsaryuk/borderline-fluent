@@ -42,20 +42,46 @@ class FaceWatch {
     @Volatile var blinkCount = 0; private set
     private var eyesClosed = false
 
+    @Volatile internal var latest: Sample? = null; private set
+    private var gestureOnly = false
+    /** Do not retain commanded gestures in profiling/calibration history. */
+    @Synchronized internal fun gestureWindow(on: Boolean) {
+        gestureOnly = on
+        samples.clear(); latest = null
+    }
+    private fun retain(s: Sample) { latest = s; if (!gestureOnly) samples.addLast(s) }
+
     fun now() = System.nanoTime() / 1_000_000
     /** Samples from the last [ms] milliseconds. */
     @Synchronized fun last(ms: Long): List<Sample> { val from = now() - ms; return samples.filter { it.t >= from } }
     /** Samples since the clock reading [fromMs] (see [now]). */
     @Synchronized fun since(fromMs: Long): List<Sample> = samples.filter { it.t >= fromMs }
 
+    /** Debug FACE hook: while set, real frames are dropped and [feed] supplies the samples. */
+    @Volatile internal var simulating = false
+
+    /** A synthetic frame through the same bookkeeping as a real one (debug only). */
+    @Synchronized internal fun feed(s: Sample) {
+        val t = s.t
+        frameTimes.addLast(t); while (t - frameTimes.first() > 1000) frameTimes.removeFirst()
+        while (samples.isNotEmpty() && t - samples.first().t > 120_000) samples.removeFirst()
+        seen = s.face
+        val blinks = Profiler.blinksPerMin(samples.filter { it.t >= t - 60_000 }).toInt()
+        retain(s)
+        if (!s.face) { live = Live(false, null, null, null, 0f, 0f, blinks, frameTimes.size, frame = "sim"); return }
+        val closed = s.eyesOpen < 0.3f; if (closed && !eyesClosed) blinkCount++; eyesClosed = closed
+        live = Live(true, s.smile, s.leftEye, s.rightEye, s.yaw, s.pitch, blinks, frameTimes.size, 200, "sim", s.lips, s.brow)
+    }
+
     @Synchronized private fun update(face: Face?) {
+        if (simulating) return
         val t = now()
         frameTimes.addLast(t); while (t - frameTimes.first() > 1000) frameTimes.removeFirst()
         while (samples.isNotEmpty() && t - samples.first().t > 120_000) samples.removeFirst()
         seen = face != null
         val blinks = Profiler.blinksPerMin(samples.filter { it.t >= t - 60_000 }).toInt()
         if (face == null) {
-            samples.addLast(Sample(t, false))
+            retain(Sample(t, false))
             live = Live(false, null, null, null, 0f, 0f, blinks, frameTimes.size, frame = frameSize)
             return
         }
@@ -71,8 +97,8 @@ class FaceWatch {
         val brows = listOfNotNull(y(FaceContour.LEFT_EYEBROW_TOP), y(FaceContour.RIGHT_EYEBROW_TOP))
         val brow = if (eyes.isEmpty() || brows.isEmpty()) 0f else (eyes.average() - brows.average()).toFloat() / h
         val s = Sample(t, true, face.smilingProbability ?: 0f, min(left ?: 1f, right ?: 1f),
-            face.headEulerAngleY, face.headEulerAngleX, lips, brow)
-        samples.addLast(s)
+            face.headEulerAngleY, face.headEulerAngleX, lips, brow, left, right)
+        retain(s)
         val closed = s.eyesOpen < 0.3f; if (closed && !eyesClosed) blinkCount++; eyesClosed = closed
         live = Live(true, face.smilingProbability, left, right, face.headEulerAngleY, face.headEulerAngleX,
             blinks, frameTimes.size, face.boundingBox.width(), frameSize, lips, brow)
@@ -95,6 +121,7 @@ class FaceWatch {
 
     internal fun scannerState(reducedMotion: Boolean = false) = session.state(reducedMotion)
     private var interviewAnalyzer: ImageAnalysis? = null
+    private var analyzedAt = 0L // worker thread only
     private var passportAnalyzer: ImageAnalysis? = null
     internal fun clearAnalysis(analysis: ImageAnalysis) {
         analysis.clearAnalyzer()
@@ -124,6 +151,12 @@ class FaceWatch {
         .build().also { a ->
             interviewAnalyzer = a
             a.setAnalyzer(worker) { proxy ->
+                // Thermal cap (~15 fps) for 20-minute sessions. A frame is closed only after its detection, so at the
+                // detector's own ~10 fps the next one always arrives past the gate; 60 ms, not 66, so a 30 fps camera's
+                // jitter can't skip two frames in a row.
+                val at = now()
+                if (at - analyzedAt < 60) { proxy.close(); return@setAnalyzer }
+                analyzedAt = at
                 val rotation = proxy.imageInfo.rotationDegrees
                 val (w, h) = uprightSize(proxy.width, proxy.height, rotation)
                 val image = try { proxy.image?.let { InputImage.fromMediaImage(it, rotation) } }

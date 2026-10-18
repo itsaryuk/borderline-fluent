@@ -11,6 +11,7 @@ import com.google.mlkit.genai.prompt.SystemInstruction
 import com.google.mlkit.genai.prompt.TextPart
 import com.google.mlkit.genai.prompt.generateContentRequest
 import com.google.mlkit.genai.speechrecognition.SpeechRecognition
+import com.google.mlkit.genai.speechrecognition.SpeechRecognizer
 import com.google.mlkit.genai.speechrecognition.SpeechRecognizerOptions
 import com.google.mlkit.genai.speechrecognition.SpeechRecognizerResponse
 import com.google.mlkit.genai.speechrecognition.speechRecognizerOptions
@@ -180,50 +181,92 @@ object Nano {
 
     /** ML Kit speech recognition, advanced mode, forced to [lang]. Sends a finished clip in ONE_SHOT mode. */
     suspend fun transcribe(lang: String, pcm: FloatArray, log: (String) -> Unit, advanced: Boolean = true, rate: Int = 16000): Pair<String, Long>? {
-        val rec = SpeechRecognition.getClient(speechRecognizerOptions {
+        val opts = speechRecognizerOptions {
             locale = asrLocale(lang, advanced)
             preferredMode = if (advanced) SpeechRecognizerOptions.Mode.MODE_ADVANCED else SpeechRecognizerOptions.Mode.MODE_BASIC
-        })
+        }
+        val rec = SpeechRecognition.getClient(opts)
         try {
             when (val st = rec.checkStatus()) {
                 FeatureStatus.AVAILABLE -> {}
                 FeatureStatus.DOWNLOADABLE, FeatureStatus.DOWNLOADING -> rec.download().takeWhile { it !is DownloadStatus.DownloadCompleted && it !is DownloadStatus.DownloadFailed }.collect { log("asr download $lang $it") }
                 else -> { log("nano asr $lang unavailable status=$st"); return null }
             }
-            val (read, write) = ParcelFileDescriptor.createPipe()
+            // One-shot clips of ~8 s and longer failed with ERROR_TYPE_AUDIO_BUFFER_OVERFLOW (Pixel 11 Pro XL,
+            // 2026-10-13) and counted as silence: long answers go in segments of at most 7 s, cut in pauses.
+            // A fresh client per later segment: a failed session closes the engine.
+            // The latency returned is the whole recognition (every segment), not just the time after the last write.
+            val startAt = System.nanoTime()
             var endAt = 0L
             val text = StringBuilder()
-            coroutineScope {
-                val feeder = async(Dispatchers.IO) {
-                    ParcelFileDescriptor.AutoCloseOutputStream(write).use { out ->
-                        val bytes = java.nio.ByteBuffer.allocate(pcm.size * 2).order(java.nio.ByteOrder.LITTLE_ENDIAN)
-                        pcm.forEach { bytes.putShort((it.coerceIn(-1f, 1f) * 32767).toInt().toShort()) }
-                        out.write(bytes.array()) // ONE_SHOT: the whole clip at once, no real-time pacing
-                    }
-                    endAt = System.nanoTime()
-                }
-                val listen = launch {
-                    rec.startRecognition(speechRecognizerRequest { audioSource = AudioSource.fromPfd(read, AudioSource.Mode.ONE_SHOT,
-                        android.media.AudioFormat.Builder().setEncoding(android.media.AudioFormat.ENCODING_PCM_16BIT)
-                            .setSampleRate(rate).setChannelMask(android.media.AudioFormat.CHANNEL_IN_MONO).build()) })
-                        .takeWhile { it !is SpeechRecognizerResponse.CompletedResponse }
-                        .collect { r ->
-                            when (r) {
-                                is SpeechRecognizerResponse.FinalTextResponse -> text.append(r.text).append(' ')
-                                is SpeechRecognizerResponse.ErrorResponse -> log("nano asr error $r")
-                                else -> {}
-                            }
-                        }
-                }
-                feeder.await()
-                // EOF should complete the stream; if the recognizer keeps waiting, stop it (what the game would do
-                // when the player releases the mic) and give it a moment to flush the final text.
-                if (withTimeoutOrNull(6000) { listen.join() } == null) {
-                    rec.stopRecognition()
-                    withTimeoutOrNull(4000) { listen.join() } ?: listen.cancel()
-                }
+            val segments = asrSegments(pcm, rate)
+            // A later segment that throws keeps the text so far.
+            for ((i, seg) in segments.withIndex()) {
+                val clip = pcm.copyOfRange(seg.first, seg.last + 1)
+                if (i == 0) { endAt = oneShot(rec, clip, rate, text, log); continue }
+                endAt = try { SpeechRecognition.getClient(opts).use { oneShot(it, clip, rate, text, log) } }
+                    catch (e: CancellationException) { throw e } catch (e: Exception) { log("nano asr segment $i failed: $e"); break }
             }
-            return text.toString().trim() to ((System.nanoTime() - endAt) / 1_000_000)
+            val now = System.nanoTime()
+            if (segments.size > 1) log("nano asr ${segments.size} segments total=${(now - startAt) / 1_000_000}ms last_after_write=${(now - endAt) / 1_000_000}ms")
+            return text.toString().trim() to ((now - startAt) / 1_000_000)
         } finally { rec.close() }
     }
+
+    /** Transcribes one clip in ONE_SHOT mode, appending final text to [text]; returns when the last byte was written. */
+    private suspend fun oneShot(rec: SpeechRecognizer, pcm: FloatArray, rate: Int, text: StringBuilder, log: (String) -> Unit): Long {
+        val (read, write) = ParcelFileDescriptor.createPipe()
+        var endAt = 0L
+        coroutineScope {
+            val feeder = async(Dispatchers.IO) {
+                ParcelFileDescriptor.AutoCloseOutputStream(write).use { out ->
+                    val bytes = java.nio.ByteBuffer.allocate(pcm.size * 2).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+                    pcm.forEach { bytes.putShort((it.coerceIn(-1f, 1f) * 32767).toInt().toShort()) }
+                    out.write(bytes.array()) // ONE_SHOT: the whole clip at once, no real-time pacing
+                }
+                endAt = System.nanoTime()
+            }
+            val listen = launch {
+                rec.startRecognition(speechRecognizerRequest { audioSource = AudioSource.fromPfd(read, AudioSource.Mode.ONE_SHOT,
+                    android.media.AudioFormat.Builder().setEncoding(android.media.AudioFormat.ENCODING_PCM_16BIT)
+                        .setSampleRate(rate).setChannelMask(android.media.AudioFormat.CHANNEL_IN_MONO).build()) })
+                    .takeWhile { it !is SpeechRecognizerResponse.CompletedResponse }
+                    .collect { r ->
+                        when (r) {
+                            is SpeechRecognizerResponse.FinalTextResponse -> text.append(r.text).append(' ')
+                            is SpeechRecognizerResponse.ErrorResponse -> log("nano asr error $r")
+                            else -> {}
+                        }
+                    }
+            }
+            feeder.await()
+            // EOF should complete the stream; if the recognizer keeps waiting, stop it (what the game would do
+            // when the player releases the mic) and give it a moment to flush the final text.
+            if (withTimeoutOrNull(6000) { listen.join() } == null) {
+                rec.stopRecognition()
+                withTimeoutOrNull(4000) { listen.join() } ?: listen.cancel()
+            }
+        }
+        return endAt
+    }
+}
+
+/** Splits a clip into ASR segments of at most 7 s, each cut at the quietest 200 ms window 4-7 s into what remains,
+ *  leaving at least 1 s after the cut (clips end in silence: a tiny silent tail cost its own session, up to 10 s). */
+internal fun asrSegments(pcm: FloatArray, rate: Int): List<IntRange> {
+    val max = 7 * rate; val min = 4 * rate; val half = rate / 10; val step = maxOf(1, rate / 100)
+    val out = ArrayList<IntRange>()
+    var start = 0
+    while (pcm.size - start > max) {
+        val end = minOf(start + max, pcm.size - rate) // > start + 6 s here, so the range is never empty
+        var cut = end; var best = Double.MAX_VALUE
+        for (c in start + min..end step step) {
+            var e = 0.0
+            for (i in maxOf(0, c - half) until minOf(pcm.size, c + half)) e += pcm[i] * pcm[i]
+            if (e < best) { best = e; cut = c }
+        }
+        out += start until cut; start = cut
+    }
+    out += start until pcm.size
+    return out
 }

@@ -26,19 +26,16 @@ class FaceMeshTest {
         val p = Point(.2, .7); near(-.2, FaceMesh.mirror(p).x)
     }
     @Test fun bothArtAnchorsAndNonSquareCrops() {
-        val room = FaceMesh.aperture(Asset.ROOM, 941.0, 941.0)!!
-        near(.5 * 941, room.center.x); near(.353 * 1672 - 365.5, room.center.y)
-        near(.110 * 941, room.radius)
         val desk = FaceMesh.aperture(Asset.DESK, 941.0, 941.0)!!
-        near(.455 * 1672 - 365.5, desk.center.y); near(.105 * 941, desk.radius)
+        near(.5 * 941, desk.center.x); near(.455 * 1672 - 365.5, desk.center.y); near(.105 * 941, desk.radius)
         for ((w, h) in listOf(400.0 to 800.0, 800.0 to 400.0)) {
             val s = maxOf(w / 941, h / 1672)
-            val c = FaceMesh.aperture(Asset.ROOM, w, h)!!
-            near(w / 2, c.center.x); near((h - s * 1672) / 2 + .353 * 1672 * s, c.center.y)
+            val c = FaceMesh.aperture(Asset.DESK, w, h)!!
+            near(w / 2, c.center.x); near((h - s * 1672) / 2 + .455 * 1672 * s, c.center.y)
         }
     }
     @Test fun anchorsStayInsideHardwareAndScaleWithSharedContainer() {
-        for ((asset, cy, radius) in listOf(Triple(Asset.ROOM, 590.216, 103.51), Triple(Asset.DESK, 760.76, 98.805))) {
+        for ((asset, cy, radius) in listOf(Triple(Asset.DESK, 760.76, 98.805))) {
             val source = FaceMesh.aperture(asset, 941.0, 1672.0)!!
             near(470.5, source.center.x); near(cy, source.center.y); near(radius, source.radius)
             val small = FaceMesh.aperture(asset, 360.0, 360.0)!!
@@ -51,7 +48,7 @@ class FaceMeshTest {
     }
     @Test fun invalidGeometryRejected() {
         for (bad in listOf(0.0, Double.NaN, Double.POSITIVE_INFINITY, -1.0)) {
-            assertNull(FaceMesh.aperture(Asset.ROOM, bad, 100.0))
+            assertNull(FaceMesh.aperture(Asset.DESK, bad, 100.0))
             assertNull(FaceMesh.fit(mapOf(Contour.FACE_OVAL to oval), Circle(Point(0.0, 0.0), bad)))
         }
         fun snap(c: Map<Contour, List<Point>>, w: Int = 640) = FaceMesh.snapshot(c, 0, w, 480, 1, 0)

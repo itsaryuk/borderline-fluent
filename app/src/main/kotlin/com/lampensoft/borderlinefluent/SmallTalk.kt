@@ -177,3 +177,13 @@ fun nextSmallTalk(current: Int, count: Int, answered: Boolean): Int? =
 
 fun judgeInterviewAnswer(isAnswer: Boolean, wasSmallTalk: Boolean, handover: Boolean): Boolean =
     isAnswer && !wasSmallTalk && !handover
+
+/** How many recent small-talk seeds the next desks avoid: half of the eight. */
+const val RECENT_TALK = 4
+
+/** A small-talk seed index out of [count], avoiding [recent] (falls back to any when all are recent). */
+fun pickSmallTalk(count: Int, recent: List<Int>, r: kotlin.random.Random): Int =
+    (0 until count).filter { it !in recent }.ifEmpty { (0 until count).toList() }.random(r)
+
+/** [recent] with [picked] moved to the end, at most [RECENT_TALK]. */
+fun rememberTalk(recent: List<Int>, picked: Int): List<Int> = (recent - picked + picked).takeLast(RECENT_TALK)

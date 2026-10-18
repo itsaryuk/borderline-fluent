@@ -6,6 +6,8 @@ import org.junit.Test
 
 class AirportsTest {
     // Frozen from the pre-refactor 99 slots; assignments from the approved plan, not the runtime catalog.
+    // 2026-10-16 cultural review (owner): Kazakhstan, Kyrgyzstan and EGO DNK OZH cut, BRU -> CRL; KZN and UUD
+    // (no old slot, empty first column) take the Kazakh and Kyrgyz officers.
     private val slots = """
 de|de|fra|de|dest_de|de_f1,de_m1
 valdenstein|austria|inn|de|dest_valdenstein|de_x1,de_x2
@@ -45,7 +47,7 @@ switzerland|switzerland|zrh|de|dest_switzerland|de_chm
 hohenmark|de|bre|de|dest_hohenmark|de_x1,de_x2
 siebenau|de|str|de|dest_siebenau|de_x1,de_x2
 brennland|de|dtm|de|dest_brennland|de_x1,de_x2
-belgium|belgium|bru|fr|dest_belgium|fr_bef
+belgium|belgium|crl|fr|dest_belgium|fr_bef
 canada_fr|canada|yul|fr|dest_fr|fr_cam
 senegal|senegal|dss|fr|dest_senegal|fr_snm
 lorvel|fr|avn|fr|dest_lorvel|fr_x1,fr_x2
@@ -70,14 +72,11 @@ wolnogrod|poland|gdn|pl|dest_wolnogrod|pl_xm,pl_xf
 jeziorna|poland|poz|pl|dest_jeziorna|pl_xm,pl_xf
 kresowia|poland|rze|pl|dest_kresowia|pl_xm,pl_xf
 zlotogora|poland|wro|pl|dest_zlotogora|pl_xm,pl_xf
-kazakhstan|kazakhstan|ala|ru|dest_kazakhstan|ru_kzf
-kyrgyzstan|kyrgyzstan|bsz|ru|dest_kyrgyzstan|ru_kgm
-belogorye|russia|ego|ru|dest_belogorye|ru_xm,ru_xf
 pribrezhye|russia|arh|ru|dest_pribrezhye|ru_xm,ru_xf
 kedrovia|russia|tof|ru|dest_kedrovia|ru_xm,ru_xf
-zelenodar|ukraine|dnk|uk|dest_zelenodar|uk_xm,uk_xf,uk_ym,uk_yf
 sonyachia|ukraine|ods|uk|dest_sonyachia|uk_xm,uk_xf,uk_ym,uk_yf
-vitrova|ukraine|ozh|uk|dest_vitrova|uk_xm,uk_xf,uk_ym,uk_yf
+|russia|kzn|ru|dest_kazan|ru_kzf,ru_xm
+|russia|uud|ru|dest_ulanude|ru_kgm,ru_xf
 dnistrovia|ukraine|lwo|uk|dest_dnistrovia|uk_xm,uk_xf,uk_ym,uk_yf
 polonyna|ukraine|ifo|uk|dest_polonyna|uk_xm,uk_xf,uk_ym,uk_yf
 yesilvadi|turkey|rzv|tr|dest_yesilvadi|tr_xm,tr_xf
@@ -109,17 +108,18 @@ westmarch|australia|asp|en|dest_westmarch|en_xm,en_xf
 """.trimIndent().lines().map { it.split('|') }
 
     @Test fun catalogPreservesEveryOldSlotAndItsPackAssets() {
-        assertEquals(31, Country.all.size)
-        val airports = Country.all.flatMap { it.airports }
-        assertEquals(99, airports.size)
-        assertEquals(99, airports.map { it.id }.toSet().size)
+        assertEquals(30, Country.all.size)
+        val airports = Country.all.filter { it.id != "usa" }.flatMap { it.airports }
+        assertEquals(96, airports.size)
+        assertEquals(96, airports.map { it.id }.toSet().size)
         assertEquals(slots.map { it[2] }.toSet(), airports.map { it.id }.toSet())
-        for (country in Country.all) {
+        for (country in Country.all.filter { it.id != "usa" }) {
             val expected = slots.filter { it[1] == country.id }.sortedBy { it[0] != it[1] && it[0] != "canada_fr" }
             assertEquals(country.id, expected.map { it[2] }, country.airports.map { it.id })
         }
         val root = listOf(File("packs"), File("../packs")).first { it.isDirectory }
-        for ((old, id, airport, lang, art, officers) in slots.map { Slot(it) }) {
+        for ((slot, id, airport, lang, art, officers) in slots.map { Slot(it) }) {
+            val old = slot.ifEmpty { airport }
             val c = Country.of(id)
             val a = c.airports.single { it.id == airport }
             assertEquals(old, lang, a.lang)
@@ -130,26 +130,45 @@ westmarch|australia|asp|en|dest_westmarch|en_xm,en_xf
             a.officers.forEach { assertTrue(old, File(dir, "officer_${it}_sheet.webp").isFile) }
         }
     }
+    @Test fun usaCatalogAndImmediateReferral() {
+        val usa = Country.of("usa")
+        assertEquals(listOf("JFK", "LAX", "ORD"), usa.airports.map { it.iata })
+        assertTrue(usa.airports.all { it.lang == "en" && it.officers == listOf("en_usm", "en_usf") })
+        val root = listOf(File("packs"), File("../packs")).first { it.isDirectory }
+        for (airport in usa.airports) {
+            val art = File(root, "lang_en/src/main/assets/art")
+            assertTrue(File(art, "${airport.art}.webp").isFile)
+            for (officer in airport.officers) assertTrue(File(art, "officer_${officer}_sheet.webp").isFile)
+        }
+        assertTrue(Country.isFemale("en_usf"))
+        assertFalse(Country.isFemale("en_usm"))
+        for (home in listOf(false, true)) {
+            val mind = OfficerMind(Persona.TRAINING).also { it.homecoming = home }
+            mind.startDesk("usa")
+            assertEquals(Decision.REFERRAL, mind.decision)
+            assertEquals(0, mind.turns)
+            assertFalse(mind.crashed)
+        }
+        for (lang in Language.all) assertFalse(OFFICER_LINES.getValue(lang.code).getValue("usa.greet.1").isBlank())
+    }
+
     private data class Slot(val old: String, val country: String, val airport: String, val lang: String, val art: String, val officers: String) {
         constructor(p: List<String>): this(p[0], p[1], p[2], p[3], p[4], p[5])
     }
     @Test fun aliasesAreExplicitAndComplete() {
-        val expected = slots.filter { it[0] != it[1] }.associate { it[0] to CountryMigration.Target(it[1], it[2]) }
-        assertEquals(69, expected.size)
+        val expected = slots.filter { it[0] != it[1] && it[0].isNotEmpty() }.associate { it[0] to CountryMigration.Target(it[1], it[2]) }
+        assertEquals(66, expected.size)
         assertEquals(expected, CountryMigration.aliases)
-        val real = slots.filter { it[0] == it[1] || it[0] == "canada_fr" }.associate { it[0] to CountryMigration.Target(it[1], it[2]) }
-        assertEquals(31, real.size)
-        assertEquals(real, CountryMigration.oldRealSlots)
     }
     @Test fun canonicalIdentityAndOrder() {
-        assertEquals("de fr es italy portugal poland russia ukraine turkey uae japan china austria switzerland belgium canada senegal mexico argentina colombia brazil angola capeverde kazakhstan kyrgyzstan egypt jordan morocco uk ireland australia".split(' '), Country.all.map { it.id })
+        assertEquals("de fr es italy portugal poland russia ukraine turkey uae japan china austria switzerland belgium canada senegal mexico argentina colombia brazil angola capeverde egypt jordan morocco uk ireland australia usa".split(' '), Country.all.map { it.id })
         assertEquals(Country.all.map { it.id }.toSet(), Country.ISO.keys)
-        assertEquals(31, Country.ISO.values.toSet().size)
-        assertFalse("US" in Country.ISO.values)
+        assertEquals(30, Country.ISO.values.toSet().size)
+        assertTrue("US" in Country.ISO.values)
         assertTrue(Country.all.all { it.airports.isNotEmpty() })
         assertEquals("UA", Country.of("ukraine").iso)
         assertEquals("GB", Country.of("uk").iso)
-        assertEquals(7, Country.of("ukraine").airports.size)
+        assertEquals(5, Country.of("ukraine").airports.size)
         assertTrue(Country.of("ukraine").airports.all { it.lang == "uk" })
         assertEquals("\uD83C\uDDFA\uD83C\uDDE6", Country.of("ukraine").emoji)
         assertEquals("\uD83C\uDDEC\uD83C\uDDE7", Country.of("uk").emoji)
@@ -226,5 +245,17 @@ westmarch|australia|asp|en|dest_westmarch|en_xm,en_xf
             assertFalse(d.airport in eligibleAirports(d.country, languages, allArt - d.airport.art, "fr"))
         }
         assertNull(selectDestination(pool, emptySet(), allArt, null, kotlin.random.Random(1), bag))
+    }
+
+    @Test fun everyAirportHasACityAndAnEnglishNameWhereNeeded() {
+        for (a in Country.all.flatMap { it.airports }) {
+            assertNotNull(a.id, AIRPORT_CITY[a.id])
+            assertEquals(a.id, 3, a.iata.length)
+            // A non-Latin local name must have an English UI name.
+            if (a.name.any { it.code > 0x24F && it !in '\u2018'..'\u201F' && it != '\u2013' && it != '\u2014' && it != '\u00AB' && it != '\u00BB' })
+                assertNotEquals(a.id, a.name, a.uiName("xx"))
+        }
+        assertEquals("Stornoway", Itinerary.roll(kotlin.random.Random(1), Destination(Country.of("uk"), Country.of("uk").airports.last()),
+            Identity(Nationality.USA, Gender.WOMAN, NameList.FEMALE, "", "", "", "", "", null, "")).city)
     }
 }

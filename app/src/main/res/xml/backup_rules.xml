@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Auto Backup and device transfer skip the voice recordings, the diagnostics log (it holds face-derived numbers)
-     and the downloaded models and voices (large, re-downloadable). The passport photo is in noBackupFilesDir. -->
+     and the downloaded models and voices (large, re-downloadable). The passport photo is in noBackupFilesDir.
+     shared_prefs are included by design: the career (with the passport identity: the chosen gender and nationality,
+     the rolled name, and a booked trip) and the settings travel with the player's backup and device transfer. -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="file" path="wavs/" />

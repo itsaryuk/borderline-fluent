@@ -5,9 +5,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class LocalesConfigTest {
-    @Test fun systemAppLanguagesPageOffersEveryGameLanguage() {
+    @Test fun systemAppLanguagesPageOffersEveryShippedLanguage() {
         val xml = File("src/main/res/xml/locales_config.xml").readText()
         val listed = Regex("""android:name="([a-z-]+)"""").findAll(xml).map { it.groupValues[1] }.toSet()
-        assertEquals(Language.all.map { it.code }.toSet(), listed)
+        assertEquals(Language.shipped.map { it.code }.toSet(), listed)
     }
 }

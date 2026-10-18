@@ -1,22 +1,24 @@
 package com.lampensoft.borderlinefluent
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class OfficerMindTest {
+    /** Homecoming fact number → id (0 = none), as Nano numbers them. */
+    private fun f(n: Int) = HOMECOMING_FACTS.getOrNull(n - 1)
+
     private val calm = Persona(patience = 0.8, suspicion = 0.2, strictness = 0.7, tolerance = 0.5, busy = 0.3)
     private val good = Check(answered = true, contradiction = false, clarity = 2, inLanguage = true)
     private fun answer(m: OfficerMind, think: Long = 2000) = m.onAnswer(Delivery(think, 2.0, "Ich bin hier für eine Messe."))
 
-    @Test fun wantedScalesWithLevelAndBusyWithinFourToEight() {
-        assertEquals(4, OfficerMind(calm.copy(level = 0, busy = 1.0)).wanted)
-        assertEquals(8, OfficerMind(calm.copy(level = 3, busy = 0.0)).wanted)
-        assertEquals(4, OfficerMind(Persona.TRAINING).wanted)
+    @Test fun wantedIsThreeAtEveryRankIncludingTraining() {
         for (level in 0..3) for (busy in listOf(0.0, 0.5, 1.0)) {
-            assertEquals((5 + level - 2 * busy).toInt().coerceIn(4, 8),
-                OfficerMind(calm.copy(level = level, busy = busy)).wanted)
+            assertEquals(3, OfficerMind(calm.copy(level = level, busy = busy)).wanted)
         }
+        assertEquals(3, OfficerMind(Persona.TRAINING).wanted)
     }
 
     @Test fun cuesTrackSilenceAndFreePauses() {
@@ -54,15 +56,15 @@ class OfficerMindTest {
 
     @Test fun cuesTrackContradictionsAndTheirLatestFact() {
         val m = OfficerMind(calm)
-        m.onCheck(good.copy(contradiction = true, inLanguage = false), 4)
+        m.onCheck(good.copy(contradiction = true, inLanguage = false), f(4))
         assertEquals(listOf(Cue.WRONG_LANGUAGE, Cue.CONTRA_FIRST), m.takeCues())
-        assertEquals(4, m.cueFact)
-        m.onCheck(good.copy(contradiction = true), 6)
+        assertEquals(f(4), m.cueFact)
+        m.onCheck(good.copy(contradiction = true), f(6))
         assertEquals(listOf(Cue.CONTRA_FIRST), m.takeCues())
-        assertEquals(6, m.cueFact)
-        m.onCheck(good.copy(contradiction = true), 4)
+        assertEquals(f(6), m.cueFact)
+        m.onCheck(good.copy(contradiction = true), f(4))
         assertEquals(listOf(Cue.CONTRA_AGAIN), m.takeCues())
-        assertEquals(4, m.cueFact)
+        assertEquals(f(4), m.cueFact)
     }
 
     @Test fun tricksEmitOnlyTrickOrGlitch() {
@@ -97,7 +99,7 @@ class OfficerMindTest {
     @Test fun oddCostsSuspicionAndNormalPatienceWithoutGoodAnswerOrFactCredit() {
         val m = OfficerMind(calm)
         answer(m)
-        m.onCheck(good.copy(odd = true), 2)
+        m.onCheck(good.copy(odd = true), f(2))
         assertEquals(1, m.odd)
         assertEquals(calm.suspicion + 0.12 + 0.12 * calm.strictness, m.suspicion, 1e-9)
         assertEquals(calm.patience - 0.03 - 0.04 * calm.busy, m.patience, 1e-9)
@@ -107,11 +109,11 @@ class OfficerMindTest {
         assertEquals(listOf(Cue.ODD), m.takeCues())
         assertNull(m.decision)
         answer(m)
-        m.onCheck(good.copy(odd = true), 3)
+        m.onCheck(good.copy(odd = true), f(3))
         assertEquals(2, m.odd)
         assertEquals(true, m.suspicion < 1.0)
         assertEquals(0, m.goodAnswers)
-        assertNull(m.decision)
+        assertEquals(Decision.REFUSED, m.decision)
     }
 
     @Test fun oddProvidesGroundsForHighSuspicion() {
@@ -121,7 +123,7 @@ class OfficerMindTest {
         assertEquals(1, m.odd)
         assertEquals(0, m.contradictions + m.dodges + m.tricks)
         assertEquals(true, m.patience > 0.0)
-        assertEquals(Decision.SECONDARY, m.decision)
+        assertEquals(Decision.REFUSED, m.decision)
     }
 
     @Test fun trickTakesPrecedenceOverOdd() {
@@ -129,7 +131,7 @@ class OfficerMindTest {
         repeat(2) { m.onCheck(good.copy(trick = true, odd = true)) }
         assertEquals(0, m.odd)
         assertEquals(0, m.goodAnswers)
-        assertEquals(Decision.BROKEN, m.decision)
+        assertEquals(Decision.REFERRAL, m.decision)
     }
 
     @Test fun emptyAnswerReasksOnceWithoutScoringThenUsesSilence() {
@@ -176,72 +178,353 @@ class OfficerMindTest {
         val trick = good.copy(answered = false, trick = true)
         val seen = (1..3).map { answer(m); val b = m.integrity; m.onCheck(trick); integrityHint(b, m.integrity, m.decision != null) }
         assertEquals(listOf(R.string.implant_unit_slipping, R.string.implant_unit_stutter, null), seen)
-        assertEquals(Decision.BROKEN, m.decision)
+        assertEquals(Decision.REFERRAL, m.decision)
     }
 
-    @Test fun cleanAnswersPass() {
+    @Test fun cleanRunPassesInThreeAnswers() {
         val m = OfficerMind(calm)
-        repeat(m.wanted) { answer(m); m.onCheck(good, 3 + it) }
+        repeat(3) { answer(m); m.onCheck(good, f(3 + it)) }
+        assertEquals(3, m.turns)
         assertEquals(Decision.PASS, m.decision)
     }
 
-    @Test fun repeatedContradictionsSendToSecondary() {
+    @Test fun twoContradictionsEndTheDesk() {
         val m = OfficerMind(calm)
-        repeat(4) { answer(m); m.onCheck(good.copy(contradiction = true), 5) }
-        assertEquals(Decision.SECONDARY, m.decision)
+        repeat(2) { answer(m); m.onCheck(good.copy(contradiction = true), f(5)) }
+        assertEquals(Decision.REFUSED, m.decision)
     }
 
     @Test fun firstContradictionPressesSecondPunishes() {
         val m = OfficerMind(calm)
-        m.onCheck(good.copy(contradiction = true), 4)
+        m.onCheck(good.copy(contradiction = true), f(4))
         assertEquals(0.28, m.suspicion, 1e-9) // +0.08 only
-        org.junit.Assert.assertTrue(m.delta, m.delta.contains("contra-first fact=4"))
+        org.junit.Assert.assertTrue(m.delta, m.delta.contains("contra-first fact=DAYS"))
         assertEquals(listOf(Cue.CONTRA_FIRST), m.takeCues())
-        m.onCheck(good.copy(contradiction = true), 5) // another fact: pressed first too, a little harder (+0.08+0.04·1)
-        assertEquals(0.40, m.suspicion, 1e-9)
-        m.onCheck(good.copy(contradiction = true), 4) // the same fact again: full weight
+        m.onCheck(good.copy(contradiction = true), f(5)) // another fact: pressed first too, a little harder (+0.08+0.04·1)
+        assertEquals(0.40, m.suspicion, 1e-9) // the second bad answer refuses: no phone offer, no charge
+        m.onCheck(good.copy(contradiction = true), f(4)) // the same fact again: full weight
         assertEquals(0.40 + 0.15 + 0.2 * calm.strictness, m.suspicion, 1e-9)
-        org.junit.Assert.assertTrue(m.delta, m.delta.contains("contra fact=4"))
+        org.junit.Assert.assertTrue(m.delta, m.delta.contains("contra fact=DAYS"))
     }
 
     @Test fun garbledContradictionCostsNoSuspicion() {
         val m = OfficerMind(calm)
-        m.onCheck(good.copy(contradiction = true), 4)
-        val before = m.suspicion
-        m.onCheck(good.copy(contradiction = true, clarity = 0), 4) // not understood: no press, no punish
+        m.onCheck(good.copy(contradiction = true), f(4))
+        val before = m.suspicion + TRANSLATOR_SUSPICION // the second wrong answer in a row brings the phone offer
+        m.onCheck(good.copy(contradiction = true, clarity = 0, answered = false), f(4)) // not understood: no press, no punish
         assertEquals(before, m.suspicion, 1e-9)
         assertEquals(1, m.contradictions)
         org.junit.Assert.assertTrue(m.delta, m.delta.contains("unclear"))
         assertEquals(Cue.UNCLEAR, m.takeCues().last())
     }
 
-    @Test fun misheardArabicAnswersDontEndTheRun() {
-        // Pixel 11, Arabic over Whisper: every garbled transcript came back ANSWERED=no MATCHES=no CLARITY 0-1.
+    @Test fun fiveUnheardAnswersEndWithoutContradictionOrDodge() {
         val m = OfficerMind(calm)
-        listOf(0, 1, 0, 1, 1).forEachIndexed { i, cl ->
-            answer(m); m.onCheck(Check(answered = false, contradiction = true, clarity = cl, inLanguage = true), 3 + i)
-        }
-        assertNull(m.decision)
-        assertEquals(calm.suspicion, m.suspicion, 1e-9)
+        repeat(5) { answer(m); m.onCheck(Check.UNCLEAR, f(3 + it)) }
+        assertEquals(Decision.REFUSED, m.decision)
+        assertEquals(calm.suspicion + TRANSLATOR_SUSPICION, m.suspicion, 1e-9) // only the phone offer at the second one costs suspicion
         assertEquals(0, m.dodges); assertEquals(0, m.contradictions)
-        assertEquals(calm.patience - 5 * (0.03 + 0.04 * calm.busy + 0.03), m.patience, 1e-9) // drains slowly
-        assertEquals(Face.CONFUSED, m.face())
     }
 
-    @Test fun aClearNonAnswerIsADodgeNotAContradiction() {
+    @Test fun translatorOfferedOnSecondWrongAnswerInARow() {
+        val dodge = good.copy(answered = false)
+        val contra = good.copy(contradiction = true)
         val m = OfficerMind(calm)
-        m.onCheck(good.copy(answered = false, contradiction = true), 4)
+        answer(m); m.onCheck(dodge, f(3)); assertFalse(m.translatorOffered)
+        answer(m); m.onCheck(dodge, f(4)); assertTrue(m.translatorOffered)
+        val n = OfficerMind(calm)
+        answer(n); n.onCheck(contra, f(3)); answer(n); n.onCheck(Check.UNCLEAR, f(4)); assertTrue(n.translatorOffered)
+        val r = OfficerMind(calm) // dodge, good, dodge: the good one resets the streak
+        for (c in listOf(dodge, good, dodge)) { answer(r); r.onCheck(c, f(3)) }
+        assertFalse(r.translatorOffered)
+        val o = OfficerMind(calm) // a merely odd answer is not "wrong"
+        for (c in listOf(good.copy(odd = true), good.copy(odd = true))) { answer(o); o.onCheck(c, f(3)) }
+        assertFalse(o.translatorOffered)
+        val u = OfficerMind(calm) // the whole-desk unclear >= 2 still works with a good answer between
+        for (c in listOf(Check.UNCLEAR, good, Check.UNCLEAR)) { answer(u); u.onCheck(c, f(3)) }
+        assertTrue(u.translatorOffered)
+    }
+
+    @Test fun translatorOfferDoesNotStandOrCostWhenTheAnswerEndsTheDesk() {
+        val m = OfficerMind(calm)
+        answer(m); m.onCheck(good.copy(contradiction = true), f(3))
+        val before = m.suspicion
+        answer(m); m.onCheck(good.copy(contradiction = true), f(4)) // second bad answer: refused, no offer
+        assertEquals(Decision.REFUSED, m.decision)
+        assertFalse(m.translatorOffered)
+        assertEquals(before + 0.08 + 0.04, m.suspicion, 1e-9) // only the answer's own suspicion, no phone charge
+    }
+
+    @Test fun translatorNeverOfferedInTrainingStoryOrRoomOnWrongStreak() {
+        val dodge = good.copy(answered = false)
+        for (mode in 0..2) {
+            val m = OfficerMind(Persona.TRAINING).apply { training = mode == 0; storyMission = mode == 1; if (mode == 2) enterRoom() }
+            repeat(2) { answer(m); m.onCheck(dodge, f(3)) }
+            assertFalse("mode $mode", m.translatorOffered)
+        }
+    }
+
+    @Test fun aClearNonAnswerWithoutContradictionIsADodge() {
+        val m = OfficerMind(calm)
+        m.onCheck(good.copy(answered = false), f(4))
         assertEquals(calm.suspicion + 0.06 + 0.06 * calm.strictness, m.suspicion, 1e-9)
         assertEquals(1, m.dodges); assertEquals(0, m.contradictions)
     }
 
+    @Test fun clearWrongAnswerNeverYieldsAnUnclearLine() {
+        for (clarity in 0..2) for (addressed in listOf(false, true)) {
+            if (clarity == 0 && !addressed) continue
+            val m = OfficerMind(calm)
+            val d = Desk(kotlin.random.Random(7), listOf("purpose", "days"))
+            d.next(emptyList(), null, emptySet(), false, false, true, false)
+            answer(m)
+            m.onCheck(good.copy(contradiction = true, clarity = clarity, answered = addressed), FactId.PURPOSE,
+                "I came to drink wine")
+            val cues = m.takeCues()
+            assertFalse(Cue.UNCLEAR in cues)
+            val move = d.next(cues, m.cueFact, emptySet(), false, false, false, false)
+            assertEquals("press.first", move.prefix?.substringBeforeLast('.'))
+            assertFalse(move.question.startsWith("exact."))
+        }
+    }
+
+    @Test fun briefUnheardTranscriptIsUnclearButShortAnswersRemainValid() {
+        for (text in listOf("", "…", "I")) {
+            val m = OfficerMind(calm)
+            m.onCheck(good.copy(answered = false, contradiction = true), FactId.PURPOSE, text)
+            assertEquals(listOf(Cue.UNCLEAR), m.takeCues())
+            assertEquals(0, m.contradictions)
+        }
+        for (text in listOf("5", "No", "是")) {
+            val m = OfficerMind(calm)
+            m.onCheck(good, FactId.DAYS, text)
+            assertEquals(listOf(Cue.GOOD), m.takeCues())
+        }
+    }
+
+    @Test fun twoBadAnswersAreRefusedWhateverTheInterest() {
+        for (interest in listOf(0.0, REFER_AT)) for (mode in 0..2) {
+            val m = OfficerMind(Persona.TRAINING).apply {
+                training = mode == 1; storyMission = mode == 2
+                onEncounter(interest / (0.5 + p.strictness), 0.0)
+            }
+            repeat(2) { answer(m); m.onCheck(good.copy(odd = true), FactId.PURPOSE) }
+            assertEquals(Decision.REFUSED, m.decision)
+            assertEquals(2, m.badAnswers)
+        }
+    }
+
+    @Test fun oddAndContradictionOnOneAnswerDoNotFailFastTwice() {
+        val m = OfficerMind(Persona.TRAINING)
+        answer(m); m.onCheck(good.copy(contradiction = true, odd = true), FactId.PURPOSE)
+        assertNull(m.decision)
+    }
+
+    @Test fun sideQuestionsReduceTripFactsButNeverBelowTwo() {
+        val m = OfficerMind(Persona.TRAINING)
+        m.onSmallTalkAnswer()
+        answer(m); m.onCheck(good, FactId.PURPOSE)
+        m.onQuestion(HOWLANG)
+        assertEquals(2, m.wanted)
+        answer(m); m.onCheck(good)
+        m.onQuestion(ENCOUNTER_TOPIC)
+        assertEquals(2, m.wanted)
+        answer(m); m.onCheck(good, FactId.ENCOUNTER)
+        assertNull(m.decision) // the encounter is not a second trip fact
+        answer(m); m.onCheck(good, FactId.DAYS)
+        assertEquals(Decision.PASS, m.decision)
+        assertEquals(5, m.turns)
+    }
+
+    @Test fun fifthAnswerIsJudgedBeforeTheCapDecides() {
+        val m = OfficerMind(Persona.TRAINING)
+        answer(m); m.onCheck(good, FactId.PURPOSE)
+        repeat(3) { answer(m); m.onCheck(good) }
+        answer(m)
+        m.onTells(emptyList(), 0.0) // Game profiles between delivery and classification
+        assertNull(m.decision)
+        m.onCheck(good, FactId.DAYS)
+        assertEquals(Decision.PASS, m.decision)
+        val bad = OfficerMind(Persona.TRAINING).apply { storyMission = true }
+        answer(bad); bad.onCheck(good, FactId.PURPOSE)
+        answer(bad); bad.onCheck(good, FactId.DAYS)
+        answer(bad); bad.onCheck(good.copy(contradiction = true), FactId.FROM)
+        answer(bad); bad.onCheck(good)
+        answer(bad); bad.onCheck(good.copy(odd = true))
+        assertEquals(Decision.REFUSED, bad.decision)
+    }
+
+    @Test fun totalDeskAnswersNeverExceedFive() {
+        for (mode in 0..2) for (smallTalk in 0..1) {
+            val m = OfficerMind(Persona.TRAINING).apply { training = mode == 1; storyMission = mode == 2 }
+            repeat(smallTalk) { m.onSmallTalkAnswer() }
+            while (m.decision == null && m.turns < 10) { answer(m); m.onCheck(Check.UNCLEAR) }
+            assertEquals(5, m.turns)
+            assertEquals(Decision.REFUSED, m.decision)
+            answer(m)
+            assertEquals(5, m.turns)
+        }
+    }
+
     @Test fun passNeedsDistinctFactsAndToleratesSomeSuspicion() {
         val same = OfficerMind(calm)
-        repeat(same.wanted) { answer(same); same.onCheck(good, 3) } // the same fact over and over
+        repeat(same.wanted) { answer(same); same.onCheck(good, f(3)) } // the same fact over and over
         assertNull(same.decision)
-        val m = OfficerMind(calm.copy(suspicion = 0.95))
-        repeat(m.wanted) { answer(m); m.onCheck(good, 3 + it) }
+        val m = OfficerMind(calm.copy(suspicion = 0.85))
+        repeat(m.wanted) { answer(m); m.onCheck(good, f(3 + it)) }
         org.junit.Assert.assertTrue(m.suspicion in 0.55..0.7) // would not have passed under the old 0.55 bar
+        assertEquals(Decision.PASS, m.decision) // suspicion alone doesn't refer: the meter does ([refers]), and it is empty
+    }
+
+    private fun passAfter(m: OfficerMind, talk: Implant = Implant.NONE): OfficerMind {
+        repeat(m.wanted) { answer(m); m.onCheck(good.copy(implant = if (it < 3) talk else Implant.NONE), f(3 + it)) }
+        return m
+    }
+
+    @Test fun noTalkAndCleanAnswersLeaveTheMeterEmptyAndPass() {
+        val m = passAfter(OfficerMind(calm))
+        assertEquals(0.0, m.meter, 1e-9)
+        assertEquals(Decision.PASS, m.decision)
+    }
+
+    @Test fun implantTalkAloneNeverRefers() { //: a mention needs a slip, bluff or trick
+        val m = passAfter(OfficerMind(calm), Implant.DETAILED)
+        assertEquals(1.5 * METER_DETAILED, m.meter, 1e-9) // 0.28 + 0.14 + 0, not strictness-scaled
+        assertEquals(Decision.PASS, m.decision)
+        val passing = passAfter(OfficerMind(calm), Implant.PASSING)
+        assertEquals(1.5 * METER_PASSING, passing.meter, 1e-9)
+        assertEquals(Decision.PASS, passing.decision)
+    }
+
+    private val lenient = calm.copy(strictness = 0.2)
+
+    @Test fun twoMentionsOfAnyKindNeedABluffToRefer() {
+        for (a in Implant.entries - Implant.NONE) for (b in Implant.entries - Implant.NONE) {
+            val m = OfficerMind(lenient)
+            m.onCheck(good.copy(implant = a)); m.onCheck(good.copy(implant = b))
+            assertFalse("$a+$b meter=${m.meter}", refers(false, false, m.meter))
+            org.junit.Assert.assertTrue(m.deskBluff())
+            org.junit.Assert.assertTrue("$a+$b+bluff meter=${m.meter}", refers(false, false, m.meter))
+        }
+    }
+
+    @Test fun oneLieAndOneMentionRefer() {
+        val m = OfficerMind(lenient)
+        m.onCheck(good.copy(contradiction = true), f(4))
+        m.onCheck(good.copy(implant = Implant.PASSING), f(4)) // the correction, with a passing mention
+        org.junit.Assert.assertTrue("meter=${m.meter}", refers(false, false, m.meter))
+        passAfter(m)
+        assertEquals(Decision.REFERRAL, m.decision)
+    }
+
+    @Test fun oneMentionOrOneLieAloneStillPasses() {
+        val strict = calm.copy(strictness = 0.6)
+        val mention = passAfter(OfficerMind(strict).also { it.onCheck(good.copy(implant = Implant.PASSING)) })
+        assertEquals(Decision.PASS, mention.decision)
+        val lie = passAfter(OfficerMind(strict).also { it.onCheck(good.copy(contradiction = true), f(4)) })
+        assertEquals(Decision.PASS, lie.decision)
+    }
+
+    @Test fun twoContradictionsRefuseWhateverTheMeter() {
+        val m = OfficerMind(lenient)
+        m.onCheck(good.copy(implant = Implant.PASSING)); m.onCheck(good.copy(implant = Implant.PASSING)) // meter over the mark
+        m.onCheck(good.copy(contradiction = true), f(4)); m.onCheck(good.copy(contradiction = true), f(5))
+        assertEquals(Decision.REFUSED, m.decision)
+    }
+
+    @Test fun secondMentionIsHalvedByItsOwnTypeAndLaterOnesAddNothing() {
+        for (second in listOf(Implant.PASSING, Implant.DETAILED)) {
+            val m = OfficerMind(calm)
+            m.onCheck(good.copy(implant = Implant.DETAILED))
+            val before = m.meter
+            assertEquals(METER_DETAILED, before, 1e-9)
+            m.onCheck(good) // quiet answers do not matter
+            m.onCheck(good.copy(implant = second))
+            assertEquals((if (second == Implant.DETAILED) METER_DETAILED else METER_PASSING) / 2, m.meter - before, 1e-9)
+            val after = m.meter
+            m.onCheck(good.copy(implant = Implant.DETAILED))
+            assertEquals(after, m.meter, 1e-9)
+            assertEquals(3, m.implantPassing + m.implantDetailed)
+        }
+    }
+
+    @Test fun officersGrowImmuneAfterThreeReleasesInTheirCountry() {
+        assertEquals(1.0, implantWeight(0), 0.0)
+        assertEquals(1.0, implantWeight(IMMUNE_AFTER - 1), 0.0)
+        assertEquals(0.5, implantWeight(IMMUNE_AFTER), 0.0)
+        val m = OfficerMind(lenient).apply { implantWeight = implantWeight(3) }
+        m.onCheck(good.copy(implant = Implant.PASSING)); m.onCheck(good.copy(implant = Implant.DETAILED))
+        assertEquals((METER_PASSING + METER_DETAILED / 2) / 2, m.meter, 1e-9)
+        // Immune officers still refer on a mention and a slip at high strictness.
+        val strict = OfficerMind(calm.copy(strictness = 1.0)).apply { implantWeight = 0.5 }
+        strict.onCheck(good.copy(implant = Implant.PASSING)); strict.onCheck(good.copy(contradiction = true), f(4))
+        org.junit.Assert.assertTrue("meter=${strict.meter}", refers(false, false, strict.meter))
+    }
+
+    @Test fun homecomingHalvesTheMeter() {
+        val away = passAfter(OfficerMind(calm), Implant.DETAILED)
+        val home = passAfter(OfficerMind(calm).apply { homecoming = true }, Implant.DETAILED)
+        assertEquals(away.meter / 2, home.meter, 1e-9)
+        assertEquals(Decision.PASS, home.decision)
+    }
+
+    @Test fun dangerBeatsInterestAndFailFast() {
+        for (patienceLimit in listOf(false, true)) {
+            val m = OfficerMind(calm.copy(suspicion = if (patienceLimit) 0.0 else 0.6))
+            m.onEncounter(1.0, 0.0)
+            answer(m); m.onCheck(good.copy(odd = true))
+            if (patienceLimit) m.onEncounter(0.0, -1.0)
+            answer(m); m.onCheck(good.copy(odd = true))
+            assertEquals(2, m.badAnswers)
+            assertEquals(Decision.REFUSED, m.decision)
+        }
+    }
+
+    @Test fun answerCapRefersWithoutEnoughFactsButLowInterestRefuses() {
+        for (interest in listOf(0.0, REFER_AT)) {
+            val m = OfficerMind(Persona.TRAINING)
+            m.onEncounter(interest / (0.5 + m.p.strictness), 0.0)
+            repeat(m.maxAnswers) { answer(m); m.onCheck(good, FactId.PURPOSE) }
+            assertEquals(if (interest >= REFER_AT) Decision.REFERRAL else Decision.REFUSED, m.decision)
+        }
+    }
+
+    @Test fun enoughFactsPassDespiteSuspicionBelowTheDangerLimit() {
+        val m = passAfter(OfficerMind(calm.copy(suspicion = 0.95)))
+        assertEquals(Decision.PASS, m.decision)
+    }
+
+    @Test fun contradictionsOddAnswersAndTellsFillTheMeterLightly() {
+        val m = OfficerMind(calm)
+        m.onCheck(good.copy(contradiction = true), f(4))
+        assertEquals(METER_CONTRA * (0.5 + calm.strictness), m.meter, 1e-9)
+        val o = OfficerMind(calm); o.onCheck(good.copy(odd = true))
+        assertEquals(METER_ODD * (0.5 + calm.strictness), o.meter, 1e-9)
+        val t = OfficerMind(calm); t.onTells(listOf(Tell.LIPS to 3.0), 0.0)
+        assertEquals(METER_TELL * (t.suspicion - calm.suspicion), t.meter, 1e-9)
+    }
+
+    @Test fun trainingAndStoryNeverRefer() {
+        for (mode in 1..2) {
+            val m = OfficerMind(calm).apply {
+                training = mode == 1; storyMission = mode == 2
+                onEncounter(1.0, 0.0)
+            }
+            assertEquals(Decision.PASS, passAfter(m, Implant.DETAILED).decision)
+            for (meter in listOf(0.0, REFER_AT, 1.0))
+                assertFalse(refers(m.training, m.storyMission, meter))
+            val usa = OfficerMind(calm).apply { training = mode == 1; storyMission = mode == 2 }
+            usa.startDesk("usa")
+            assertNull(usa.decision)
+        }
+        val usa = OfficerMind(calm)
+        usa.startDesk("usa")
+        assertEquals(Decision.REFERRAL, usa.decision)
+    }
+
+    @Test fun storyCrashesPassWithoutReferral() {
+        val m = OfficerMind(calm).apply { storyMission = true }
+        repeat(3) { answer(m); m.onCheck(good.copy(trick = true)) }
         assertEquals(Decision.PASS, m.decision)
     }
 
@@ -251,7 +534,7 @@ class OfficerMindTest {
         assertEquals(0.9 + calm.tellCap, m.suspicion, 1e-9) // capped per run
         assertNull(m.decision)
         answer(m); m.onCheck(good.copy(answered = false)) // a dodge backs the tells up
-        assertEquals(Decision.SECONDARY, m.decision)
+        assertEquals(Decision.REFUSED, m.decision)
     }
 
     @Test fun tellsWeighMoreAtHigherRanksButStayCappedAndNeedGrounds() {
@@ -285,7 +568,7 @@ class OfficerMindTest {
     @Test fun pausesForeverEndInSecondary() {
         val m = OfficerMind(calm)
         repeat(10) { m.onPause(passportPending = true) }
-        assertEquals(Decision.SECONDARY, m.decision)
+        assertEquals(Decision.REFUSED, m.decision)
     }
 
     @Test fun answeringResetsThePauseCount() {
@@ -297,18 +580,18 @@ class OfficerMindTest {
     @Test fun serialLiarIsNotPassed() {
         // A new contradiction on each of five facts, then three good answers: the old flat +0.08 ended at 0.62 → PASS.
         val m = OfficerMind(calm)
-        (3..7).forEach { answer(m); m.onCheck(good.copy(contradiction = true), it) }
-        repeat(3) { answer(m); m.onCheck(good, 8) }
+        (3..7).forEach { answer(m); m.onCheck(good.copy(contradiction = true), f(it)) }
+        repeat(3) { answer(m); m.onCheck(good, f(6)) }
         org.junit.Assert.assertNotEquals(Decision.PASS, m.decision)
         org.junit.Assert.assertTrue(m.suspicion > 0.7)
     }
 
     @Test fun turnCapNeedsTwoGoodFacts() {
         val m = OfficerMind(calm.copy(busy = 0.0))
-        repeat(m.wanted + 4) { answer(m); m.onCheck(good.copy(clarity = 1), 0) } // clean but never about a cover fact
-        assertEquals(Decision.SECONDARY, m.decision)
+        repeat(m.maxAnswers) { answer(m); m.onCheck(good.copy(clarity = 1), f(0)) } // clean but never about a cover fact
+        assertEquals(Decision.REFUSED, m.decision)
         val ok = OfficerMind(calm.copy(busy = 0.0))
-        repeat(m.wanted + 4) { answer(ok); ok.onCheck(good, if (it < 2) 3 + it else 0) }
+        repeat(m.maxAnswers) { answer(ok); ok.onCheck(good, f(if (it < 2) 3 + it else 0)) }
         assertEquals(Decision.PASS, ok.decision)
     }
 
@@ -325,7 +608,7 @@ class OfficerMindTest {
         repeat(2) { m.onSilence() }
         assertNull(m.decision)
         repeat(2) { m.onSilence() }
-        assertEquals(Decision.SECONDARY, m.decision)
+        assertEquals(Decision.REFUSED, m.decision)
     }
 
     @Test fun withheldPassportEscalates() {
@@ -344,20 +627,40 @@ class OfficerMindTest {
         assertNull(m.decision)
         assertEquals(Face.CONFUSED, m.face())
         answer(m); m.onCheck(good.copy(trick = true))
-        assertEquals(Decision.BROKEN, m.decision)
-        // The story room after a desk break: a rebooted unit, not crashed again by the first answer.
+        assertEquals(Decision.REFERRAL, m.decision) // a crash brings the associate at once
+        org.junit.Assert.assertTrue(m.crashed)
+        // The room after a desk break: a rebooted unit, not crashed again by the first answer.
         m.enterRoom(); answer(m); m.onCheck(good)
         assertNull(m.decision)
+        org.junit.Assert.assertFalse(m.crashed)
+        // The associate can't be crashed into a release: the room's verdict is the Assessment's.
+        repeat(3) { answer(m); m.onCheck(good.copy(trick = true)) }
+        assertNull(m.decision)
+    }
+
+    @Test fun trainingCrashPassesAndPassesReferOnlyByTheRule() {
+        val t = OfficerMind(calm).apply { training = true; storyMission = true }
+        repeat(3) { answer(t); t.onCheck(good.copy(trick = true)) }
+        assertEquals(Decision.PASS, t.decision) // training is level 1 only
+        // A clean desk pass with no referral evidence passes; a debug #pass follows the same rule, never in the room.
+        for (story in listOf(false, true)) {
+            val m = OfficerMind(calm.copy(suspicion = 0.0)).apply { storyMission = story }
+            repeat(m.wanted) { answer(m); m.onCheck(good, f(3 + it)) }
+            assertEquals(Decision.PASS, m.decision)
+            assertEquals(Decision.PASS, OfficerMind(calm.copy(suspicion = 0.0)).apply { storyMission = story; settle(Decision.PASS) }.decision)
+        }
+        val room = OfficerMind(calm).apply { storyMission = true; enterRoom(); settle(Decision.RELEASED) }
+        assertEquals(Decision.RELEASED, room.decision)
     }
 
     @Test fun roomInterrogatorIsAFreshUnit() {
         val m = OfficerMind(calm.copy(suspicion = 0.0))
         val trick = good.copy(answered = false, trick = true)
-        answer(m); m.onCheck(trick); answer(m); m.onCheck(good, 3)
+        answer(m); m.onCheck(trick); answer(m); m.onCheck(good, f(3))
         answer(m); m.onCheck(trick) // spread out: two single hits, no chain
         assertEquals(0.5, m.integrity, 0.01)
         var fact = 4
-        while (m.decision == null) { answer(m); m.onCheck(good, fact++) }
+        while (m.decision == null) { answer(m); m.onCheck(good, f(fact++)) }
         assertEquals(Decision.PASS, m.decision)
         m.enterRoom()
         assertEquals(1.0, m.integrity, 0.0)
@@ -368,14 +671,15 @@ class OfficerMindTest {
 
     @Test fun spreadOutTricksDoNotChain() {
         val m = OfficerMind(calm)
-        repeat(3) { answer(m); m.onCheck(good.copy(trick = true)); answer(m); m.onCheck(good) }
+        repeat(2) { answer(m); m.onCheck(good.copy(trick = true)); answer(m); m.onCheck(good) }
         assertNull(m.decision)
+        assertEquals(0.5, m.integrity, 1e-9)
     }
 
     @Test fun strictOfficersCatchTricksFirst() {
         val m = OfficerMind(calm.copy(strictness = 1.0, suspicion = 0.4))
         repeat(4) { answer(m); m.onCheck(good.copy(trick = true)) }
-        assertEquals(Decision.SECONDARY, m.decision)
+        assertEquals(Decision.REFUSED, m.decision)
     }
 
     @Test fun tellsRaiseSuspicion() {
@@ -401,8 +705,8 @@ class OfficerMindTest {
         assertEquals(0.0, floor.suspicion, 1e-9) // never below zero
     }
 
-    @Test fun pokerFaceCalmsTheRoom() {
-        val a = Assessment(0.5, Backstory.BENCH, kotlin.random.Random(1))
+    @Test fun unaidedPokerFaceCalmsTheRoom() {
+        val a = Assessment(0.5, Backstory.BENCH, kotlin.random.Random(1), coached = false)
         val start = a.index
         a.onTells(emptyList(), absent = 0.0); assertEquals(start - 1, a.index, 1e-9)
         a.onTells(emptyList(), absent = 0.9); assertEquals(start - 1 + 3, a.index, 1e-9) // unseen: the absence costs, no bonus
@@ -411,7 +715,7 @@ class OfficerMindTest {
     @Test fun facesFollowEvents() {
         val m = OfficerMind(calm)
         assertEquals(Face.NEUTRAL, m.face())
-        answer(m); m.onCheck(good.copy(clarity = 0))
+        answer(m); m.onCheck(Check.UNCLEAR)
         assertEquals(Face.CONFUSED, m.face())
         answer(m); m.onCheck(good.copy(contradiction = true))
         assertEquals(Face.SUSPICIOUS, m.face())
@@ -515,5 +819,56 @@ class VoicesTest {
         val female = Voices.medianF0(wav(215.0))!!
         org.junit.Assert.assertEquals(115.0, male, 6.0)
         org.junit.Assert.assertEquals(215.0, female, 10.0)
+    }
+
+    private val flagged = Check(answered = true, contradiction = true, clarity = 2, inLanguage = true)
+    private val fine = Check(answered = true, contradiction = false, clarity = 2, inLanguage = true)
+    private fun deskMind() = OfficerMind(Persona(1.0, 0.0, 0.5, 1.0, 0.0))
+
+    @Test fun firstFlagIsReaskedOnceAndTheSecondCounts() {
+        val m = deskMind()
+        m.onAnswer(Delivery(1000, 1.0, "Two weeks."))
+        assertTrue(m.reask(flagged))
+        assertEquals(0, m.turns); assertEquals(0, m.flagCount); assertNull(m.slip)
+        m.onAnswer(Delivery(1000, 1.0, "Three weeks."))
+        assertFalse(m.reask(flagged)) // once per desk
+        m.onCheck(flagged, FactId.DAYS, "Three weeks.")
+        assertEquals(1, m.flagCount); assertEquals("Three weeks." to FactId.DAYS, m.slip)
+    }
+
+    @Test fun reaskedContradictionCountsTowardTheTranslatorStreak() {
+        val dodge = fine.copy(answered = false)
+        val m = deskMind()
+        m.onAnswer(Delivery(1000, 1.0, "x")); assertTrue(m.reask(flagged)); assertFalse(m.translatorOffered) // reask alone never offers
+        m.onAnswer(Delivery(1000, 1.0, "x")); m.onCheck(dodge, FactId.DAYS); assertTrue(m.translatorOffered)
+        val n = deskMind() // dodge, re-asked contradiction, good repeat: the good one resets
+        n.onAnswer(Delivery(1000, 1.0, "x")); n.onCheck(dodge, FactId.DAYS)
+        n.onAnswer(Delivery(1000, 1.0, "x")); assertTrue(n.reask(flagged))
+        n.onAnswer(Delivery(1000, 1.0, "x")); n.onCheck(fine, FactId.DAYS); assertFalse(n.translatorOffered)
+        val o = deskMind() // an odd-only re-ask doesn't count
+        o.onAnswer(Delivery(1000, 1.0, "x")); assertTrue(o.reask(fine.copy(odd = true)))
+        o.onAnswer(Delivery(1000, 1.0, "x")); o.onCheck(dodge, FactId.DAYS); assertFalse(o.translatorOffered)
+    }
+
+    @Test fun reaskSkipsCleanAnswersTricksAndTheRoom() {
+        val m = deskMind()
+        assertFalse(m.reask(fine))
+        assertFalse(m.reask(flagged.copy(trick = true)))
+        m.enterRoom()
+        assertFalse(m.reask(flagged))
+    }
+
+    @Test fun everyLanguageHasAReaskQuestion() {
+        for (l in Language.all) assertTrue(l.code, isQuestion(OFFICER_LINES.getValue(l.code).getValue("reask.1"), l.code))
+    }
+
+    @Test fun untrainedLanguageStartsWithMorePatience() {
+        val p = Persona(0.8, 0.0, 0.5, 1.0, 0.0)
+        assertEquals(0.8 * GENTLE_PATIENCE, OfficerMind(p, gentle = true).patience, 1e-9)
+        assertEquals(0.8, OfficerMind(p).patience, 1e-9)
+        assertTrue(gentleDesk("de", setOf("fr"), false))
+        assertFalse(gentleDesk("de", setOf("de"), false))
+        assertFalse(gentleDesk("de", emptySet(), true))
+        assertFalse(gentleDesk("de", null, false))
     }
 }

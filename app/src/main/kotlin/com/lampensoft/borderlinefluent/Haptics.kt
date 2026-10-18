@@ -11,7 +11,7 @@ import android.provider.Settings
 import android.view.HapticFeedbackConstants
 import android.view.View
 
-internal enum class HapticEvent { STAMP_PASS, STAMP_DETAIN, SCAN, IMPLANT_GLITCH, IMPLANT_STUTTER, BREAK, TASER }
+internal enum class HapticEvent { OVERLOAD_TICK, STAMP_PASS, STAMP_DETAIN, SCAN, IMPLANT_GLITCH, IMPLANT_STUTTER, BREAK }
 internal enum class HapticPrimitive { THUD, CLICK, RISE, FALL, TICK }
 internal data class EnvelopePoint(val intensity: Float, val sharpness: Float, val ms: Long)
 internal data class PrimitivePoint(val primitive: HapticPrimitive, val scale: Float, val delay: Int = 0)
@@ -22,13 +22,16 @@ internal fun hapticSpec(event: HapticEvent): HapticSpec {
     fun p(i: Float, s: Float, ms: Long) = EnvelopePoint(i, s, ms)
     fun c(k: HapticPrimitive, scale: Float, delay: Int = 0) = PrimitivePoint(k, scale, delay)
     return when (event) {
+        HapticEvent.OVERLOAD_TICK -> HapticSpec(listOf(p(.25f, .5f, 20), p(0f, .5f, 20)),
+            listOf(c(HapticPrimitive.TICK, .25f)))
         HapticEvent.STAMP_PASS, HapticEvent.STAMP_DETAIN -> {
             val detain = event == HapticEvent.STAMP_DETAIN
             HapticSpec(listOf(p(if (detain) 1f else .85f, .15f, 20), p(0f, .1f, if (detain) 100 else 70)),
                 listOf(c(HapticPrimitive.THUD, if (detain) 1f else .85f)))
         }
-        HapticEvent.SCAN -> HapticSpec(listOf(p(.2f, .1f, 40), p(.65f, .8f, 220), p(0f, .8f, 40)),
-            listOf(c(HapticPrimitive.RISE, .6f)))
+        // Half strength (owner: on a table the old .65 buzz read as a loud click next to the quieter scan beep).
+        HapticEvent.SCAN -> HapticSpec(listOf(p(.1f, .1f, 40), p(.32f, .8f, 220), p(0f, .8f, 40)),
+            listOf(c(HapticPrimitive.RISE, .3f)))
         HapticEvent.IMPLANT_GLITCH, HapticEvent.IMPLANT_STUTTER -> {
             val scale = if (event == HapticEvent.IMPLANT_STUTTER) .8f else .4f
             HapticSpec(listOf(p(scale, .8f, 20), p(0f, .8f, 20), p(0f, .8f, 40),
@@ -37,8 +40,6 @@ internal fun hapticSpec(event: HapticEvent): HapticSpec {
         }
         HapticEvent.BREAK -> HapticSpec(listOf(p(1f, .6f, 20), p(.7f, .3f, 120), p(.3f, .1f, 200), p(0f, .1f, 260)),
             listOf(c(HapticPrimitive.THUD, 1f), c(HapticPrimitive.FALL, .8f, 30), c(HapticPrimitive.FALL, .3f, 80)))
-        HapticEvent.TASER -> HapticSpec(listOf(p(1f, 1f, 20), p(0f, 1f, 20), p(0f, 1f, 40), p(.85f, 1f, 20), p(0f, 1f, 60)),
-            listOf(c(HapticPrimitive.CLICK, 1f), c(HapticPrimitive.CLICK, .85f, 60)), true)
     }
 }
 
@@ -54,27 +55,55 @@ internal class HapticRateLimiter {
     }
 }
 
+/** Pure capture gate; its owner serializes requests, capture transitions and cancellation. */
+internal class HapticCaptureGate {
+    private var capturing = false
+    private val pending = mutableListOf<() -> Unit>()
+    fun defer(action: () -> Unit): Boolean {
+        if (!capturing) return false
+        pending += action
+        return true
+    }
+    fun start() { capturing = true }
+    fun end(): List<() -> Unit> {
+        capturing = false
+        return pending.toList().also { pending.clear() }
+    }
+    fun cancel() { pending.clear() }
+}
+
 /** Calls and lifecycle transitions share a lock: a late worker cannot vibrate after pause cancels. */
 internal class Haptics(private val ctx: Context, private val enabled: () -> Boolean, private val dbg: (String) -> Unit) {
     private val vibrator = ctx.getSystemService(Vibrator::class.java)
     private val audio = ctx.getSystemService(AudioManager::class.java)
     private val limiter = HapticRateLimiter()
+    private val captureGate = HapticCaptureGate()
     private var foreground = false
     private var busyUntil = 0L
     @Synchronized fun foreground(on: Boolean) { foreground = on; if (!on) cancel() }
-    @Synchronized fun cancel() { vibrator?.cancel(); busyUntil = 0 }
+    @Synchronized fun cancel() { captureGate.cancel(); vibrator?.cancel(); busyUntil = 0 }
+    @Synchronized fun capture(on: Boolean) {
+        if (on) {
+            captureGate.start()
+            vibrator?.cancel() // stop an effect that started before the recorder opened
+            busyUntil = 0
+        } else captureGate.end().forEach { it() }
+    }
     private fun allowed() = foreground && enabled() &&
         Settings.System.getInt(ctx.contentResolver, Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0 &&
         audio?.ringerMode != AudioManager.RINGER_MODE_SILENT
 
     @Synchronized fun result(view: View, passed: Boolean) {
-        if (!allowed() || SystemClock.elapsedRealtime() < busyUntil) return
+        if (!allowed()) return
+        if (captureGate.defer { result(view, passed) }) return
+        if (SystemClock.elapsedRealtime() < busyUntil) return
         if (view.performHapticFeedback(if (passed) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.REJECT))
             dbg("haptic RESULT_${if (passed) "CONFIRM" else "REJECT"} tier=predefined (view)")
     }
 
     @Synchronized fun play(event: HapticEvent) {
         if (!allowed()) return
+        if (captureGate.defer { play(event) }) return
         val v = vibrator ?: return
         if (!v.hasVibrator()) return
         val now = SystemClock.elapsedRealtime()
@@ -89,7 +118,8 @@ internal class Haptics(private val ctx: Context, private val enabled: () -> Bool
                     spec.composition.forEach { addPrimitive(primitiveId(it.primitive), it.scale, it.delay) }
                 }.compose() else {
                     tier = "predefined"
-                    VibrationEffect.createPredefined(if (spec.doubleClick) VibrationEffect.EFFECT_DOUBLE_CLICK else VibrationEffect.EFFECT_HEAVY_CLICK)
+                    VibrationEffect.createPredefined(if (event == HapticEvent.OVERLOAD_TICK) VibrationEffect.EFFECT_TICK
+                        else if (spec.doubleClick) VibrationEffect.EFFECT_DOUBLE_CLICK else VibrationEffect.EFFECT_HEAVY_CLICK)
                 }
             }
             v.vibrate(effect, VibrationAttributes.createForUsage(VibrationAttributes.USAGE_TOUCH))

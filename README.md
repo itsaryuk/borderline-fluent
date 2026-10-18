@@ -1,21 +1,23 @@
 # Borderline Fluent
 
-2035. AI companies own the only software anyone needs, and every translated word is billed. Most countries can't
-pay, so their borders went cheap: every booth has an android that speaks one language, the country's own.
+2035. AI companies own the only software anyone needs, and every translated word is billed. Borders went cheap:
+every booth has an android officer that speaks one language, the country's own.
 
-You had no job and you needed money. So you took the job some strange people offered: a chip behind your left eye,
-the Neural Retina Implant, build zero-point-nine. It listens, it translates, it whispers what to say. Most of the
-time it's right. The assignment: cross border after border with a passport that says you're coming home, and answer
-the officers out loud, in their language.
+You needed money for your AI subscription, so you signed up for a "medical trial". Now there's a chip behind your
+left eye, the Neural Retina Implant, build zero-point-nine. It listens, it translates, it whispers what to say. Most of
+the time it's right. The AI companies keep their own machine at every border, and it tests travellers for exactly that.
 
 An Android game you play by speaking:
-- Officers in 13 languages at airports in 31 countries, with fixed, translated lines.
-- They check your trip, your passport stamps and your date of birth, press on slips and notice odd answers.
-- A behavioral assessment watches your feelings, your speed and your face.
-- Difficulty per language, and contracts once you've proven yourself.
+- Your own passport: pick your nationality and roll your identity; every trip rolls a new itinerary to remember.
+- Officers in 10 languages at 78 airports in 24 countries, with fixed, translated lines. They check your trip, notice
+  odd answers, and react when you talk about your implant. Arabic, Turkish and Chinese are in the code but held back
+  until a native speaker has checked them (`heldBackLanguages` in gradle.properties).
+- Things happen in the queue before the desk, and the officer may ask what you saw.
+- Act 2: balance facts and lies to get referred to the machine, survive its Kade-Sorensen test, and train the
+  implant there. Upgrades arrive by mail.
 
-Everything runs on the phone: speech recognition, the officers' minds (Gemini Nano, Android's built-in AI), their
-voices and the face reading. The app has no internet access.
+Everything runs on the phone: speech recognition, the answer checks and the implant's suggestions (Gemini Nano, Android's built-in AI), their
+voices and the face reading. The app has no internet access. A work of fiction.
 
 Copyright (C) 2026 Fluffy Pants Studio LLC. Borderline Fluent and Lampensoft are trademarks of Fluffy Pants Studio LLC.
 This program is free software: you can redistribute it and/or modify it under

@@ -21,12 +21,12 @@ class ExportRoutingTest {
         assertEquals(98, lines.size)
         val expected = Country.all.flatMap { it.airports }.associate { it.art to it.lang }
         assertEquals(expected, lines.associate { it.substringBefore('\t') to it.substringAfter('\t') })
-        val keys = expected.keys + listOf("officer_uk_xm_sheet", "officer_story_m_sheet", "travelers_sheet")
+        val keys = expected.keys + listOf("officer_uk_xm_sheet", "officer_story_associate_sheet", "travelers_sheet")
         val dry = run(script, "--dry-run", *keys.toTypedArray())
         assertEquals(dry.second, 0, dry.first)
         for ((art, lang) in expected) assertTrue(dry.second.contains("$art\t../packs/lang_$lang/src/main/assets/art/$art.webp"))
         assertTrue(dry.second.contains("officer_uk_xm_sheet\t../packs/lang_uk/"))
-        assertTrue(dry.second.contains("officer_story_m_sheet\t../app/src/main/assets/art/"))
+        assertTrue(dry.second.contains("officer_story_associate_sheet\t../app/src/main/assets/art/"))
         assertTrue(dry.second.contains("travelers_sheet\t../app/src/main/assets/art/"))
         assertNotEquals(0, run(script, "--dry-run", "dest_unknown").first)
     }

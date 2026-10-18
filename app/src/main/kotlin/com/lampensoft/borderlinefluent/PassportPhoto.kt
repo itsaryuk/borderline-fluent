@@ -55,6 +55,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -182,16 +184,20 @@ fun passportCrop(box: IntRect, w: Int, h: Int): IntRect? {
     return IntRect(left, top, left + cw, top + ch).takeIf { left >= 0 && top >= 0 && it.right <= w && it.bottom <= h }
 }
 
-private val Ink = Color(0xFF0A111C); private val Card = Color(0xFF121B2A); private val Text1 = Color(0xFFE8ECF2)
-private val Dim = Color(0xFF94A0B4); private val Cyan = Color(0xFF8FE3FF); private val Amber = Color(0xFFFFC14D)
+private val Ink = Color(0xFF000A24); private val Card = Color(0xFF000E30); private val Text1 = Color(0xFFF3ECE0)
+private val Dim = Color(0xFFA9B0C3); private val Cyan = Color(0xFF7DF9FF); private val Amber = Color(0xFFFFC14D)
 private val Red = Color(0xFFD9443A); private val Green = Color(0xFF3FB56E)
+/** Square corners like the rest of the UI (Ui.kt's Square); the shutter stays round. */
+private val Square = RoundedCornerShape(2.dp)
 
 /**
  * The player's own passport photo. The camera is asked for here, in context, only for this photo; live
  * observation during interviews stays its own setting. A capture is a draft in memory until "Use this photo".
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PassportScreen(faceWatch: FaceWatch, faceReading: Boolean, onReading: (Boolean) -> Unit, onDone: () -> Unit, onBack: (() -> Unit)?) {
+fun PassportScreen(faceWatch: FaceWatch, faceReading: Boolean, onReading: (Boolean) -> Unit, onDone: () -> Unit, onBack: (() -> Unit)?,
+                   card: @Composable (photo: @Composable (Modifier) -> Unit) -> Unit, extra: @Composable () -> Unit = {}) {
     val ctx = LocalContext.current
     val owner = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
@@ -251,75 +257,65 @@ fun PassportScreen(faceWatch: FaceWatch, faceReading: Boolean, onReading: (Boole
         }
     }
 
-    Column(Modifier.fillMaxSize().background(Ink).safeDrawingPadding().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
+    val d = draft
+    // What to fix now (live checks), or what went wrong with the last capture.
+    val c = checks
+    val status = message ?: if (d == null && cameraOn && !noCamera && c != null) when {
+        c.faces == 0 -> R.string.passport_check_no_face
+        c.faces > 1 -> R.string.passport_check_one_face
+        !c.straight -> R.string.passport_check_straight
+        !c.centred -> R.string.passport_check_centre
+        c.size < 0 -> R.string.passport_check_closer
+        c.size > 0 || !c.fits -> R.string.passport_check_farther
+        ready -> R.string.passport_check_ready
+        else -> R.string.passport_check_hold
+    } else null
+
+    Column(Modifier.fillMaxSize().background(Ink).safeDrawingPadding().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             if (onBack != null) IconButton(onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = Text1) }
-            Text(stringResource(R.string.passport_title), color = Text1, fontSize = 22.sp, fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(vertical = 12.dp))
+            Text(stringResource(R.string.passport_title), style = display(24, 2.0), color = Text1, // the game's screen-title style
+                modifier = Modifier.padding(vertical = 4.dp))
         }
-        Text(stringResource(R.string.passport_disclosure), color = Text1, fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
-        // Above the photo, so it can't be missed: face reading during interviews is its own choice.
-        Column(Modifier.fillMaxWidth().padding(vertical = 12.dp).clip(RoundedCornerShape(12.dp)).background(Card).padding(14.dp)) {
-            Text(stringResource(R.string.passport_face_title), color = Text1, fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            Text(stringResource(R.string.passport_face_body), color = Dim, fontSize = 13.sp, modifier = Modifier.padding(vertical = 6.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.passport_face_switch), color = Text1, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                Switch(reading, { on -> reading = on; onReading(on); if (on && !granted()) askReading.launch(Manifest.permission.CAMERA) })
-            }
-        }
-
-        val frame = Modifier.fillMaxWidth(0.72f).aspectRatio(35f / 45f).clip(RoundedCornerShape(10.dp)).background(Card)
-        val d = draft
-        when {
-            d != null -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(d.asImageBitmap(), null, frame, contentScale = ContentScale.Crop)
-                if (!sample) Text(stringResource(R.string.passport_unmirrored), color = Dim, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
-            }
-            cameraOn && !noCamera -> Box(frame) {
-                PassportCamera(faceWatch, Modifier.fillMaxSize(),
-                    onFrame = { faces, w, h ->
-                        val c = passportChecks(faces, w, h); val now = SystemClock.elapsedRealtime()
-                        checks = c; since = passSince(c.ok, since, now); ready = shutterReady(since, now)
-                    },
-                    onReady = { capture = it }, onFail = { noCamera = true; cameraOn = false; capture = null; showSample() })
-                Canvas(Modifier.fillMaxSize()) { // the oval guide, centred where passportChecks wants the face
-                    val ow = size.width * 0.5f; val oh = ow * 1.3f
-                    drawOval(if (checks?.ok == true) Green else Color.White.copy(alpha = 0.8f),
-                        Offset((size.width - ow) / 2, (size.height - oh) / 2), Size(ow, oh), style = Stroke(3.dp.toPx()))
+        // The identity card (Ui.kt) with the photo slot on its leading side: it hosts the camera, the draft or the saved photo.
+        card { slot ->
+            when {
+                d != null -> Image(d.asImageBitmap(), null, slot, contentScale = ContentScale.Crop)
+                cameraOn && !noCamera -> Box(slot) {
+                    PassportCamera(faceWatch, Modifier.fillMaxSize(),
+                        onFrame = { faces, w, h ->
+                            val c = passportChecks(faces, w, h); val now = SystemClock.elapsedRealtime()
+                            checks = c; since = passSince(c.ok, since, now); ready = shutterReady(since, now)
+                        },
+                        onReady = { capture = it }, onFail = { noCamera = true; cameraOn = false; capture = null; showSample() })
+                    Canvas(Modifier.fillMaxSize()) { // the oval guide, centred where passportChecks wants the face
+                        val ow = size.width * 0.5f; val oh = ow * 1.3f
+                        drawOval(if (checks?.ok == true) Green else Color.White.copy(alpha = 0.8f),
+                            Offset((size.width - ow) / 2, (size.height - oh) / 2), Size(ow, oh), style = Stroke(3.dp.toPx()))
+                    }
+                    if (busy) CircularProgressIndicator(Modifier.align(Alignment.Center), color = Cyan)
                 }
-                if (busy) CircularProgressIndicator(Modifier.align(Alignment.Center), color = Cyan)
+                busy -> Box(slot, contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Cyan) }
+                photo != null -> Image(photo, null, slot, contentScale = ContentScale.Crop)
+                else -> Box(slot, contentAlignment = Alignment.Center) { Icon(Icons.Default.PhotoCamera, null, tint = Dim, modifier = Modifier.size(36.dp)) }
             }
-            busy -> Box(frame, contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Cyan) }
-            photo != null -> Image(photo, null, frame, contentScale = ContentScale.Crop)
-            else -> Box(frame, contentAlignment = Alignment.Center) { Icon(Icons.Default.PhotoCamera, null, tint = Dim, modifier = Modifier.size(48.dp)) }
         }
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(6.dp))
 
-        // What to fix now (live checks), or what went wrong with the last capture.
-        val c = checks
-        val status = message ?: if (d == null && cameraOn && !noCamera && c != null) when {
-            c.faces == 0 -> R.string.passport_check_no_face
-            c.faces > 1 -> R.string.passport_check_one_face
-            !c.straight -> R.string.passport_check_straight
-            !c.centred -> R.string.passport_check_centre
-            c.size < 0 -> R.string.passport_check_closer
-            c.size > 0 || !c.fits -> R.string.passport_check_farther
-            ready -> R.string.passport_check_ready
-            else -> R.string.passport_check_hold
-        } else null
-        status?.let { Text(stringResource(it), color = if (message != null) Amber else Text1, fontSize = 15.sp) }
+        status?.let { Text(stringResource(it), color = if (message != null) Amber else Text1, fontSize = 15.sp, textAlign = TextAlign.Center) }
         if (d == null && cameraOn && c?.ok == true) {
             if (c.eyesHint) Text(stringResource(R.string.passport_hint_eyes), color = Dim, fontSize = 13.sp)
             if (c.smileHint) Text(stringResource(R.string.passport_hint_smile), color = Dim, fontSize = 13.sp)
         }
-        if (noCamera) Text(stringResource(R.string.passport_no_camera), color = Amber, fontSize = 15.sp)
-        Spacer(Modifier.height(10.dp))
+        if (d != null && !sample) Text(stringResource(R.string.passport_unmirrored), color = Dim, fontSize = 12.sp)
+        if (noCamera) Text(stringResource(R.string.passport_no_camera), color = Amber, fontSize = 15.sp, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(6.dp))
 
         when {
             d != null -> Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                if (sample) OutlinedButton(::showSample, enabled = !busy) { Text(stringResource(R.string.passport_sample_another), color = Text1) }
-                else OutlinedButton({ draft = null; checks = null }) { Text(stringResource(R.string.passport_retake), color = Text1) }
+                if (sample) OutlinedButton(::showSample, enabled = !busy, shape = Square) { Text(stringResource(R.string.passport_sample_another), color = Text1) }
+                else OutlinedButton({ draft = null; checks = null }, shape = Square) { Text(stringResource(R.string.passport_retake), color = Text1) }
                 Button({
                     busy = true
                     scope.launch {
@@ -327,29 +323,51 @@ fun PassportScreen(faceWatch: FaceWatch, faceReading: Boolean, onReading: (Boole
                         busy = false
                         if (ok) { hasPhoto = true; draft = null; sample = false; cameraOn = false; onDone() } else message = R.string.passport_save_failed
                     }
-                }, enabled = !busy) { Text(stringResource(R.string.passport_use)) }
+                }, enabled = !busy, shape = Square) { Text(stringResource(R.string.passport_use)) }
             }
-            cameraOn && !noCamera -> IconButton(::shoot, Modifier.size(72.dp).clip(CircleShape)
+            cameraOn && !noCamera -> IconButton(::shoot, Modifier.size(64.dp).clip(CircleShape)
                 .background(if (ready && !busy) Color.White else Color.White.copy(alpha = 0.25f)).border(3.dp, Cyan, CircleShape),
                 enabled = ready && !busy && capture != null) {
                 Icon(Icons.Default.PhotoCamera, stringResource(R.string.passport_shutter), tint = Ink)
             }
             else -> Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedButton(::startCamera) { Text(stringResource(if (hasPhoto) R.string.passport_retake else R.string.passport_take), color = Text1) }
-                if (photo != null) Button(onDone) { Text(stringResource(R.string.passport_keep)) }
+                OutlinedButton(::startCamera, shape = Square) { Text(stringResource(if (hasPhoto) R.string.passport_retake else R.string.passport_take), color = Text1) }
+                if (photo != null) Button(onDone, shape = Square) { Text(stringResource(R.string.passport_keep)) }
             }
         }
         // A sample face is always on offer; accepted, it becomes the passport photo just like a capture.
-        if (sample) TextButton({ draft = null; sample = false; checks = null; startCamera() }, enabled = !busy) {
-            Text(stringResource(R.string.passport_back_to_camera), color = Cyan)
-        } else TextButton(::showSample, enabled = !busy) {
-            Text(stringResource(R.string.passport_use_sample), color = Cyan)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)) {
+            if (sample) TextButton({ draft = null; sample = false; checks = null; startCamera() }, enabled = !busy) {
+                Text(stringResource(R.string.passport_back_to_camera), color = Cyan)
+            } else TextButton(::showSample, enabled = !busy) {
+                Text(stringResource(R.string.passport_use_sample), color = Cyan)
+            }
+            if (hasPhoto) TextButton({ PassportPhoto.delete(ctx); hasPhoto = false }, enabled = !busy) {
+                Text(stringResource(R.string.passport_delete), color = Red)
+            }
+            extra()
         }
-        if (hasPhoto) TextButton({ PassportPhoto.delete(ctx); hasPhoto = false }, enabled = !busy) {
-            Text(stringResource(R.string.passport_delete), color = Red)
+
+        // Face reading during interviews is its own choice, kept compact under the controls.
+        Column(Modifier.fillMaxWidth().padding(vertical = 6.dp).clip(Square).background(Card).padding(horizontal = 12.dp, vertical = 8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.passport_face_title), color = Text1, fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.passport_face_switch), color = Text1, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 8.dp))
+                Switch(reading, { on -> reading = on; onReading(on); if (on && !granted()) askReading.launch(Manifest.permission.CAMERA) })
+            }
+            Text(stringResource(R.string.passport_face_body), color = Dim, fontSize = 11.sp, lineHeight = 14.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
         }
-        Spacer(Modifier.height(16.dp))
+        Text(stringResource(R.string.passport_disclosure), color = Dim, fontSize = 11.sp, lineHeight = 14.sp, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(8.dp))
     }
+}
+
+/** The saved passport photo, or a camera-icon placeholder; the photo slot of the identity card outside the camera step. */
+@Composable fun SavedPhotoSlot(modifier: Modifier) {
+    val ctx = LocalContext.current
+    val photo = produceState<ImageBitmap?>(null) { value = withContext(Dispatchers.IO) { if (PassportPhoto.exists(ctx)) PassportPhoto.load(ctx) else null } }.value
+    if (photo != null) Image(photo, null, modifier, contentScale = ContentScale.Crop)
+    else Box(modifier, contentAlignment = Alignment.Center) { Icon(Icons.Default.PhotoCamera, null, tint = Dim, modifier = Modifier.size(36.dp)) }
 }
 
 /**

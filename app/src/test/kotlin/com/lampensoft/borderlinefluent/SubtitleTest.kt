@@ -17,24 +17,33 @@ class SubtitleTest {
     }
 
     @Test fun fixedLinesFollowSubtitle() {
-        assertEquals(Language.of("de").sayPass.first, Language.of("ru").lastWords(Decision.PASS, "de").second)
-        assertEquals(Language.of("en").sayPass.first, Language.of("ru").lastWords(Decision.PASS, "en").second)
+        assertEquals(Language.of("de").sayPass.first, Language.of("ru").lastWords(Decision.PASS, "de", TripKind.HOMECOMING).second)
+        assertEquals(Language.of("en").sayPass.first, Language.of("ru").lastWords(Decision.PASS, "en", TripKind.HOMECOMING).second)
     }
 
     @Test fun everyEndingUsesTheSubtitleLanguagesOwnFixedLine() {
-        for (target in Language.all) for (sub in Language.all) for (d in Decision.entries) {
-            val pair = target.lastWords(d, sub.code)
-            assertEquals(target.lastWords(d).first, pair.first)
-            assertEquals(sub.lastWords(d).first, pair.second)
-            // The broken unit's stock English refusal is the joke (owner): only PASS/SECONDARY must stay refusal-free.
-            if (d != Decision.BROKEN) { assertFalse(modelRefusal(pair.first)); assertFalse(modelRefusal(pair.second)) }
+        for (target in Language.all) for (sub in Language.all) for (d in Decision.entries) for (crashed in listOf(false, true)) {
+            val pair = target.lastWords(d, sub.code, TripKind.HOMECOMING, crashed)
+            assertEquals(target.lastWords(d, TripKind.HOMECOMING, crashed).first, pair.first)
+            assertEquals(sub.lastWords(d, TripKind.HOMECOMING, crashed).first, pair.second)
+            // The broken unit's stock English refusal is the joke (owner): only uncrashed units must stay refusal-free.
+            if (!crashed) { assertFalse(modelRefusal(pair.first)); assertFalse(modelRefusal(pair.second)) }
         }
-        assertEquals("Willkommen… Willkommen… Willkomm— I'm sorry. I can't help with that.", Language.of("de").lastWords(Decision.BROKEN, "en").first)
+        assertEquals("Willkommen… Willkommen… Willkomm— I'm sorry. I can't help with that.",
+            Language.of("de").lastWords(Decision.REFERRAL, "en", TripKind.HOMECOMING, crashed = true).first)
     }
 
-    /** Every cover is a citizen coming home: the officer's last words welcome them home, never "enjoy your stay". */
+    /** A homecoming is welcomed home, never "enjoy your stay"; a visitor is welcomed to a stay, never home. */
     @Test fun passWordsWelcomeHome() {
         assertTrue(Language.all.all { it.sayPass.first.isNotBlank() && !it.sayPass.second.contains("stay") && !it.sayPass.second.contains("trip") })
+        for (l in Language.all) {
+            val (line, en) = l.lastWords(Decision.PASS, TripKind.ARRIVAL)
+            assertTrue(l.code, line.isNotBlank() && line != l.sayPass.first && !en.contains("home") && en.contains("elcome"))
+            assertFalse(l.code, '{' in line)
+            assertEquals(l.sayRefused, l.lastWords(Decision.REFUSED, TripKind.ARRIVAL))
+        }
+        assertEquals(Language.of("de").lastWords(Decision.PASS, TripKind.ARRIVAL).first,
+            Language.of("ru").lastWords(Decision.PASS, "de", TripKind.ARRIVAL).second)
     }
 
     /** UI strings get names in the UI language; unsupported UIs fall back to English; prompts keep English country names. */

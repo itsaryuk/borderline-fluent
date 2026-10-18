@@ -13,7 +13,7 @@ import kotlin.math.min
 class FaceMesh private constructor() {
     data class Point(val x: Double, val y: Double)
     data class Circle(val center: Point, val radius: Double)
-    enum class Asset { ROOM, DESK }
+    enum class Asset { DESK } // the eye machine at the desk (the old room art is gone)
     /** The face detector's contour set; polylines, in the order the SDK returns them. */
     enum class Contour {
         FACE_OVAL, LEFT_EYE, RIGHT_EYE, LEFT_EYEBROW_TOP, LEFT_EYEBROW_BOTTOM,
@@ -90,8 +90,7 @@ class FaceMesh private constructor() {
                      sourceWidth: Double = 941.0, sourceHeight: Double = 1672.0): Circle? {
             if (listOf(width, height, sourceWidth, sourceHeight).any { !it.isFinite() || it <= 0 }) return null
             val scale = max(width / sourceWidth, height / sourceHeight)
-            val cy = if (asset == Asset.ROOM) .353 else .455
-            val radius = if (asset == Asset.ROOM) .110 else .105
+            val cy = .455; val radius = .105
             val c = Circle(Point(width / 2, (height - scale * sourceHeight) / 2 + cy * sourceHeight * scale),
                 radius * sourceWidth * scale)
             return c.takeIf { finite(it.center) && it.radius.isFinite() && it.radius > 0 }

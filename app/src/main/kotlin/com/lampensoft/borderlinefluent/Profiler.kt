@@ -17,6 +17,7 @@ data class Sample(
     val yaw: Float = 0f, val pitch: Float = 0f,
     val lips: Float = 0f, // visible lip height / face height: drops when lips compress
     val brow: Float = 0f, // eyebrow-to-eye gap / face height: jumps in an eyebrow flash
+    val leftEye: Float? = null, val rightEye: Float? = null, // valid binocular gesture input
 )
 
 /** A deviation from the traveler's own baseline, Six-Minute X-Ray style. [z] = how far, in baseline spreads. */
@@ -46,6 +47,7 @@ class Profiler {
     private data class Stat(val mean: Double, val sd: Double)
     private var base: Map<String, Stat>? = null
     private var baseBlinks = 12.0
+    private var neutralQuality = false
 
     val calibrated get() = base != null
 
@@ -53,9 +55,22 @@ class Profiler {
     fun calibrate(s: List<Sample>): Boolean {
         val f = s.filter { it.face }
         if (f.size < 15) return false
+        neutralQuality = f.all { NeutralFace.valid(it) } && f.last().t - f.first().t >= 1500
         base = SIGNALS.mapValues { (_, get) -> f.map(get).let { v -> Stat(v.average(), sd(v)) } }
         baseBlinks = blinksPerMin(s).coerceIn(6.0, 30.0)
         return true
+    }
+
+    /** Quality gate for deliberate face controls; never learn a new baseline from a challenge. */
+    internal fun neutralFace(): NeutralFace? {
+        if (!neutralQuality) return null
+        val b = base ?: return null
+        if (b.values.any { !it.mean.isFinite() || !it.sd.isFinite() } ||
+            b.getValue("yaw").sd > 8 || b.getValue("pitch").sd > 8 ||
+            kotlin.math.abs(b.getValue("yaw").mean) > 15 || kotlin.math.abs(b.getValue("pitch").mean) > 15 ||
+            b.getValue("smile").sd > .15 || b.getValue("brow").sd > .015 || b.getValue("lips").sd > .01) return null
+        val n = NeutralFace(b.getValue("smile").mean.toFloat(), b.getValue("brow").mean.toFloat(), b.getValue("lips").mean.toFloat())
+        return n.takeIf { it.brow > 0 && it.lips > 0 && it.smile <= .5f }
     }
 
     /** Tells in [s] (an answer, or the last couple of seconds for live implant warnings), strongest first. */

@@ -15,26 +15,28 @@ fun effectiveLevel(training: Boolean, finaleSeen: Boolean, careerLevel: Int, cho
 }
 
 /** Contracts unlock at Agent rank after the finale, outside training. */
-fun contractsUnlocked(finaleSeen: Boolean, training: Boolean, rankLevel: Int) = finaleSeen && !training && rankLevel >= 1
+/** Contracts are offered from act 2's first rank (owner, 2026-10-15). */
+fun contractsUnlocked(finaleSeen: Boolean, training: Boolean) = finaleSeen && !training
 
 /** Chance that one retinal display suggestion quietly contradicts the cover at the frozen attempt level. */
 fun trapChance(level: Int) = listOf(0.0, 0.15, 0.25, 0.35)[level.coerceIn(0, 3)]
 
-/** Missions, clears and streaks across runs. Rank sets difficulty only during the first story. */
+/** Career statistics and the implant upgrades that set Free AI difficulty. */
 class Career(ctx: Context) {
     private val p = ctx.getSharedPreferences("career", 0)
     val store = CareerStore(
         read = {
-            // Snapshot authority means stale (or malformed) legacy keys are never consulted after migration.
-            val raw = p.getString("snapshot", null)
-            val marker = if (p.contains("schemaVersion")) p.getInt("schemaVersion", 0) else null
-            if (raw != null || marker != null) CareerInput(raw, marker) else CareerInput(
-                counters = CareerCounters(p.getInt("missions", 0), p.getInt("cleared", 0), p.getInt("streak", 0),
-                    p.getInt("best", 0), p.getInt("broken", 0), p.getInt("rooms", 0)),
-                countries = p.getStringSet("countries", emptySet())!!.toSet(),
-            )
+            // StoryReset ran first: only a v2 snapshot and its marker remain (legacy counters are gone).
+            CareerInput(p.getString("snapshot", null), if (p.contains("schemaVersion")) p.getInt("schemaVersion", 0) else null)
         },
         write = { raw, marker -> p.edit().putString("snapshot", raw).putInt("schemaVersion", marker).commit() },
+        legacyFinale = { ctx.getSharedPreferences("settings", 0).getBoolean("finale", false) },
+        // snapshot_backup* keys have no reader: kept for manual recovery via run-as; never clean them up as dead keys.
+        backup = { raw ->
+            val old = raw ?: p.getString("snapshot", null)
+            // An earlier backup is never overwritten.
+            old == null || p.edit().putString(if (p.contains("snapshot_backup")) "snapshot_backup_${System.currentTimeMillis()}" else "snapshot_backup", old).commit()
+        },
     )
     var snapshot by mutableStateOf<CareerSnapshot?>(null); private set
     /** Called on Main after the store has acknowledged a write or retained valid read-only history. */
@@ -46,19 +48,17 @@ class Career(ctx: Context) {
     val broken get() = snapshot?.counters?.broken ?: 0
     val rooms get() = snapshot?.counters?.rooms ?: 0
     val countries: Set<String> get() = snapshot?.countries.orEmpty()
-    val level get() = RANKS.indexOfLast { cleared >= it.second }
-    /** The rank name as a string resource id. */
-    val rank get() = RANKS[level].first
-    /** Clears still needed for the next rank, or null at the top. */
-    val toNext get() = RANKS.getOrNull(level + 1)?.let { it.second - cleared }
+    /** Granted level: the rank (officer scaling, contracts, points to the next); perks and the build follow [delivered]. */
+    val level get() = snapshot?.upgradesGranted ?: 0
+    val delivered get() = deliveredUpgrades(snapshot)
+    val sessions get() = snapshot?.machineSessions ?: 0
+    val points get() = snapshot?.progressPoints ?: 0
+    val build get() = implantBuild(delivered)
+    val toNext get() = UPGRADE_THRESHOLDS.getOrNull(level)?.let { (it - points).coerceAtLeast(0) }
 
     /** All callers must supply the frozen attempt event; no unchecked counter-only write remains. */
     suspend fun record(event: AttemptResult, continuation: String? = null): CareerSave = store.settle(event, continuation)
 
-    companion object {
-        /** (rank name string resource, clears needed) */
-        val RANKS = listOf(R.string.rank_rookie to 0, R.string.rank_agent to 3, R.string.rank_operative to 8, R.string.rank_ghost to 15)
-    }
 }
 
 /** Short effects over the music: passport scanner, entry stamp, the door to secondary. */
@@ -66,10 +66,16 @@ class Sfx(ctx: Context) {
     private val pool = SoundPool.Builder().setMaxStreams(3).setAudioAttributes(
         AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
     ).build()
-    private val ids = listOf(R.raw.sfx_scan, R.raw.sfx_stamp, R.raw.sfx_door, R.raw.sfx_blink, R.raw.sfx_tell, R.raw.sfx_siren).associateWith { pool.load(ctx, it, 1) }
+    private val ids = listOf(R.raw.sfx_scan, R.raw.sfx_stamp, R.raw.sfx_door, R.raw.sfx_blink, R.raw.sfx_tell, R.raw.sfx_door_break,
+        R.raw.sfx_tap, R.raw.sfx_type, R.raw.sfx_message, R.raw.sfx_boot, R.raw.sfx_fail).associateWith { pool.load(ctx, it, 1) }
     var enabled = true
-    fun play(res: Int) { if (enabled) ids[res]?.let { pool.play(it, GAIN, GAIN, 1, 0, 1f) } }
-    /** The files carry the balance (momentary max: siren -18, stamp/door/scan -20, tell -26, blink -28 LUFS). */
-    companion object { const val GAIN = 1f }
-    fun release() = pool.release()
+    fun play(res: Int, gain: Float = GAIN) { if (enabled) ids[res]?.let { pool.play(it, gain, gain, 1, 0, 1f) } }
+    /** The files carry the balance (2026-10-15): events peak at -3 dBFS (door_break limited to it, the loudest by mean), scan/tell sit at -12 dB mean
+     *  (peaks ~-7) so they stay clear of the music bed and the voice; UI sounds (tap, type, message, boot, fail) peak at -6 dBFS,
+     *  tap plays at [TAP_GAIN] and scan at [SCAN_GAIN] (owner: both too loud), type at a quarter of [GAIN] (owner 10-17: half was too loud). [uiSfx] lets composables without a Game play them; it respects [enabled]. */
+    companion object { const val GAIN = 1f; const val TAP_GAIN = 0.18f; const val SCAN_GAIN = 0.3f }
+    fun release() { if (uiSfx === this) uiSfx = null; pool.release() }
 }
+
+/** The live [Sfx], for shared composables (PrimaryButton, GameSwitch, BookingLog); never set in BenchActivity. */
+internal var uiSfx: Sfx? = null

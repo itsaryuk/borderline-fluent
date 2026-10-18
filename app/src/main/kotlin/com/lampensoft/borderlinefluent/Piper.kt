@@ -34,25 +34,58 @@ object Piper {
     /**
      * Speaks [text] as it is generated (sentence by sentence into a streaming AudioTrack), then [onDone]. Cancel the
      * job to stop. [robot]: how much ring modulation to mix in (0 = clean; [ANDROID] for officers, [CRASH] for BROKEN).
+     * [pitch] < 1 plays the voice slower and lower together (the track runs at that share of the voice's sample rate).
      */
-    fun speak(scope: kotlinx.coroutines.CoroutineScope, tts: OfflineTts, text: String, speed: Float, robot: Float, onDone: () -> Unit) =
+    fun speak(scope: kotlinx.coroutines.CoroutineScope, tts: OfflineTts, text: String, speed: Float, robot: Float, pitch: Float = 1f, onLevel: ((Float) -> Unit)? = null, onDone: () -> Unit) =
         scope.launch(kotlinx.coroutines.Dispatchers.Default) {
             val rate = tts.sampleRate()
+            val playRate = (rate * pitch).toInt()
             val track = AudioTrack.Builder().setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build())
-                .setAudioFormat(AudioFormat.Builder().setEncoding(AudioFormat.ENCODING_PCM_FLOAT).setSampleRate(rate)
+                .setAudioFormat(AudioFormat.Builder().setEncoding(AudioFormat.ENCODING_PCM_FLOAT).setSampleRate(playRate)
                     .setChannelMask(AudioFormat.CHANNEL_OUT_MONO).build())
                 .setTransferMode(AudioTrack.MODE_STREAM)
-                .setBufferSizeInBytes(AudioTrack.getMinBufferSize(rate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_FLOAT) * 4).build()
+                .setBufferSizeInBytes(AudioTrack.getMinBufferSize(playRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_FLOAT) * 4).build()
             var written = 0
+            // Queue only envelope windows, never PCM. The writer and playback observer run independently.
+            data class LevelWindow(val start: Int, val end: Int, val level: Float)
+            val levels = java.util.concurrent.ConcurrentLinkedQueue<LevelWindow>()
+            val meter = if (onLevel == null) null else launch(kotlinx.coroutines.Dispatchers.Default) {
+                var value = 0f
+                var last = System.nanoTime()
+                while (isActive) {
+                    val head = track.playbackHeadPosition
+                    while (levels.peek()?.let { it.end <= head } == true) levels.poll()
+                    val window = levels.peek()
+                    val target = if (window != null && head >= window.start) window.level else 0f
+                    val now = System.nanoTime()
+                    value = LipEnvelope.smooth(value, target, (now - last) / 1_000_000f)
+                    onLevel(value)
+                    last = now
+                    delay(16)
+                }
+            }
             try {
                 track.play()
                 tts.generateWithCallback(text, synchronized(sids) { sids[tts] } ?: 0, speed, OnChunk({ isActive }) { chunk ->
-                    val x = level(if (robot > 0f) robot(chunk, rate, mix = robot) else chunk); track.write(x, 0, x.size, AudioTrack.WRITE_BLOCKING); written += x.size
+                    val x = level(if (robot > 0f) robot(chunk, rate, mix = robot) else chunk)
+                    if (onLevel != null) {
+                        val windowSize = (playRate * LipEnvelope.WINDOW_MS / 1000).coerceAtLeast(1)
+                        for (start in x.indices step windowSize) {
+                            val end = minOf(start + windowSize, x.size)
+                            levels.add(LevelWindow(written + start, written + end, LipEnvelope.rms(x, start, end)))
+                        }
+                    }
+                    track.write(x, 0, x.size, AudioTrack.WRITE_BLOCKING); written += x.size
                 })
                 // Let the tail drain: the buffer still holds up to its size in samples.
                 while (isActive && track.playbackHeadPosition < written) delay(30)
-            } finally { runCatching { track.stop() }; track.release() }
+            } finally {
+                meter?.cancel()
+                kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) { meter?.join() }
+                onLevel?.invoke(0f)
+                runCatching { track.stop() }; track.release()
+            }
             if (isActive) onDone()
         }
 

@@ -74,3 +74,23 @@ class SmallTalkMindTest {
         assertEquals(700L, Pace.of(listOf(0, 0)).fast(700))
     }
 }
+
+class HandoverReplyTest {
+    @Test fun aLatePassportLineIsNotReadForOdd() {
+        listOf("en" to "Here it is.", "ru" to "Вот мой паспорт.", "de" to "Hier ist mein Pass.", "fr" to "Voilà.",
+            "es" to "Aquí tiene.", "tr" to "İşte pasaportum.", "pl" to "Proszę bardzo.", "ja" to "はい、パスポートです。",
+            "zh" to "这是我的护照。", "ar" to "تفضّل، هذا جوازي.", "en" to "Here you go, my passport.", "en" to "Here's my passport.",
+            "ru" to "Вот, пожалуйста.", "ru" to "Пожалуйста.", "uk" to "Ось мій паспорт.", "it" to "Ecco il mio passaporto.",
+            "pt" to "Aqui está o meu passaporte.").forEach { (l, s) -> assertTrue("$l: $s", isHandoverReply(s, l)) }
+    }
+
+    @Test fun oddOrOrdinarySmallTalkIsStillRead() {
+        listOf("en" to "I ate the pilot.", "en" to "Bombs fell on every village I passed.", "en" to "Yes, a bit cold.",
+            "en" to "Here it is, and I killed the pilot on the way over.", "ru" to "Я съел пилота.",
+            "de" to "Ich habe den Piloten gegessen.", "ja" to "パイロットを食べました。", "en" to "", "xx" to "passport",
+            // A passport word inside a confession is not a handover formula.
+            "en" to "I killed for this passport.", "en" to "I stole this passport.", "ru" to "Я украл этот паспорт.",
+            "de" to "Ich habe diesen Pass gestohlen.", "zh" to "我偷了这本护照。")
+            .forEach { (l, s) -> assertEquals("$l: $s", false, isHandoverReply(s, l)) }
+    }
+}

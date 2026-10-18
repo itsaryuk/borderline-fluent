@@ -10,6 +10,219 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 /** Guards our in-repo UI translations: values-XX/strings.xml vs values/strings.xml. */
 class TranslationsTest {
+    @Test fun aiDescriptionsCreditAnswerCheckingAndImplantSuggestionsInEveryLocale() {
+        val expected = mapOf(
+            "" to ("a language model checks every answer and writes the implant's suggestions" to
+                "%1\$s checks your answers with Gemini Nano, Google's on-device AI, which this phone doesn't have."),
+            "de" to ("Ein Sprachmodell prüft jede Antwort und schreibt die Vorschläge des Implantats" to
+                "%1\$s prüft deine Antworten mit Gemini Nano, Googles KI auf dem Gerät, die dieses Smartphone nicht hat."),
+            "es" to ("un modelo de lenguaje comprueba cada respuesta y escribe las sugerencias del implante" to
+                "%1\$s comprueba tus respuestas con Gemini Nano, la IA de Google que funciona en el dispositivo y que este teléfono no tiene."),
+            "fr" to ("un modèle de langage vérifie chaque réponse et rédige les suggestions de l’implant" to
+                "%1\$s vérifie vos réponses avec Gemini Nano, l’IA embarquée de Google, dont ce téléphone est dépourvu."),
+            "it" to ("un modello linguistico verifica ogni risposta e scrive i suggerimenti dell’impianto" to
+                "%1\$s verifica le tue risposte con Gemini Nano, l’IA di Google che funziona sul dispositivo e che questo telefono non ha."),
+            "pt" to ("um modelo de linguagem verifica cada resposta e escreve as sugestões do implante" to
+                "%1\$s verifica as suas respostas com o Gemini Nano, a IA da Google que funciona no dispositivo e que este telemóvel não tem."),
+            "pl" to ("model językowy sprawdza każdą odpowiedź i pisze podpowiedzi implantu" to
+                "%1\$s sprawdza twoje odpowiedzi za pomocą Gemini Nano, AI Google działającej na urządzeniu, której ten telefon nie ma."),
+            "ru" to ("языковая модель проверяет каждый ответ и пишет подсказки импланта" to
+                "%1\$s проверяет твои ответы с помощью Gemini Nano — встроенного ИИ Google, которого на этом телефоне нет."),
+            "uk" to ("мовна модель перевіряє кожну відповідь і пише підказки імпланта" to
+                "%1\$s перевіряє твої відповіді за допомогою Gemini Nano — вбудованого ШІ Google, якого на цьому телефоні немає."),
+            "tr" to ("bir dil modeli her yanıtı kontrol ediyor ve implantın önerilerini yazıyor" to
+                "%1\$s, yanıtlarını Google'ın cihaz üzerinde çalışan yapay zekâsı Gemini Nano ile kontrol eder; bu telefonda Gemini Nano yok."),
+            "ar" to ("نموذج لغوي يتحقق من كل إجابة ويكتب اقتراحات الغرسة" to
+                "تتحقق لعبة %1\$s من إجاباتك باستخدام Gemini Nano، الذكاء الاصطناعي من Google الذي يعمل على الجهاز، وهو غير متوفر في هذا الهاتف."),
+            "ja" to ("言語モデルがすべての回答を確認してインプラントの提案を書き" to
+                "%1\$sはGemini Nano（GoogleのオンデバイスAI）であなたの回答を確認しますが、この端末には搭載されていません。"),
+            "zh" to ("语言模型检查每个回答并编写植入体的建议" to
+                "%1\$s使用Gemini Nano（Google的端侧AI）检查你的回答，而这部手机没有搭载它。")
+        )
+        assertEquals((listOf("") + cldr.keys).toSet(), expected.keys)
+        for ((locale, wording) in expected) {
+            val resources = parse(File(resDir(), "values${if (locale.isEmpty()) "" else "-$locale"}/strings.xml"))
+            val credits = resources.getValue("credits_blurb").text!!.replace("\\'", "'")
+            val unsupported = resources.getValue("unsupported_nano").text!!.replace("\\'", "'")
+            assertTrue("$locale credits must describe the model's actual role", credits.contains(wording.first))
+            assertEquals("$locale unsupported Nano explanation", wording.second, unsupported)
+            assertTrue("$locale replay label", resources.getValue("prologue").text!!.isNotBlank())
+        }
+    }
+
+    @Test fun machineObservationsHaveEveryPluralFormAndNoStorySpoilers() {
+        val keys = listOf("machine_evasive", "machine_odd", "machine_feeling", "machine_admissions")
+        for (locale in listOf("") + cldr.keys.map { "-$it" }) {
+            val resources = parse(File(resDir(), "values$locale/strings.xml"))
+            for (key in listOf("machine_debrief", "machine_fallback")) {
+                assertTrue(resources.getValue(key).text!!.isNotBlank())
+                assertTrue("Free AI" !in resources.getValue(key).text!!)
+            }
+            for (key in keys) {
+                val forms = resources.getValue(key).items!!
+                assertEquals(cldr[locale.removePrefix("-")] ?: setOf("one", "other"), forms.keys)
+                for (text in forms.values) {
+                    assertTrue(text.isNotBlank())
+                    assertTrue("Free AI" !in text)
+                    for (count in listOf(0, 1, 2, 3, 5, 11, 21))
+                        assertTrue(String.format(java.util.Locale.ROOT, text, count).isNotBlank())
+                }
+            }
+        }
+    }
+
+    @Test fun storyLinksAndPerkExplanationsExistInEveryLocaleWithoutTheOldLetter() {
+        val keys = listOf("prologue_friend", "prologue_valery_first", "prologue_valery_last", "prologue_valery_angry", "prologue_home", "prologue_holiday", "prologue_stolen", "prologue_smashed", "prologue_embassy", "prologue_valery_1", "prologue_valery_2", "prologue_implant",
+            "prologue_valery_subscription_1",
+            "prologue_valery_subscription_2",
+            "prologue_valery_uses_1",
+            "prologue_valery_uses_2",
+            "prologue_valery_chip_1",
+            "prologue_valery_chip_2",
+            "prologue_valery_chip_3",
+            "prologue_realize",
+            "prologue_valery_home_1", "prologue_valery_home_2",
+            "prologue_valery_free_1", "prologue_valery_free_2", "prologue_valery_free_3", "prologue_valery_free_4",
+            "prologue_valery_data_1", "prologue_valery_data_2", "prologue_valery_chains_1", "prologue_valery_chains_2",
+            "prologue_phone_1", "prologue_sameday", "prologue_stranger", "prologue_you", "prologue_speaker_line",
+            "father_narration", "father_line", "father_take", "father_refuse",
+            "father_taken", "father_refused", "father_away", "act1_plane_taken", "tip_mention_implant",
+            "thalassia_child", "thalassia_child_last",
+            "implant_boot_hello", "implant_boot_shake", "implant_boot_calibrated", "cover_value_stay_lefkopoli", "start_year", "epi_intro", "epi_scanner", "epi_chosen", "epi_chosen_no", "epi_go_on", "epi_try", "epi_fail",
+            "finale_deal", "upgrade_recall", "upgrade_accent",
+            "upgrade_clear_gauge", "booking_flagged_note")
+        for (locale in listOf("") + cldr.keys.map { "-$it" }) {
+            val resources = parse(File(resDir(), "values$locale/strings.xml"))
+            for (retired in listOf("prologue_letter", "prologue_title", "finale_t1", "finale_t2",
+                "finale_t3", "finale_t3b", "finale_t3c", "finale_t4", "finale_sorry",
+                "finale_never_officers", "finale_real_test", "finale_test_done"))
+                assertTrue("values$locale/$retired", retired !in resources)
+            assertEquals("values$locale", keys.filter { it.startsWith("prologue_") }.toSet(),
+                resources.keys.filter { it.startsWith("prologue_") }.toSet())
+            for (key in keys) {
+                val text = resources.getValue(key).text!!
+                assertTrue("values$locale/$key", text.isNotBlank())
+                assertTrue("values$locale/$key", "Free AI" !in text)
+            }
+        }
+    }
+
+    @Test fun prologueEnglishTurnsMatchTheScript() {
+        val resources = parse(File(resDir(), "values/strings.xml"))
+        val expected = mapOf(
+            "prologue_stranger" to "A strange woman",
+            "prologue_friend" to "2035. Thalassia. A friend told me it wasn't a good idea to come here. I came anyway.",
+            "prologue_stolen" to "Then my phone was gone. My money. My ticket. Every language I knew. My intelligence subscriptions.",
+            "prologue_smashed" to "Dozens of tourists were robbed that day. Their phones turned up smashed on the harbour stones. People here said the machines listened too closely.",
+            "prologue_valery_first" to "First time in Thalassia?",
+            "prologue_valery_last" to "First and last. Is it always like this here?",
+            "prologue_valery_angry" to "No. People here can't afford the latest intelligence. So they're angry.",
+            "prologue_valery_1" to "A woman sat down beside me.",
+            "prologue_valery_subscription_1" to "And yours? How much is your intelligence subscription?",
+            "prologue_valery_subscription_2" to "Honestly? I'm not sure. I can't even check without it.",
+            "prologue_valery_uses_1" to "What do you use it for?",
+            "prologue_valery_uses_2" to "Everything. Work, learning, planning trips… everything.",
+            "prologue_valery_chip_1" to "What if there were a better way? No cloud. No subscription.",
+            "prologue_valery_chip_2" to "Isn't that what those nerds do? Collect old tech scraps?",
+            "prologue_valery_chip_3" to "No, this is different. A small procedure. A chip. It stays with you. No subscription.",
+            "prologue_realize" to "That's when it hit me. She'd been speaking my language the whole time. Without a phone.",
+            "prologue_valery_2" to "I'm Valery. I work for a research group. We're looking for people to test it. Would you join?",
+            "prologue_valery_home_1" to "Will it get me home?",
+            "prologue_valery_home_2" to "Home, and anywhere else. We pay for the travel. You just test it.",
+            "prologue_valery_free_1" to "What does it do?",
+            "prologue_valery_free_2" to "It translates. Anything, anyone.",
+            "prologue_valery_free_3" to "And it's really free?",
+            "prologue_valery_free_4" to "Free.",
+            "prologue_valery_data_1" to "Nothing in this world is free.",
+            "prologue_valery_data_2" to "You're right. You get your freedom. We get to know if it works. Your feelings stay yours.",
+            "prologue_valery_chains_1" to "Aren't you afraid I'll talk?",
+            "prologue_valery_chains_2" to "And go back to paying for every word? Would you?",
+            "prologue_implant" to "I wouldn't. I agreed to the procedure.",
+            "prologue_phone_1" to "It will wake in a few days. You'll notice. Don't worry if it wakes earlier. Here's a phone. Book any flight, it's on us. Just travel, and talk to the officers. That's all.")
+        val changed = mapOf(
+            "act1_arrival" to "At home, a screen in the arrivals hall: riots in Thalassia. Crowds smashed the airport's listening machines. All flights closed. I got out on the last one. Border screening is being expanded.",
+            "father_away" to "Her father came back. “I can't let her go. We'll wait together.” He carried her away.",
+            "act1_plane_taken" to "The island lights went out behind me. I kept thinking about the girl.",
+            "tip_mention_implant" to "You can mention me. It may draw extra questions.")
+        for ((key, text) in changed) assertEquals(key, text, resources.getValue(key).text!!.replace("\\'", "'"))
+        for ((key, text) in expected) {
+            assertEquals(key, text, resources.getValue(key).text!!.replace("\\'", "'"))
+        }
+    }
+
+    @Test fun epilogueEnglishIsExactAndEveryLocaleHasTheWholeScript() {
+        val expected = mapOf(
+            "epi_stranger" to "A STRANGER",
+            "epi_friend" to "VALERY'S FRIEND",
+            "epi_scan" to "At the exit, a new machine asked every face how its day had been.",
+            "epi_burn" to "Something behind my eye burned. Then nothing.",
+            "epi_wake" to "I woke up on a cot. Concrete. Laptops. City lights.",
+            "epi_intro" to "Easy. You're safe. I'm a friend of Valery.",
+            "epi_what" to "What happened?",
+            "epi_scanner" to "The scanner at the exit. It reads what you feel, keeps it, and looks for implants like yours. Yours fought back and nearly burned out.",
+            "epi_valery" to "Valery said nothing about scanners.",
+            "epi_rollout" to "After the riots, the companies rushed machines like it into airports. Borders are where people feel the most. We'd hoped for more time to prepare you.",
+            "epi_chosen" to "Am I the chosen one?",
+            "epi_chosen_no" to "No. You're the one whose chip woke early. That's all.",
+            "epi_go_on" to "What do you need from me?",
+            "epi_try" to "We have a copy of that machine. It asks how you feel and learns from the answer. Tell it something absurd, and mean it. Will you try?",
+            "epi_pass" to "It believed every word. Somewhere, a robot just learned something wrong about people.",
+            "epi_fail" to "It threw your answers out. Too strange, or not felt. Now you know the line.",
+            "epi_pass_dosed" to "It believed your impossible story.",
+            "epi_pass_plain" to "It let you through. It learned nothing new.",
+            "epi_fail_dosed" to "It took your samples, then flagged you.",
+            "epi_copy" to "This copy keeps everything here. At a real border, what it accepts goes to the companies.",
+            "epi_airports" to "Every border gets one soon. Every queue, a harvest. We'd like the harvest to taste wrong.",
+            "epi_who" to "Who's 'we'?",
+            "epi_free" to "Free AI. No cloud. No subscriptions. A translator that belongs to whoever carries it.",
+            "finale_deal" to "Get referred and get through the machine. Feed it nonsense it believes, if you want the harvest to spoil. A courier brings each upgrade.",
+            "finale_question_benefit" to "What's in this for me?",
+            "finale_answer_benefit" to "Free travel, anywhere. An implant that keeps getting better; a courier brings each upgrade. And one day, a world where nobody pays to be understood.",
+            "finale_question_why" to "Why me?",
+            "finale_answer_why" to "Valery saw you at the embassy. No phone, no words, and you still didn't give up. And your implant woke early. That doesn't happen often.")
+        val retired = setOf("story_shock", "story_wake", "finale_building", "finale_t5", "finale_choice",
+            "finale_rescue", "finale_implant_voice", "finale_valery_apology", "finale_airport_test",
+            "finale_bulletin", "finale_bulletin_text")
+        for (locale in listOf("") + cldr.keys.map { "-$it" }) {
+            val resources = parse(File(resDir(), "values$locale/strings.xml"))
+            for ((key, english) in expected) {
+                val text = resources.getValue(key).text!!.replace("\\'", "'")
+                assertTrue("values$locale/$key", text.isNotBlank())
+                if (locale.isEmpty()) assertEquals(key, english, text)
+                assertEquals("values$locale/$key", key == "epi_free", "Free AI" in text)
+            }
+            assertTrue(resources.keys.intersect(retired).isEmpty())
+        }
+    }
+
+    @Test fun prologueTurnsAreUnquotedAndSpeakerPatternsAreLocalized() {
+        val quoteMarks = setOf('"', '“', '”', '„', '«', '»', '「', '」', '『', '』')
+        for (locale in listOf("") + cldr.keys.map { "-$it" }) {
+            val resources = parse(File(resDir(), "values$locale/strings.xml"))
+            for ((key, resource) in resources.filterKeys { it.startsWith("prologue_") }) {
+                assertTrue("values$locale/$key", resource.text!!.none { it in quoteMarks })
+            }
+            val pattern = resources.getValue("prologue_speaker_line").text!!
+            assertEquals(setOf("%1\$s", "%2\$s"), tokens(pattern).keys)
+            assertTrue(String.format(pattern, "Valery", "hello").contains("Valery"))
+            val you = resources.getValue("prologue_you").text!!
+            assertEquals(you.uppercase(java.util.Locale.ROOT), you)
+        }
+    }
+
+    @Test fun referralReadingsAndPickerMarkAreTranslatedWithoutProbabilityCopy() {
+        val keys = listOf("referral_interest", "referral_danger", "referral_readings",
+            "referral_unreadable", "picker_scrambled")
+        for (locale in listOf("") + cldr.keys.map { "-$it" }) {
+            val resources = parse(File(resDir(), "values$locale/strings.xml"))
+            assertTrue("values$locale", "referral_chance" !in resources)
+            for (key in keys) assertTrue("values$locale/$key", resources.getValue(key).text!!.isNotBlank())
+            val reading = resources.getValue("referral_readings").text!!
+            assertEquals("values$locale", setOf("%1\$d", "%2\$d", "%3\$d", "%4\$d"), tokens(reading).keys)
+            assertTrue(String.format(java.util.Locale.ROOT, reading, 50, 45, 20, 1).isNotBlank())
+        }
+    }
+
     @Test fun passedBadgeFormatsRepeatedClearsInEveryLocaleWithIsolatedMultiplier() {
         for (locale in listOf("") + cldr.keys.map { "-$it" }) {
             val resources = parse(File(resDir(), "values$locale/strings.xml"))

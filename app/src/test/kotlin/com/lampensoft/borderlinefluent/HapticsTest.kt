@@ -4,6 +4,42 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class HapticsTest {
+    @Test fun hapticsWaitForCaptureToEnd() {
+        val gate = HapticCaptureGate()
+        val played = mutableListOf<HapticEvent>()
+        gate.start()
+        HapticEvent.entries.forEach { event ->
+            assertTrue(gate.defer { played += event })
+        }
+        assertTrue(played.isEmpty())
+        gate.end().forEach { it() }
+        assertEquals(HapticEvent.entries.toList(), played)
+        assertTrue(gate.end().isEmpty())
+        assertFalse(gate.defer { fail("Outside capture the caller plays immediately") })
+    }
+
+    @Test fun cancellationDropsPendingFeedbackWithoutOpeningCaptureGate() {
+        val gate = HapticCaptureGate()
+        gate.start()
+        assertTrue(gate.defer { fail("Cancelled haptic must not play") })
+        gate.cancel()
+        var played = false
+        assertTrue(gate.defer { played = true })
+        assertFalse(played)
+        gate.end().forEach { it() }
+        assertTrue(played)
+    }
+
+    @Test fun viewResultFeedbackAlsoWaitsForCapture() {
+        val gate = HapticCaptureGate()
+        var result = false
+        gate.start()
+        assertTrue(gate.defer { result = true })
+        assertFalse(result)
+        gate.end().forEach { it() }
+        assertTrue(result)
+    }
+
     @Test fun allEnvelopesAreFiniteAndEndSilent() {
         HapticEvent.entries.forEach { event ->
             val spec = hapticSpec(event)
@@ -35,11 +71,10 @@ class HapticsTest {
         assertEquals(listOf(0, 40, 80), strong.composition.map { it.delay })
         assertTrue(strong.doubleClick)
     }
-    @Test fun crashDecaysAndTaserIsDistinct() {
+    @Test fun crashDecays() {
         val crash = hapticSpec(HapticEvent.BREAK).envelope
         assertEquals(600L, crash.sumOf { it.ms })
         assertTrue(crash.zipWithNext().all { (a,b) -> a.intensity > b.intensity })
-        assertNotEquals(hapticSpec(HapticEvent.BREAK), hapticSpec(HapticEvent.TASER))
     }
     @Test fun strengthsShareCooldownAndRejectedCallsDoNotExtendIt() {
         val gate = HapticRateLimiter()

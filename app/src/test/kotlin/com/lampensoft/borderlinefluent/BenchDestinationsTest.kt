@@ -16,22 +16,20 @@ class BenchDestinationsTest {
         assertEquals("uk", Destination.forLanguage("en").country.id)
     }
 
-    @Test fun birthAndStampExtrasUseBenchFactsAndCatalogQuestionsInEveryLanguage() {
-        val labels = listOf("born right", "born wrong", "stamp year right", "stamp year wrong")
+    @Test fun birthAndDurationExtrasUseBenchFactsAndCatalogQuestionsInEveryLanguage() {
+        val labels = listOf("born right", "born wrong", "days right", "days wrong")
         val story = Backstory.BENCH
         assertEquals("3 Jun 1984", story.born)
-        assertEquals("Japan 2033", story.stamps[1])
         assertEquals(Language.all.map { it.code }.toSet(), JudgeCases.all.keys)
         for ((lang, cases) in JudgeCases.all) {
             val extras = cases.extra.filter { it.label in labels }
             assertEquals(lang, labels, extras.map { it.label })
             assertEquals(listOf(false, true, false, true), extras.map { it.conflict })
-            val country = coverNation("Japan", lang)
             for ((i, extra) in extras.withIndex()) {
                 assertEquals(story, extra.story)
-                assertEquals(renderLine(if (i < 2) "ask.born.1" else "ask.stamps.3",
-                    lang, story.female, story.days, "", country), extra.q)
-                assertTrue(extra.a.contains(listOf("1984", "1975", "2033", "2032")[i]))
+                assertEquals(renderLine(if (i < 2) "ask.born.1" else "ask.days.1",
+                    lang, story.gender, story.days, ""), extra.q)
+                assertTrue(extra.a.contains(listOf("1984", "1975", "5", "14")[i]))
                 assertFalse(extra.q.contains('{'))
             }
         }
@@ -41,7 +39,7 @@ class BenchDestinationsTest {
         assertEquals(195, JudgeCases.all.values.sumOf { it.cases.size + 1 })
         assertEquals(39, JudgeCases.paraphrase.values.sumOf { it.size })
         assertEquals(26, JudgeCases.tricks.values.sumOf { it.size })
-        assertEquals(12, JudgeCases.all.getValue("uk").extra.size)
+        assertEquals(14, JudgeCases.all.getValue("uk").extra.size)
         assertEquals("de", Backstory.BENCH.country.id)
         assertEquals("Lindenberg", Backstory.BENCH.home)
         val cases = JudgeCases.ukrainianCitizen
@@ -52,9 +50,9 @@ class BenchDestinationsTest {
             assertEquals("ukraine", e.story.country.id)
             assertEquals("uk", e.story.lang)
             assertEquals("Canada", e.story.from)
-            assertTrue(e.story.female)
+            assertEquals(Gender.WOMAN, e.story.gender)
             assertEquals("Олена Коваль", e.story.name)
-            assertEquals(11, e.story.facts().size)
+            assertEquals(6, e.story.facts().size)
             assertFalse(e in JudgeCases.all.getValue("uk").extra)
         }
     }

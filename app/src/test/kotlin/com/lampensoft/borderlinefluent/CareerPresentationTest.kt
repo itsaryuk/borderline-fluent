@@ -4,6 +4,14 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class CareerPresentationTest {
+    @Test fun unaidedAwardSurvivesRoundTrip() {
+        val a = attempt().copy(contract = "unaided")
+        val saved = reduceReplayResult(pending(a), victory(a)).snapshot
+        val loaded = decoded(CareerJson.encode(saved))
+        assertEquals(saved, loaded)
+        assertEquals(Contract.UNAIDED, markContract(loaded.receipt!!.newMarks.last()))
+    }
+
     @Test fun quietAwardMarkDisplaysAfterSnapshotRoundTrip() {
         val a = attempt().copy(contract = "quiet")
         val awarded = reduceReplayResult(pending(a), victory(a)).snapshot
@@ -15,7 +23,7 @@ class CareerPresentationTest {
     }
 
     @Test fun contractResultRequiresAcknowledgedReceipt() {
-        val receipt = Receipt(1, ReplayOutcome.INFILTRATION, emptyList(), contract = "quiet")
+        val receipt = Receipt(1, ReplayOutcome.CLEARED, emptyList(), contract = "quiet", contractMet = true)
         val snapshot = CareerSnapshot(receipt = receipt)
         val saved = CareerSave.Saved(snapshot, receipt)
         assertEquals(null, contractResult(saved, true))
@@ -27,21 +35,16 @@ class CareerPresentationTest {
     }
 
     @Test fun contractResultIgnoresAbsentAndUnknownContracts() {
-        for (id in listOf(null, "unaided")) {
-            val receipt = Receipt(1, ReplayOutcome.INFILTRATION, emptyList(), contract = id)
+        for (id in listOf(null, "retired-contract")) {
+            val receipt = Receipt(1, ReplayOutcome.CLEARED, emptyList(), contract = id)
             assertEquals(null, contractResult(CareerSave.Saved(CareerSnapshot(), receipt), false))
         }
     }
 
-    @Test fun contractResultUsesReceiptOutcomeEvenWithoutANewMark() {
-        for (contract in Contract.entries) for (outcome in ReplayOutcome.entries) {
-            val receipt = Receipt(1, outcome, emptyList(), contract = contract.id)
-            val done = when (contract) {
-                Contract.QUIET -> outcome == ReplayOutcome.INFILTRATION
-                Contract.DISABLE -> outcome == ReplayOutcome.SABOTAGE
-            }
-            assertEquals("$contract / $outcome", contract to done,
-                contractResult(CareerSave.Saved(CareerSnapshot(), receipt), false))
+    @Test fun contractResultUsesTheReceiptEvenWithoutANewMark() {
+        for (contract in Contract.entries) for (met in listOf(false, true)) {
+            val receipt = Receipt(1, ReplayOutcome.CLEARED, emptyList(), contract = contract.id, contractMet = met)
+            assertEquals("$contract / $met", contract to met, contractResult(CareerSave.Saved(CareerSnapshot(), receipt), false))
         }
     }
 
@@ -51,7 +54,7 @@ class CareerPresentationTest {
             album = Album(historicalCleared = setOf("de", "uk"), clears = mapOf("de" to 3),
                 infiltration = mapOf("fr" to AwardMeta(1, "fr", "fr_x1", "desk", 2)),
                 sabotage = mapOf("austria" to AwardMeta(2, "austria", "de_at_m", "desk", 2))))
-        for ((country, count) in mapOf("de" to 3, "uk" to 1, "fr" to 1, "austria" to 1,
+        for ((country, count) in mapOf("de" to 3, "uk" to 1, "fr" to 0, "austria" to 0, // album marks alone (desk passes) are no machine clear
             "counter-only" to 0, "pending" to 0, "missing" to 0)) assertEquals(count, passedCount(s, country))
     }
 

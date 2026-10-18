@@ -4,11 +4,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class DifficultyTest {
-    @Test fun contractsRequireAgentRankAfterFinaleOutsideTraining() {
-        assertEquals(false, contractsUnlocked(finaleSeen = true, training = false, rankLevel = 0))
-        assertEquals(true, contractsUnlocked(finaleSeen = true, training = false, rankLevel = 1))
-        assertEquals(false, contractsUnlocked(finaleSeen = false, training = false, rankLevel = 1))
-        assertEquals(false, contractsUnlocked(finaleSeen = true, training = true, rankLevel = 1))
+    @Test fun contractsOpenFromActTwoRankZeroOutsideTraining() {
+        assertEquals(true, contractsUnlocked(finaleSeen = true, training = false))
+        assertEquals(false, contractsUnlocked(finaleSeen = false, training = false))
+        assertEquals(false, contractsUnlocked(finaleSeen = true, training = true))
     }
 
     @Test fun trainingAlwaysUsesLevelZero() {

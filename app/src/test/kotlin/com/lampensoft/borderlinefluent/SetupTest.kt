@@ -7,8 +7,68 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class SetupTest {
+    @Test fun firstRunHasOneSetupScreenBeforeStoryWithoutAPassport() {
+        fun next(input: Boolean, face: Boolean, stage: Act1Stage = Act1Stage.PROLOGUE) =
+            setupForAct1(stage, true, false, false, false, input, face)
+        assertEquals(Screen.INPUT_MODE, next(false, false))
+        assertEquals(Screen.INPUT_MODE, next(true, false)) // resume the old flow after input only
+        assertEquals(Screen.INPUT_MODE, next(false, true)) // input still needs confirmation
+        assertEquals(Screen.INTRO, next(true, true))
+        assertEquals(Screen.TRAINING_SETUP, next(true, true, Act1Stage.DEPARTURE))
+        assertEquals(Screen.ACT1_CUTSCENE, next(true, true, Act1Stage.FLIGHT))
+        assertEquals(Screen.PASSPORT, next(true, true, Act1Stage.PASSPORT))
+        // Identity saved, photo still pending: the durable stage remains authoritative.
+        assertEquals(Screen.PASSPORT, setupForAct1(Act1Stage.PASSPORT, true, false, true, false, true, true))
+        assertEquals(Screen.START, setupForAct1(Act1Stage.DONE, true, false, true, true, true, false))
+        assertEquals(Screen.INTRO, setupForAct1(Act1Stage.PROLOGUE, true, false, true, true, true, false))
+    }
+
+    @Test fun prologueSeenSkipsOnlyTheAutomaticViewingAfterSetup() {
+        assertEquals(Screen.INTRO, beforeStoryScreen(Screen.START, introSeen = false))
+        assertEquals(Screen.START, beforeStoryScreen(Screen.START, introSeen = true))
+        for (setup in listOf(Screen.LANGUAGES, Screen.DOWNLOAD, Screen.PASSPORT, Screen.INPUT_MODE)) {
+            assertEquals(setup, beforeStoryScreen(setup, introSeen = false))
+            assertEquals(setup, beforeStoryScreen(setup, introSeen = true))
+        }
+    }
+
+    @Test fun pauseClockExcludesRepeatedBackgroundIntervalsAndPreservesSilenceDeadline() {
+        var wall = 1_000_000_000L
+        val clock = InterviewClock { wall }
+        val answerAt = clock.now()
+        val silenceDue = answerAt + 10_000_000_000L
+        wall += 3_000_000_000L
+        clock.pause()
+        wall += 60_000_000_000L
+        clock.pause() // duplicate lifecycle notification does not move the pause boundary
+        assertEquals(3_000_000_000L, clock.now() - answerAt)
+        clock.resume()
+        clock.resume()
+        assertEquals(7_000_000_000L, silenceDue - clock.now())
+        wall += 2_000_000_000L
+        clock.pause()
+        wall += 120_000_000_000L
+        clock.resume()
+        assertEquals(5_000_000_000L, clock.now() - answerAt)
+        assertEquals(5_000_000_000L, silenceDue - clock.now())
+    }
+
+    @Test fun roomThinkTimeExcludesBothBackgroundTimeAndHintDelay() {
+        var wall = 1_000_000_000L
+        val clock = InterviewClock { wall }
+        val spoken = clock.now()
+        wall += 2_000_000_000L
+        clock.pause()
+        wall += 300_000_000_000L
+        clock.resume()
+        wall += 1_000_000_000L
+        val hints = clock.now()
+        wall += 4_000_000_000L
+        assertEquals(4000L, Assessment.thinkMs(spoken, hints, clock.now()))
+    }
+
     @Test fun savePresentationNeverOffersRetryForCorruptionOrMarksBeforeCommit() {
-        val receipt = Receipt(1, ReplayOutcome.INFILTRATION, listOf(NewMark("infiltration", "de")))
+        val receipt = Receipt(1, ReplayOutcome.CLEARED, listOf(NewMark("infiltration", "de")))
         val snapshot = CareerSnapshot(receipt = receipt)
         assertEquals(SavePresentation.SAVING, savePresentation(null, false))
         assertEquals(SavePresentation.SAVING, savePresentation(CareerSave.Saved(snapshot), true))
@@ -31,17 +91,17 @@ class SetupTest {
         // An existing install (languages, no passport step yet) sees PASSPORT once.
         assertEquals(Screen.PASSPORT, nextSetupScreen(hasLanguages = true, downloading = false, passportDone = false, inputDone = true))
         assertEquals(Screen.START, nextSetupScreen(hasLanguages = true, downloading = false, passportDone = true, inputDone = true))
-        // How to answer comes after the passport, never before it or the languages.
+        // Settled-career repair retains the old order; onboarding uses setupForAct1.
         assertEquals(Screen.INPUT_MODE, nextSetupScreen(hasLanguages = true, downloading = false, passportDone = true, inputDone = false))
         assertEquals(Screen.PASSPORT, nextSetupScreen(hasLanguages = true, downloading = false, passportDone = false, inputDone = false))
         assertEquals(Screen.LANGUAGES, nextSetupScreen(hasLanguages = false, downloading = false, passportDone = true, inputDone = false))
     }
 
     @Test fun backNeverSkipsSetup() {
-        assertEquals(Screen.INTRO, backFrom(Screen.PASSPORT, setup = Screen.PASSPORT)) // not START
-        assertEquals(Screen.INTRO, backFrom(Screen.LANGUAGES, setup = Screen.LANGUAGES))
-        assertEquals(Screen.INTRO, backFrom(Screen.DOWNLOAD, setup = Screen.DOWNLOAD))
-        assertEquals(Screen.INTRO, backFrom(Screen.INPUT_MODE, setup = Screen.INPUT_MODE))
+        assertNull(backFrom(Screen.PASSPORT, setup = Screen.PASSPORT)) // not START
+        assertNull(backFrom(Screen.LANGUAGES, setup = Screen.LANGUAGES))
+        assertNull(backFrom(Screen.DOWNLOAD, setup = Screen.DOWNLOAD))
+        assertNull(backFrom(Screen.INPUT_MODE, setup = Screen.INPUT_MODE))
         assertNull(backFrom(Screen.INTRO, setup = Screen.PASSPORT)) // leaves the app
         assertEquals(Screen.START, backFrom(Screen.INTRO, setup = Screen.START))
         assertEquals(Screen.START, backFrom(Screen.SETTINGS, setup = Screen.START))
@@ -55,7 +115,7 @@ class SetupTest {
         assertEquals(Screen.PASSPORT, arrowTo(Screen.SETTINGS, Screen.LANGUAGES, setup = Screen.PASSPORT))
         assertEquals(Screen.LANGUAGES, arrowTo(Screen.START, Screen.SETTINGS, setup = Screen.LANGUAGES))
         assertEquals(Screen.DOWNLOAD, arrowTo(Screen.SETTINGS, Screen.LANGUAGES, setup = Screen.DOWNLOAD))
-        assertEquals(Screen.INTRO, arrowTo(Screen.SETTINGS, Screen.LANGUAGES, setup = Screen.LANGUAGES)) // like system Back
+        assertEquals(Screen.LANGUAGES, arrowTo(Screen.SETTINGS, Screen.LANGUAGES, setup = Screen.LANGUAGES)) // stays on setup
         assertEquals(Screen.INPUT_MODE, arrowTo(Screen.SETTINGS, Screen.LANGUAGES, setup = Screen.INPUT_MODE))
         assertEquals(Screen.INPUT_MODE, arrowTo(Screen.START, Screen.SETTINGS, setup = Screen.INPUT_MODE))
         // Setup done: arrows go where they point.
@@ -80,7 +140,7 @@ class SetupTest {
         // First run: on to the input step; from Settings it is skipped even while that step is pending.
         assertEquals(Screen.INPUT_MODE, passportExit(Screen.INTRO, setup = Screen.INPUT_MODE))
         assertEquals(Screen.SETTINGS, passportExit(Screen.SETTINGS, setup = Screen.INPUT_MODE))
-        assertEquals(Screen.INTRO, backFrom(Screen.PASSPORT, setup = Screen.PASSPORT, passportFrom = Screen.INTRO))
+        assertNull(backFrom(Screen.PASSPORT, setup = Screen.PASSPORT, passportFrom = Screen.INTRO))
     }
 
     @Test fun storyFactsAreBold() {
@@ -92,12 +152,6 @@ class SetupTest {
         val trip = fillBold("%2\$s: %1\$d days, %3\$s.", 3, "Lviv", purpose)
         assertEquals("Lviv: 3 days, for a wedding.", trip.text)
         assertEquals(listOf("Lviv", "3", "a wedding"), trip.bold.map { trip.text.substring(it) })
-    }
-
-    @Test fun oldDestinationPrefMigrates() {
-        assertEquals("random", migrateDest(null))
-        assertEquals("random", migrateDest("random"))
-        assertEquals("random", migrateDest("de")) // an old language code: "Any <language>" is gone
     }
 
     private val de = Country.all.first { it.id == "de" }
@@ -120,35 +174,32 @@ class SetupTest {
         assertEquals(playable, destPool("lang:ja", playable)) // retired: anywhere
     }
 
-    @Test fun trainingNeverEntersTheRoom() {
-        for (story in listOf(true, false)) {
-            assertEquals(false, entersRoom(Decision.PASS, wasInRoom = false, training = true, storyMission = story, suspicion = 1.0, contradictions = 0))
-            assertEquals(false, entersRoom(Decision.BROKEN, wasInRoom = false, training = true, storyMission = story, suspicion = 1.0, contradictions = 0))
-            assertEquals(true, entersRoom(Decision.PASS, wasInRoom = false, training = false, storyMission = story, suspicion = 1.0, contradictions = 0))
-            assertEquals(false, entersRoom(Decision.PASS, wasInRoom = true, training = false, storyMission = story, suspicion = 1.0, contradictions = 0))
-            assertEquals(false, entersRoom(Decision.SECONDARY, wasInRoom = false, training = false, storyMission = story, suspicion = 1.0, contradictions = 0))
+    @Test fun aReferralEntersTheRoomAndTrainingNeverRefers() {
+        for (d in Decision.entries) {
+            assertEquals(d == Decision.REFERRAL, entersRoom(d, wasInRoom = false))
+            assertFalse(entersRoom(d, wasInRoom = true))
         }
-        // A break: the story goes on into the room; after the story it wins the mission at the desk.
-        assertEquals(true, entersRoom(Decision.BROKEN, wasInRoom = false, training = false, storyMission = true, suspicion = 1.0, contradictions = 0))
-        assertEquals(false, entersRoom(Decision.BROKEN, wasInRoom = false, training = false, storyMission = false, suspicion = 1.0, contradictions = 0))
-        assertEquals(false, entersRoom(Decision.BROKEN, wasInRoom = true, training = false, storyMission = true, suspicion = 1.0, contradictions = 0))
-        fun e(d: Decision, story: Boolean, training: Boolean, s: Double, c: Int) = entersRoom(d, false, training, story, s, c)
-        assertTrue(e(Decision.PASS, true, false, 0.0, 0))       // story always enters
-        assertFalse(e(Decision.PASS, false, true, 0.9, 3))      // training never
-        assertFalse(e(Decision.PASS, false, false, 0.2, 0))     // clean post-story PASS ends at the desk
-        assertFalse(e(Decision.PASS, false, false, 0.25, 0))    // strictly above the threshold
-        assertTrue(e(Decision.PASS, false, false, 0.3, 0))
-        assertTrue(e(Decision.PASS, false, false, 0.1, 1))
-        assertFalse(e(Decision.BROKEN, false, false, 0.9, 2))   // broken after the story wins outright
+        for (training in listOf(false, true)) for (meter in listOf(0.0, 0.5, 1.0)) {
+            assertFalse(refers(training, true, meter))
+        }
+        assertFalse(refers(false, false, 0.0))
+        assertFalse(refers(false, false, REFER_AT - 0.000001))
+        assertTrue(refers(false, false, REFER_AT))
     }
 
-    @Test fun storyRoomBreakReachesTheFinale() {
-        assertEquals(true, reachesFinale(Decision.PASS, storyMission = true, wasInRoom = true))
-        assertEquals(true, reachesFinale(Decision.BROKEN, storyMission = true, wasInRoom = true))
-        assertEquals(false, reachesFinale(Decision.SECONDARY, storyMission = true, wasInRoom = true))
-        assertEquals(false, reachesFinale(Decision.BROKEN, storyMission = false, wasInRoom = true)) // normal result
-        assertEquals(false, reachesFinale(Decision.PASS, storyMission = false, wasInRoom = true))
-        assertEquals(false, reachesFinale(Decision.BROKEN, storyMission = true, wasInRoom = false)) // desk: room first
+    @Test fun storyDeskPassEntersBuildingOnlyAfterTraining() {
+        for (d in Decision.entries) for (training in listOf(false, true)) {
+            assertEquals(!training && d == Decision.PASS, entersRoom(d, false, true, training))
+            assertFalse(entersRoom(d, true, true, training))
+        }
+    }
+
+    @Test fun eitherBuildingVerdictReachesTheFinale() {
+        for (d in Decision.entries) {
+            assertEquals(d in setOf(Decision.RELEASED, Decision.REFUSED), reachesFinale(d, true, true))
+            assertFalse(reachesFinale(d, false, true))
+            assertFalse(reachesFinale(d, true, false))
+        }
     }
 
     @Test fun foreignTongueComparesLanguageCodes() {

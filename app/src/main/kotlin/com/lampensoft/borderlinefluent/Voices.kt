@@ -47,16 +47,17 @@ object Voices {
     /**
      * Sets a voice of the officer's gender. If the language only has the other gender, shifts pitch instead.
      * ponytail: 165 Hz is the textbook male/female F0 boundary; a voice near it may land on the wrong side.
+     * [pitch]: on top of either (the associate speaks lower than the officers).
      */
-    fun apply(ctx: Context, tts: TextToSpeech, lang: String, female: Boolean, seed: String) {
+    fun apply(ctx: Context, tts: TextToSpeech, lang: String, female: Boolean, seed: String, pitch: Float = 1f) {
         val voices = offline(tts, lang).take(6)
         val known = voices.filter { prefs(ctx).getFloat(it.name, -1f) > 0f }
         val match = known.filter { (prefs(ctx).getFloat(it.name, 0f) > 165f) == female }
         val pick = match.getOrNull(Math.floorMod(seed.hashCode(), match.size.coerceAtLeast(1)))
         tts.language = Locale.forLanguageTag(lang)
-        if (pick != null) { tts.voice = pick; tts.setPitch(1f); return }
+        if (pick != null) { tts.voice = pick; tts.setPitch(pitch); return }
         (known.firstOrNull() ?: voices.firstOrNull())?.let { tts.voice = it }
-        tts.setPitch(if (known.isEmpty()) 1f else if (female) 1.3f else 0.75f)
+        tts.setPitch(pitch * if (known.isEmpty()) 1f else if (female) 1.3f else 0.75f)
     }
 
     private suspend fun pitch(ctx: Context, tts: TextToSpeech, v: Voice, text: String): Double? {

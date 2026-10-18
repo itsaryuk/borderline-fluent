@@ -21,7 +21,7 @@ val SONGS = listOf(
     Song(0, "Sure the Train Always Waits", "taxi_en_ie", "en"),
     Song(0, "Front Seat", "taxi_en_au", "en"),
     Song(0, "Feu vert sur le toit", "taxi_fr", "fr"),
-    Song(0, "Elfenbein", "taxi_de", "de"),
+    Song(0, "Taxi, Licht auf dem Dach", "taxi_de", "de"),
     Song(0, "Aquí nunca es tarde", "taxi_es", "es"),
     Song(0, "Motorini", "taxi_it", "it"),
     Song(0, "Saudade no banco de trás", "taxi_pt", "pt"),

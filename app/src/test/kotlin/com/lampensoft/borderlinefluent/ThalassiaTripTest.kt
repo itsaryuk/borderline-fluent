@@ -82,7 +82,7 @@ class ThalassiaTripTest {
         assertEquals(R.string.thal_n_surge, marek.turns.last().text)
         val thanks = marek.turns.single { it.text == R.string.thal_m_thanks }
         assertEquals(PrologueSpeaker.MAN_FRIEND, thanks.speaker)
-        assertEquals(listOf("thal_1_window", "thal_2_arrivals", "thal_3_lens", "thal_4_square", "thal_5_cafe", "thal_6_valery", "thal_7_raid", "thal_8_marek"),
+        assertEquals(listOf("thal_1_window", "thal_2_arrivals", "thal_3_lens", "thal_4_square", "thal_6_valery", "thal_7_raid", "thal_8_marek"),
             script.map { it.art }.distinct())
     }
 

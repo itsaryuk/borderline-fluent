@@ -1697,7 +1697,7 @@ internal fun visitScript(allInstalled: Boolean): List<WhyStep> {
 /** Career doses from which Valery remarks on the queues that laughed for a month. */
 internal const val HEAVY_POISONER_DOSES = 10
 
-/** The return to Thalassia after the USA ending: five narrated frames, then Valery in the café's back room. */
+/** The return to Thalassia after the USA ending: four narrated frames, then Valery in the café's back room. */
 internal fun thalassiaScript(heavy: Boolean = false, away: Span = awaySpan(0)): List<WhyStep> = run {
     fun n(text: Int, span: Span? = null) = PrologueTurn(PrologueSpeaker.NARRATOR, text, span = span)
     fun v(text: Int, span: Span? = null) = PrologueTurn(PrologueSpeaker.VALERY, text, span = span)
@@ -1709,8 +1709,8 @@ internal fun thalassiaScript(heavy: Boolean = false, away: Span = awaySpan(0)): 
         WhyTurns("thal_2_arrivals", listOf(n(R.string.thal_n_arrivals))),
         WhyTurns("thal_3_lens", listOf(n(R.string.thal_n_lens))),
         WhyTurns("thal_4_square", listOf(n(R.string.thal_n_square))),
-        WhyTurns("thal_5_cafe", listOf(n(R.string.thal_n_cafe))),
-        WhyTurns(art, listOf(v(R.string.thal_v_came), v(R.string.thal_v_vanished), v(R.string.thal_v_waited, away),
+        // The café note plays over Valery already at the table: the scene opens with her (owner, 2026-10-18).
+        WhyTurns(art, listOf(n(R.string.thal_n_cafe), v(R.string.thal_v_came), v(R.string.thal_v_vanished), v(R.string.thal_v_waited, away),
             y(R.string.thal_y_look), v(R.string.thal_v_whose))),
         // Both lead on; the second names him, or Valery's "Marek?" would answer a name nobody said.
         WhyChoice(art, listOf(

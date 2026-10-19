@@ -16,9 +16,9 @@ class HeldBackTest {
         assertEquals(held, Language.HELD_BACK)
         assertEquals(setOf("en", "de", "fr", "es", "it", "pt", "pl", "ru", "uk", "ja"), shippedCodes)
         assertEquals(13, Language.all.size) // the content stays
-        // play/listing/store-listing.md and play/whatsnew: 10 languages, 24 countries, 78 airports.
+        // play/listing/store-listing.md and play/whatsnew: 10 languages, 24 countries, 79 airports.
         assertEquals(24, Country.shipped.size)
-        assertEquals(78, Country.shipped.sumOf { c -> c.airports.count { Language.isShipped(it.lang) } })
+        assertEquals(79, Country.shipped.sumOf { c -> c.airports.count { Language.isShipped(it.lang) } })
     }
 
     @Test fun noHeldBackDestinationNationalityOrOriginIsOffered() {

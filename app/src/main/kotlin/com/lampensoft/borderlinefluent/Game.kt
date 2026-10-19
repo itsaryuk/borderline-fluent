@@ -23,6 +23,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.genai.common.FeatureStatus
+import com.google.mlkit.genai.common.GenAiException
 import com.google.mlkit.genai.prompt.Generation
 import com.google.mlkit.genai.prompt.GenerativeModel
 import com.k2fsa.sherpa.onnx.OfflineRecognizer
@@ -56,6 +57,7 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 
 internal enum class TranscriptKind { EMPTY, FRAGMENT, ANSWER }
 internal fun transcriptKind(text: String): TranscriptKind = when {
@@ -464,6 +466,7 @@ class Game(app: Application) : AndroidViewModel(app) {
 
     /** Resume the live turn, or a committed transition that finished saving while away. */
     @Synchronized fun resumeAfterStop() {
+        resumed.complete(Unit) // before the guard: every resume counts for a waiting model load, backgrounded interview or not
         if (!backgrounded) return
         interviewClock.resume()
         backgrounded = false
@@ -1493,6 +1496,9 @@ class Game(app: Application) : AndroidViewModel(app) {
     fun behaviorDebrief(): String? = if (watching && profiler.calibrated) debrief(behavior).joinToString(" ") { it.text(ctx) } else null
     private val turnLock = Mutex()
     private val nanoLock = Mutex()
+    private val brainLock = Mutex() // before init: its start-up launch runs [loadBrain] on another thread
+    /** Completed by every [resumeAfterStop]; [loadBrain] swaps in a fresh one per attempt. */
+    @Volatile private var resumed = CompletableDeferred<Unit>()
     private val voiceLock = Mutex() // every use of [piper], see piperSay
     private var pendingRetina: Deferred<Retina?>? = null
     /** Set when the player's answer arrives, cleared as each suggestion call starts: [Analyst.suggest] then skips its retry. */
@@ -1543,16 +1549,23 @@ class Game(app: Application) : AndroidViewModel(app) {
     }
 
     /** The officer's model, once Nano is ready (an AICore download first, see [install]). Re-run after installs. */
-    private suspend fun loadBrain() {
-        if (brain != null || nanoStatus != FeatureStatus.AVAILABLE) return
-        try {
-            ttsReady.await()
-            brain = Nano.model(::dbg) ?: run { loadError = "Gemini Nano unavailable"; return }
-            loadError = null
-            ready = true
-        } catch (t: Throwable) {
-            Log.e(TAG, "model load failed", t)
-            loadError = "${t.javaClass.simpleName}: ${t.message}"
+    private suspend fun loadBrain() = brainLock.withLock { // start-up, install() and retry can overlap: one warmup
+        while (brain == null && nanoStatus == FeatureStatus.AVAILABLE) {
+            val resumedSince = CompletableDeferred<Unit>().also { resumed = it }
+            try {
+                ttsReady.await()
+                brain = Nano.model(::dbg) ?: run { loadError = "Gemini Nano unavailable"; return@withLock }
+                loadError = null
+                ready = true
+            } catch (t: Throwable) {
+                // A cold start behind the lock screen (or left during boot): AICore refuses, the cover keeps calibrating.
+                // Wait for a resume, at most 15 s (its view of process state can lag onResume): one attempt per 15 s while locked is harmless.
+                if (backgroundBlocked(t)) { dbg("model load blocked in background, retry on resume"); withTimeoutOrNull(15_000) { resumedSince.await() }; continue }
+                Log.e(TAG, "model load failed", t)
+                dbg("model load failed: $t")
+                loadError = "${t.javaClass.simpleName}: ${t.message}"
+            }
+            return@withLock
         }
     }
 
@@ -3889,3 +3902,7 @@ private val HANDOVER_FORMULAS = mapOf(
 
 /** The chatbot trick's tip, once per install, in training after a first good answer at an ordinary desk. */
 internal fun chatbotTipDue(thalassian: Boolean, goodAnswers: Int, shown: Boolean) = !thalassian && goodAnswers >= 1 && !shown
+
+/** AICore refuses Nano while the app isn't in the foreground (ErrorCode 30); anywhere in the cause chain. */
+internal fun backgroundBlocked(t: Throwable): Boolean =
+    generateSequence(t) { it.cause }.take(8).any { (it as? GenAiException)?.errorCode == GenAiException.ErrorCode.BACKGROUND_USE_BLOCKED }

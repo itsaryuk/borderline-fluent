@@ -7,7 +7,7 @@ import org.junit.Test
 class AirportsTest {
     // Frozen from the pre-refactor 99 slots; assignments from the approved plan, not the runtime catalog.
     // 2026-10-16 cultural review (owner): Kazakhstan, Kyrgyzstan and EGO DNK OZH cut, BRU -> CRL; KZN and UUD
-    // (no old slot, empty first column) take the Kazakh and Kyrgyz officers.
+    // (no old slot, empty first column) take the Kazakh and Kyrgyz officers. 2026-10-18 (owner): GVA, a French Swiss desk.
     private val slots = """
 de|de|fra|de|dest_de|de_f1,de_m1
 valdenstein|austria|inn|de|dest_valdenstein|de_x1,de_x2
@@ -48,7 +48,7 @@ hohenmark|de|bre|de|dest_hohenmark|de_x1,de_x2
 siebenau|de|str|de|dest_siebenau|de_x1,de_x2
 brennland|de|dtm|de|dest_brennland|de_x1,de_x2
 belgium|belgium|crl|fr|dest_belgium|fr_bef
-canada_fr|canada|yul|fr|dest_fr|fr_cam
+canada_fr|canada|yul|fr|dest_canada_fr|fr_cam
 senegal|senegal|dss|fr|dest_senegal|fr_snm
 lorvel|fr|avn|fr|dest_lorvel|fr_x1,fr_x2
 saintclairon|fr|run|fr|dest_saintclairon|fr_x1,fr_x2
@@ -77,6 +77,7 @@ kedrovia|russia|tof|ru|dest_kedrovia|ru_xm,ru_xf
 sonyachia|ukraine|ods|uk|dest_sonyachia|uk_xm,uk_xf,uk_ym,uk_yf
 |russia|kzn|ru|dest_kazan|ru_kzf,ru_xm
 |russia|uud|ru|dest_ulanude|ru_kgm,ru_xf
+|switzerland|gva|fr|dest_geneva|fr_chf
 dnistrovia|ukraine|lwo|uk|dest_dnistrovia|uk_xm,uk_xf,uk_ym,uk_yf
 polonyna|ukraine|ifo|uk|dest_polonyna|uk_xm,uk_xf,uk_ym,uk_yf
 yesilvadi|turkey|rzv|tr|dest_yesilvadi|tr_xm,tr_xf
@@ -110,8 +111,8 @@ westmarch|australia|asp|en|dest_westmarch|en_xm,en_xf
     @Test fun catalogPreservesEveryOldSlotAndItsPackAssets() {
         assertEquals(30, Country.all.size)
         val airports = Country.all.filter { it.id != "usa" }.flatMap { it.airports }
-        assertEquals(96, airports.size)
-        assertEquals(96, airports.map { it.id }.toSet().size)
+        assertEquals(97, airports.size)
+        assertEquals(97, airports.map { it.id }.toSet().size)
         assertEquals(slots.map { it[2] }.toSet(), airports.map { it.id }.toSet())
         for (country in Country.all.filter { it.id != "usa" }) {
             val expected = slots.filter { it[1] == country.id }.sortedBy { it[0] != it[1] && it[0] != "canada_fr" }
@@ -197,7 +198,7 @@ westmarch|australia|asp|en|dest_westmarch|en_xm,en_xf
         assertEquals(listOf("yyz"), eligibleAirports(ca, setOf("en"), allArt).map { it.id })
         assertEquals(listOf("yul"), eligibleAirports(ca, languages, allArt, "fr").map { it.id })
         assertTrue(eligibleAirports(ca, setOf("en"), allArt, "fr").isEmpty())
-        assertEquals(listOf("yyz"), eligibleAirports(ca, languages, allArt - "dest_fr").map { it.id })
+        assertEquals(listOf("yyz"), eligibleAirports(ca, languages, allArt - "dest_canada_fr").map { it.id })
         assertEquals(listOf("yyz"), eligibleAirports(ca, languages, allArt - "officer_fr_cam_sheet").map { it.id })
         val de = Country.of("de")
         assertTrue(de.airports.first() in eligibleAirports(de, languages, allArt - "officer_de_f1_sheet"))

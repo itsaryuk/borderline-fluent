@@ -18,7 +18,7 @@ class ExportRoutingTest {
         val (code, output) = run(script, "--mapping")
         assertEquals(output, 0, code)
         val lines = output.trim().lines()
-        assertEquals(98, lines.size)
+        assertEquals(100, lines.size)
         val expected = Country.all.flatMap { it.airports }.associate { it.art to it.lang }
         assertEquals(expected, lines.associate { it.substringBefore('\t') to it.substringAfter('\t') })
         val keys = expected.keys + listOf("officer_uk_xm_sheet", "officer_story_associate_sheet", "travelers_sheet")

@@ -68,7 +68,7 @@ class DestinationIntegrationTest {
         assertEquals(Country.all, picker)
         assertEquals(30, picker.map { it.id }.toSet().size)
         assertEquals(setOf("uk", "de", "canada"), picker.filter { it.id in passedCountries(passed) }.map { it.id }.toSet())
-        assertEquals(99, languages.sumOf(::airportCount))
+        assertEquals(100, languages.sumOf(::airportCount))
     }
 
     @Test fun canadaReadinessAndLanguageChoicesFollowExactAssets() {

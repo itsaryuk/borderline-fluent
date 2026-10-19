@@ -42,7 +42,7 @@ private val SEASIDE = setOf("Marseille", "Nice", "Saint-Denis", "Olbia", "Naples
 private val BEACH = setOf("Nice", "Saint-Denis", "Olbia", "Naples", "Rimini", "Funchal", "Ponta Delgada", "Praia da Vitória", "Odesa",
     "Dalaman", "Izmir", "Dubai", "Abu Dhabi", "Naha", "Xiamen", "Dakar", "Cancún", "Cartagena", "Sydney", "Los Angeles", "Praia",
     "Luanda", "Barcelona", "Lisbon")
-private val MOUNTAINS = setOf("Innsbruck", "Salzburg", "Zurich", "Mendoza", "Medellín", "Bogotá", "Guilin",
+private val MOUNTAINS = setOf("Innsbruck", "Salzburg", "Zurich", "Geneva", "Mendoza", "Medellín", "Bogotá", "Guilin",
     "Wuyishan", "Kayseri", "Nevşehir", "Rize", "Guiyang", "Lanzhou", "Kraków", "Ivano-Frankivsk", "Chitose", "Komatsu", "Perugia")
 
 /** The stay is a hotel (booked through the Solvane Collection); apartments, guesthouses, huts and hosts' homes are not. */

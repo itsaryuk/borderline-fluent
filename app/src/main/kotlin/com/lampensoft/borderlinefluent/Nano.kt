@@ -114,7 +114,7 @@ object Nano {
             }
             else -> { log("nano unavailable status=$st"); m.close(); return null }
         }
-        m.warmup()
+        try { m.warmup() } catch (t: Throwable) { m.close(); throw t }
         log("nano ready model=${m.getBaseModelName()} systemPrompt=${m.isSystemPromptAvailable()} tokens=${m.getTokenLimit()}")
         return m
     }

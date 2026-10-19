@@ -166,7 +166,7 @@ gdn=Gdańsk poz=Poznań rze=Rzeszów wro=Wrocław svo=Moscow mmk=Murmansk arh=Ar
 kbp=Kyiv hrk=Kharkiv ods=Odesa lwo=Lviv ifo=Ivano-Frankivsk ist=Istanbul nav=Nevşehir rzv=Rize
 dlm=Dalaman asr=Kayseri adb=Izmir saw=Istanbul dxb=Dubai auh=Abu_Dhabi aan=Al_Ain nrt=Tokyo hij=Hiroshima kmq=Komatsu
 kij=Niigata koj=Kagoshima cts=Chitose oka=Naha pek=Beijing kwl=Guilin hgh=Hangzhou kwe=Guiyang xmn=Xiamen lhw=Lanzhou
-wus=Wuyishan vie=Vienna inn=Innsbruck szg=Salzburg zrh=Zurich crl=Charleroi yul=Montreal yyz=Toronto dss=Dakar
+wus=Wuyishan vie=Vienna inn=Innsbruck szg=Salzburg zrh=Zurich gva=Geneva crl=Charleroi yul=Montreal yyz=Toronto dss=Dakar
 mex=Mexico_City cun=Cancún cjs=Ciudad_Juárez eze=Buenos_Aires mdz=Mendoza bog=Bogotá ctg=Cartagena mde=Medellín
 gru=São_Paulo lad=Luanda rai=Praia cai=Cairo amm=Amman cmn=Casablanca fez=Fès lhr=London
 syy=Stornoway dub=Dublin syd=Sydney asp=Alice_Springs jfk=New_York lax=Los_Angeles ord=Chicago

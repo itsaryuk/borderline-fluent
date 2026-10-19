@@ -13,7 +13,10 @@ PACKS=${PACKS:-packs}
 # system voice (no Piper voice of that gender in the measured candidates; ja has none at all). sid != 0 -> speaker.txt.
 # Licences: NOTICE.md. Not redistributable, so dropped (2026-10-15): en_US-lessac (research-only dataset), ru_RU-irina
 # and ar_JO-kareem (no licence stated); those officers speak with the system voice.
-# Each language pack also gets espeak-ng-data minus the other languages' *_dict (the voice's espeak.voice decides which).
+# Each language pack also gets espeak-ng-data with the *_dict of EVERY shipped Piper language (DICTS below), not just its
+# own: espeak-ng inside sherpa-onnx is process-global and initialises once, from the FIRST loaded voice's data_dir, so
+# a Spanish voice loaded after a German one reads lang_de/.../es_dict. With only de_dict there, es spoke ~0.2 s of
+# near-silence in the Play build (2026-10-18). Dev pushes (push-voices.sh) merge all packs and never showed it.
 PIPER_URL=https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models
 VOICES='
 ar f ar_JO-SA_dii-high 02f6f990b31323b7f36c8c68c3a5dc7f7c9f3db555c632310693cf7d82b9540e 0
@@ -38,6 +41,12 @@ uk f uk_UA-ukrainian_tts-medium 9e3e20f311e3c486d989c3d481d9537741deb7beaeed1aa6
 # Held-back languages (heldBackLanguages in gradle.properties, the release switch) have no pack in the bundle: their
 # rows stay above for the day they come back, but nothing is fetched for them (HELD_BACK= in the environment fetches all).
 HELD_BACK=${HELD_BACK-$(sed -n 's/^heldBackLanguages=//p' gradle.properties | tr ',' ' ')}
+# zh's espeak dictionary is cmn_dict. ru/ja have no Piper row, so their dicts (ru_dict is 8.5 MB) are left out.
+DICTS=$(echo "$VOICES" | while read -r lang rest; do
+  [ -n "$lang" ] || continue
+  case " $HELD_BACK " in *" $lang "*) continue ;; esac
+  case $lang in zh) echo cmn_dict ;; *) echo "${lang}_dict" ;; esac
+done | sort -u | tr '\n' ' ')
 fetch_voices() {
   echo "$VOICES" | while read -r lang g name sha sid; do
     [ -n "$lang" ] || continue
@@ -50,13 +59,16 @@ fetch_voices() {
     mv "$w"/v/*.onnx "$d/${lang}_$g/model.onnx"; mv "$w/v/tokens.txt" "$d/${lang}_$g/"
     [ "$sid" = 0 ] || echo "$sid" > "$d/${lang}_$g/speaker.txt"
     if [ ! -d "$d/espeak-ng-data" ]; then
-      case $lang in zh) keep=cmn_dict ;; *) keep=${lang}_dict ;; esac
       mkdir -p "$d/espeak-ng-data"
       for f in "$w"/v/espeak-ng-data/*; do
-        case $f in *_dict) [ "$(basename "$f")" = "$keep" ] || continue ;; esac
+        case $f in *_dict) case " $DICTS " in *" $(basename "$f") "*) ;; *) continue ;; esac ;; esac
         cp -r "$f" "$d/espeak-ng-data/"
       done
     fi
+    # Also catches a stale per-language dir from before the fix (PACKS=<dir> reruns keep it).
+    for k in $DICTS; do
+      [ -f "$d/espeak-ng-data/$k" ] || { echo "fetch-models: $d/espeak-ng-data lacks $k" >&2; exit 1; }
+    done
   done
   rm -rf "$w/v"
 }

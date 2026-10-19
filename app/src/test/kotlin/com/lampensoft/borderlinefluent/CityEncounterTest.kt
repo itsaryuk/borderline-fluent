@@ -110,6 +110,13 @@ class CityEncounterTest {
         assertEquals("fr", regionOf("fr", "canada")); assertEquals("uk", regionOf("uk", "ukraine"))
     }
 
+    @Test fun cityArtUsesFullCountryNames() {
+        assertEquals("germany", artCountry("de")); assertEquals("uk", artCountry("uk"))
+        val root = listOf(File("packs"), File("../packs")).first { it.isDirectory }
+        for ((id, name) in listOf("de" to "germany", "fr" to "france", "es" to "spain"))
+            assertTrue(name, File(root, "lang_$id/src/main/assets/art/fg_taxi_${artCountry(id)}.webp").exists())
+    }
+
     @Test fun everyRegionOrdersEachItemByItsOwnName() {
         for ((region, items) in BAR_MENU) {
             assertEquals(region, 3, items.size)

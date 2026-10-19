@@ -9,7 +9,7 @@ the time it's right. The AI companies keep their own machine at every border, an
 
 An Android game you play by speaking:
 - Your own passport: pick your nationality and roll your identity; every trip rolls a new itinerary to remember.
-- Officers in 10 languages at 78 airports in 24 countries, with fixed, translated lines. They check your trip, notice
+- Officers in 10 languages at 79 airports in 24 countries, with fixed, translated lines. They check your trip, notice
   odd answers, and react when you talk about your implant. Arabic, Turkish and Chinese are in the code but held back
   until a native speaker has checked them (`heldBackLanguages` in gradle.properties).
 - Things happen in the queue before the desk, and the officer may ask what you saw.

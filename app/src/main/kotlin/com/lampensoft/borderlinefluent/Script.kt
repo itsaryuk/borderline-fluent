@@ -250,6 +250,7 @@ data class Country(
             Country("switzerland", "Switzerland", "Swiss Border Guard",
                 listOf(
                     Airport("zrh", "de", "Flughafen Zürich (ZRH)", "dest_switzerland", listOf("de_chm")),
+                    Airport("gva", "fr", "Aéroport de Genève (GVA)", "dest_geneva", listOf("fr_chf")),
                 )),
             Country("belgium", "Belgium", "Belgian Federal Police",
                 listOf(
@@ -257,7 +258,7 @@ data class Country(
                 )),
             Country("canada", "Canada", "Canada Border Services Agency",
                 listOf(
-                    Airport("yul", "fr", "Aéroport international Montréal-Trudeau (YUL)", "dest_fr", listOf("fr_cam")),
+                    Airport("yul", "fr", "Aéroport international Montréal-Trudeau (YUL)", "dest_canada_fr", listOf("fr_cam")),
                     Airport("yyz", "en", "Toronto Pearson International Airport (YYZ)", "dest_canada", listOf("en_cam")),
                 )),
             Country("senegal", "Senegal", "Senegalese Air and Border Police",

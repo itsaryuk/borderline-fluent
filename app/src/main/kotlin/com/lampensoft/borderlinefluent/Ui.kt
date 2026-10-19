@@ -2816,16 +2816,15 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
     val captionAlpha by animateFloatAsState(if (intro && lit) 1f else 0f, tween(if (fades && intro) 900 else 0), label = "cityCaption")
     Box(Modifier.fillMaxSize().background(Color.Black)) {
     val scene = c.kind.name.lowercase()
-    val region = regionOf(c.lang, c.country)
-    // A region's own foreground (its classic cab: fg_taxi_<region>, in the language pack) before the shared one.
+    val region = regionOf(c.lang, c.country); val art = artCountry(c.country)
     // Most specific first: the airport's own city view (taxi), the country's room and robot, then the language region's, then shared.
     val bg = (if (c.kind == CityKind.TAXI) rememberAsset("bg_taxi_${c.airport}") else null)
-        ?: rememberAsset("bg_${scene}_${c.country}") ?: rememberAsset("bg_${scene}_$region")
-    val own = rememberAsset("fg_${scene}_${c.country}") ?: rememberAsset("fg_${scene}_$region"); val fg = own ?: rememberAsset("fg_$scene")
+        ?: rememberAsset("bg_${scene}_${art}") ?: rememberAsset("bg_${scene}_$region")
+    val own = rememberAsset("fg_${scene}_${art}") ?: rememberAsset("fg_${scene}_$region"); val fg = own ?: rememberAsset("fg_$scene")
     // The bar's foreground is two layers: the bartender (fg above) and the counter in front of him (absent -> the single foreground, as before).
-    val counter = if (c.kind != CityKind.BAR) null else rememberAsset("fg_bar_counter_${c.country}") ?: rememberAsset("fg_bar_counter")
+    val counter = if (c.kind != CityKind.BAR) null else rememberAsset("fg_bar_counter_${art}") ?: rememberAsset("fg_bar_counter")
     // The taxi's driving state (robot facing forward), shown once the answer is judged; absent -> the standing car stays.
-    val drive = if (c.kind != CityKind.TAXI) null else rememberAsset("fg_taxi_${c.country}_drive") ?: rememberAsset("fg_taxi_${region}_drive")
+    val drive = if (c.kind != CityKind.TAXI) null else rememberAsset("fg_taxi_${art}_drive") ?: rememberAsset("fg_taxi_${region}_drive")
     val drinkArt = rememberAsset(c.drink?.let { if (it == Drink.SPECIAL) "drink_$region" else "drink_${it.name.lowercase()}" }.orEmpty())
     // The tallest bottom block seen (mic, or the outcome): the layered art is sized so the counter stays above it.
     var panelsPx by remember { mutableIntStateOf(0) }

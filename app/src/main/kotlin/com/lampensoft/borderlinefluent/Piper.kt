@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.sin
 
 /**
- * Piper voices through sherpa-onnx: ~17 MB per voice plus espeak-ng-data (trimmed per language pack). The officer's
+ * Piper voices through sherpa-onnx: ~17 MB per voice plus espeak-ng-data (each pack carries every Piper language's dict: espeak-ng is process-global, see fetch-models.sh). The officer's
  * voice when a vetted one exists for the language and gender (tts/<lang>_<m|f>/ in the language pack, or files/tts
  * for dev pushes); otherwise the system TTS. Bench: first audio ~0.11 s, RTF 0.11-0.16 on the Pixel 11 Pro XL.
  */

@@ -26,6 +26,14 @@ fun regionOf(lang: String, countryId: String): String = if (lang != "en") lang e
     else -> "gb"
 }
 
+/** The country's name in its city art files (fg_taxi_germany, bg_bar_france): full name for de/fr/es, else the id. */
+fun artCountry(countryId: String): String = when (countryId) {
+    "de" -> "germany"
+    "fr" -> "france"
+    "es" -> "spain"
+    else -> countryId
+}
+
 /** The taxi radio's song (a pack [Song] key): one per language, English by [regionOf]. */
 fun taxiSong(lang: String, countryId: String): String =
     if (lang != "en") "taxi_$lang" else "taxi_en_${regionOf(lang, countryId)}"

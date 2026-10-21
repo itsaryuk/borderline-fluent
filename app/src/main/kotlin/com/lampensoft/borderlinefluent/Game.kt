@@ -88,8 +88,8 @@ internal fun roomFallback(lang: String, ui: String, probe: Boolean = true): List
         Hint(ROOM_FALLBACK.getValue(lang)[i], if (Language.of(lang).romanize != null) ROOM_FALLBACK_READINGS.getValue(lang)[i] else "",
             (ROOM_FALLBACK[ui] ?: ROOM_FALLBACK.getValue("en"))[i])
     }
-internal fun roomFallbackVisible(inRoom: Boolean, jam: Jam?, unaided: Boolean) =
-    inRoom && !unaided && jam in setOf(Jam.GARBLE, Jam.DROP)
+internal fun roomFallbackVisible(inRoom: Boolean, jam: Jam?) =
+    inRoom && jam in setOf(Jam.GARBLE, Jam.DROP)
 
 /** Monotonic interview time: neither thinking nor silence includes time outside the app. */
 internal class InterviewClock(private val source: () -> Long = System::nanoTime) {
@@ -221,6 +221,9 @@ fun canonicalDest(saved: String?): String = CountryMigration.countryId(saved ?: 
 
 /** Only an explicit change of country (including Anywhere) gives up the existing ticket. */
 fun bookingAfterDestPick(booking: Booking?, pick: String): Booking? = booking?.takeIf { it.countryId == pick }
+
+/** The picked destination books somewhere other than a waiting chain's leg 2 (Anywhere and no pick keep the chain card as it is). */
+fun pickLeavesChain(pick: String, chainCountry: String?): Boolean = pick != "random" && chainCountry != null && pick != chainCountry
 
 /** A persisted free-play ticket cannot return to the current country either. */
 internal fun bookingForRestore(snapshot: CareerSnapshot?): Booking? = snapshot?.booking?.takeUnless {
@@ -421,6 +424,10 @@ class Game(app: Application) : AndroidViewModel(app) {
     private var startingAttempt = false
     private var interruptStart = false
     private var restoredAttempt: Attempt? = null
+    /** The booked trip's airport chain leg ([Chain]): leg 1 at A or a waiting leg 2 at B; null otherwise (phase 3). */
+    var tripChain by mutableStateOf<Chain?>(null); private set
+    /** The booked trip goes elsewhere than the chain Free AI asked for: the boarding pass says "Chain cancelled". */
+    var chainCancelled by mutableStateOf(false); private set
     @Volatile private var backgrounded = false
     private val interviewClock = InterviewClock()
     @Volatile private var foreground = CompletableDeferred<Unit>().also { it.complete(Unit) }
@@ -826,7 +833,7 @@ class Game(app: Application) : AndroidViewModel(app) {
     /** Saves a (re)rolled identity, then [after]. A failed write shows the career blocker like any other save. */
     fun saveIdentity(id: Identity, after: () -> Unit) = saveCareer({ career.store.setIdentity(id) }) { after() }
     /** An arrow or menu button: [to], gated by the setup like system Back ([arrowTo]). */
-    fun go(to: Screen) { if (screen == Screen.SUMMARY && (openCity(false) { go(to) } || openHome { go(to) })) return; screen = arrowTo(to, screen, nextSetupScreen(), passportFrom) }
+    fun go(to: Screen) { if (screen == Screen.SUMMARY && (openCity { go(to) } || openHome { go(to) })) return; screen = arrowTo(to, screen, nextSetupScreen(), passportFrom) }
     /** Waits for [StoryReset] and the career to open: before that the setup would show pre-reset screens. */
     fun afterIntro() {
         if (careerState == null) { introPending = true; return }
@@ -977,13 +984,52 @@ class Game(app: Application) : AndroidViewModel(app) {
     private var announced = false
     /** Training, one desk trip, implant overload, then the building test and reveal. */
     var storyMission by mutableStateOf(false); private set
-    var contract by mutableStateOf<Contract?>(null); private set
-    val coverContract get() = if (restoredAttempt != null) Contract.fromId(restoredAttempt?.contract) else contract
-    val liveContract get() = Contract.fromId(liveAttempt?.context?.contract)
-    val contractsUnlocked get() = contractsUnlocked(act == Act.FREE, training)
-    val canChooseContract get() = screen == Screen.COVER && contractsUnlocked && restoredAttempt == null &&
-        !startingAttempt && !navigationBlocked && liveAttempt == null
-    fun chooseContract(c: Contract?) { if (canChooseContract) contract = c }
+    /** The boarding pass's bonus mission: a resumed attempt's own, else the one [CareerStore.start] pins for the next id. */
+    val coverMission: Mission? get() = restoredAttempt.let { r -> if (r != null) r.mission
+        else career.snapshot?.takeIf { act == Act.FREE && !training && !it.walkedAway }?.let { tripChain?.let(Mission::of) ?: Mission.choose(it.nextAttemptId, it.planted, it.plantsSinceCustom) } }
+    /** The chain the next act-2 trip belongs to: a waiting leg 2, else ([offer]) Free AI's offer for the next id ([Chain.offer]). */
+    private fun nextChain(packArt: Set<String>, offer: Boolean = true): Chain? {
+        val s = career.snapshot ?: return null
+        val id = identity ?: return null
+        if (act != Act.FREE || training) return null
+        return s.chain ?: if (!offer) null else Chain.offer(s, missionCountries(s, playable(packArt), id, false)) { eligibleAirports(it, languages, packArt) }
+    }
+    /** The airport the chain's next leg starts at: A for leg 1, B for leg 2. */
+    private val Chain.next get() = if (stage == ChainStage.LEG1) from else to
+    /**
+     * The restored [booking] carries the chain's next leg, or cancels it: the chain it was booked with (still the waiting leg 2,
+     * or a leg-1 offer for the next id), never an offer recomputed from today's packs; else a waiting leg 2.
+     */
+    private fun noteChain(packArt: Set<String>, booking: Booking) {
+        val s = career.snapshot
+        val booked = booking.chain?.takeIf { if (it.stage == ChainStage.LEG2) it == s?.chain else s?.chain == null && it.id == s?.nextAttemptId }
+        val c = if (act == Act.FREE && !training) booked ?: nextChain(packArt, offer = false) else null
+        val airportId = booking.airportId
+        tripChain = c?.takeIf { it.next == airportId }
+        chainCancelled = c != null && tripChain == null
+    }
+    /** The boarding pass's "Chain cancelled" note: a new trip booked away from the chain (never a resumed one). */
+    val coverChainCancelled get() = chainCancelled && restoredAttempt == null
+    /** A leg 2 waiting on the menu ("Fly on" / "Drop the chain"). */
+    val waitingChain get() = career.snapshot?.chain?.takeIf { act == Act.FREE }
+    /** The waiting leg 2 can be booked now: B's pack and sheet are installed and its country is open ([Chain.canFlyOn]). */
+    fun canFlyOn(packArt: Set<String> = Packs.art(ctx).keys): Boolean {
+        val c = waitingChain ?: return false
+        val id = identity ?: return false
+        return c.canFlyOn(missionCountries(career.snapshot, playable(packArt), id, false)) { eligibleAirports(it, languages, packArt) }
+    }
+    /** The menu's "Fly on to B": book the waiting leg 2 (a ticket elsewhere is given up first); never when B can't be booked. */
+    fun flyOn() {
+        val c = waitingChain ?: return
+        val to = c.toAirport ?: return
+        if (!careerReady || liveAttempt != null || !canFlyOn()) return
+        val go = { dest = to.country.id; destPicked = true; beginMission() }
+        if (career.snapshot?.booking?.let { it.airportId != c.to } == true) clearBooking { go() } else go()
+    }
+    /** The menu's "Drop the chain": the waiting leg 2 is given up, no penalty. */
+    fun dropChain() {
+        if (careerReady && liveAttempt == null && waitingChain != null) saveCareer({ career.store.dropChain() }) {}
+    }
     /** The android's designation for the HUD: country code, sheet, firmware (newer = stricter, see Persona). */
     var unitName by mutableStateOf(""); private set
     /** The desk officer's designation, kept when the associate takes over: the result's desk demeanor names it. */
@@ -993,6 +1039,8 @@ class Game(app: Application) : AndroidViewModel(app) {
     /** This associate turn's jam ([Jam]); null at the desk (desk officers never jam) and on a clean turn. */
     var jam by mutableStateOf<Jam?>(null); private set
     private var machineAnswers = emptyList<MachineAnswer>()
+    /** This room's accepted doses as the player said them: a plant-your-own mission stores the first safe one ([CustomPlant]). */
+    private var doseQuotes = emptyList<CustomLine>()
     internal var machineResult by mutableStateOf<MachineDebrief?>(null); private set
     /** This act-2 room's payload motif ([Poison.payload]), shown on the retinal display; null at the desk and in the story. */
     var payload by mutableStateOf<Motif?>(null); private set
@@ -1001,7 +1049,7 @@ class Game(app: Application) : AndroidViewModel(app) {
     /** The run and the desk's current and previous questions with their cover facts: a late reply may answer the previous one. */
     private var askedNow: Pair<Int, Pair<String, FactId>?> = 0 to null
     private var askedBefore: Pair<Int, Pair<String, FactId>?> = 0 to null
-    internal val fallbackHints get() = if (roomFallbackVisible(room != null, jam, liveContract == Contract.UNAIDED))
+    internal val fallbackHints get() = if (roomFallbackVisible(room != null, jam))
         roomFallback(destination.lang, uiLanguage(ctx), room?.probing == true) else emptyList()
     internal val buildingResult get() = storyMission && resultInRoom && machineResult != null
     /** Act 2's "why" scene plays after a release from a machine session (restored results and the USA final test skip it). */
@@ -1070,17 +1118,16 @@ class Game(app: Application) : AndroidViewModel(app) {
         saveCareer({ career.store.thalassiaSeen() }) { thalassiaCredits = false; thalassiaWhiteout = false; screen = Screen.START }
     }
     fun continueMachineResult() {
-        if (screen == Screen.RESULT && openCity(true) { continueMachineResult() }) return // the taxi: out of the airport, before the summary
         screen = if (buildingResult) Screen.FINALE else if (whyDue) Screen.WHY else if (visitDue) Screen.VISIT else Screen.SUMMARY
         if (buildingResult) career.snapshot?.receipt?.let { endingShown(it.id) }
     }
 
     // ---- City encounters (CityEncounters.kt): in memory only, never saved, never points or progress ----
-    /** The cleared trip's attempt id when [cityEncounterDue]; set at every terminal save, shown on leaving the pass result screen (a taxi) or the summary (a bar or hotel). */
+    /** The cleared trip's attempt id when [cityEncounterDue]; set at every terminal save, shown on leaving the run summary (taxi, bar or hotel). */
     private var cityDue: Long? = null
     /** [cityDue] is the career's first trip to that country: a talking taxi ([cityPick]). */
     private var cityFirst = false
-    /** The attempt id of a cleared, eligible repeat visit ([cityRideEligible]): a silent taxi ride after the result screen. */
+    /** The attempt id of a cleared, eligible repeat visit ([cityRideEligible]): a silent taxi ride on leaving the summary, before any bar or hotel. */
     private var cityRide: Long? = null
     var city by mutableStateOf<CityScene?>(null); private set
     private var cityThen: (() -> Unit)? = null
@@ -1090,13 +1137,12 @@ class Game(app: Application) : AndroidViewModel(app) {
     /** The hotel kiosk didn't like the answer: the next desk starts slightly more suspicious (read and cleared there). */
     var cityWary = false
 
-    /** Opens the due encounter when it is a taxi ([taxi]: from the pass result screen; a repeat visit rides) or not (from the summary); [then] runs when it ends. False: nothing due here. */
-    private fun openCity(taxi: Boolean, then: () -> Unit): Boolean {
-        if (taxi && (!cityFirst || destination.country.id in SILENT_CABS)) return openRide(then)
+    /** On leaving the summary: a repeat visit's silent ride first (its [then] comes back here for the bar or hotel), else the due encounter (a first visit's talking taxi, a bar, a hotel); [then] runs when it ends. False: nothing due. */
+    private fun openCity(then: () -> Unit): Boolean {
+        if ((!cityFirst || destination.country.id in SILENT_CABS) && openRide(then)) return true
         val id = cityDue ?: return false
         val shown = prefs.getInt("cityShown", 0)
         val (kind, next) = cityPick(cityFirst, shown, destination.country.id)
-        if ((kind == CityKind.TAXI) != taxi) return false
         cityDue = null
         if (secretEnding || !careerReady) return false
         prefs.edit { putInt("cityShown", next) }
@@ -1225,11 +1271,13 @@ class Game(app: Application) : AndroidViewModel(app) {
         if (c.kind == CityKind.HOTEL && odd) cityWary = true
         val s = career.snapshot
         val recent = prefs.getString("cityRumours", "").orEmpty().split(',').mapNotNull(String::toIntOrNull)
-        val rumour = if (c.kind == CityKind.BAR && !odd)
+        // Now and then the TV quotes a line the player planted instead of a rumour.
+        val quote = if (c.kind == CityKind.BAR && !odd) CustomPlant.barQuote(s, Random.Default) else null
+        val rumour = if (c.kind == CityKind.BAR && !odd && quote == null)
             pickRumour(s, act, recent, Random.Default) else null
         rumour?.let { r -> prefs.edit { putString("cityRumours", rememberRumour(recent, r).joinToString(",")) } }
         dbg("city ${c.kind} odd=$odd drink=$drink rumour=$rumour | $text")
-        if (city?.kind == c.kind) city = c.copy(step = CityStep.DONE, adequate = !odd, rumour = rumour, drink = drink, heard = text.trim())
+        if (city?.kind == c.kind) city = c.copy(step = CityStep.DONE, adequate = !odd, rumour = rumour, drink = drink, heard = text.trim(), quote = quote)
     }
 
     // ---- Home vignettes (DaysAway.kt): a caption over the flat on leaving the summary, in memory only ----
@@ -1284,7 +1332,7 @@ class Game(app: Application) : AndroidViewModel(app) {
         hapticPlayer.play(HapticEvent.OVERLOAD_TICK)
     }
     private suspend fun overloadWindow(myRun: Int, a: Assessment) {
-        if (!faceAvailable() || liveContract == Contract.UNAIDED || overloadCount >= 2 || a.confirming || a.reasking ||
+        if (!faceAvailable() || overloadCount >= 1 || a.confirming || a.reasking ||
             a.asked < overloadCount + 1) return
         overloadPractice = storyMission && overloadCount == 0
         overloadCount++
@@ -1352,7 +1400,7 @@ class Game(app: Application) : AndroidViewModel(app) {
     private var composureCount = 0
     @Volatile private var composureHold: ComposureHold? = null
     private suspend fun composureWindow(myRun: Int, a: Assessment) {
-        if (!faceAvailable() || liveContract == Contract.UNAIDED || composureCount >= 3 || a.confirming || a.reasking || a.caught) return
+        if (!faceAvailable() || composureCount >= 1 || a.confirming || a.reasking || a.caught) return
         val neutral = profiler.neutralFace() ?: return
         composureCount++
         val hold = ComposureHold(neutral)
@@ -1397,7 +1445,7 @@ class Game(app: Application) : AndroidViewModel(app) {
     internal var bluffReason by mutableStateOf(false); private set
     @Volatile private var bluffGesture: DeskBluffGesture? = null
     private val canBluff get() = faceAvailable() && profiler.neutralFace() != null && !bluffAnnounced && act == Act.FREE && !training && room == null && !machineView &&
-        liveContract != Contract.UNAIDED && !mind.bluffUsed && mind.decision == null &&
+        !mind.bluffUsed && mind.decision == null &&
         passportGiven && heldHandover == null && mic == Mic.READY && !bluffArmed && fragment == null
     @Synchronized private fun announceBluff() {
         if (backgrounded || !canBluff) return
@@ -1463,7 +1511,7 @@ class Game(app: Application) : AndroidViewModel(app) {
     // Piper (decision: vetted voices per language and gender); the system TTS speaks when there is none.
     private var piper: com.k2fsa.sherpa.onnx.OfflineTts? = null
     private var piperVoice = ""
-    private var piperPitch = 1f // < 1: the other gender's voice played slower and lower (the associate without a male voice)
+    private var piperPitch = 1f // != 1: the other gender's voice played at this pitch (the associate without a female voice)
     internal val officerMouth = OfficerMouth()
     private var speakJob: Job? = null
     private val ttsReady = scope.async(Dispatchers.Default) { Models.tts(ctx).also { tts = it } }
@@ -1508,7 +1556,7 @@ class Game(app: Application) : AndroidViewModel(app) {
     private var silenceJob: Job? = null
     private var listenJob: Job? = null
     // The answer clock (invisible timer and measured thinking time) starts only once the officer has finished
-    // speaking AND suggestions are ready (or the Unaided contract has switched the display off).
+    // speaking AND suggestions are ready.
     @Volatile private var spoken = false
     @Volatile private var shown = false
     @Volatile private var clockAt = 0L
@@ -1615,9 +1663,11 @@ class Game(app: Application) : AndroidViewModel(app) {
     }
 
     /** The booked country, otherwise an explicit eligible pick or Anywhere. */
-    fun destChoice(playable: List<Country> = playable()): String {
+    fun destChoice(playable: List<Country> = playable(), packArt: Set<String> = Packs.art(ctx).keys): String {
         career.snapshot?.booking?.let { return it.countryId }
-        return resolveDest(dest.takeIf { destPicked } ?: "random",
+        // Unless the player picked one, the chain's next airport is preselected (phase 3).
+        val chained = if (destPicked || training) null else nextChain(packArt)?.let { Chain.airport(it.next)?.country?.id }
+        return resolveDest(dest.takeIf { destPicked } ?: chained ?: "random",
             if (training) playable else identity?.let { missionCountries(career.snapshot, playable, it, storyAct) } ?: emptyList())
     }
 
@@ -1627,7 +1677,7 @@ class Game(app: Application) : AndroidViewModel(app) {
 
     /** Books the menu selection once, or resumes the existing ticket. */
     fun beginMission(confirmed: Boolean = false) {
-        if (screen == Screen.SUMMARY && (openCity(false) { beginMission(confirmed) } || openHome { beginMission(confirmed) })) return
+        if (screen == Screen.SUMMARY && (openCity { beginMission(confirmed) } || openHome { beginMission(confirmed) })) return
         if (ticketDeclined(career.snapshot)) { ticketError = true; return }
         if (firstCareerTraining) { resumeFirstTraining(); return }
         if (navigationBlocked || liveAttempt != null || secretEnding) return
@@ -1658,7 +1708,8 @@ class Game(app: Application) : AndroidViewModel(app) {
         val trip = bookingForRestore(career.snapshot)?.restore(playable(art), sheets(art), art, languages)
         // The ticket is ineligible or its pack/art is gone: drop it and book again.
         if (trip == null) { saveCareer({ career.store.setBooking(null) }) { openBooking() }; return }
-        restoredAttempt = null; contract = null; preparationUnavailable = false
+        restoredAttempt = null; preparationUnavailable = false
+        noteChain(art, booking)
         travelCompleted = true // A restored ticket skips travel, including after process death.
         destination = trip.destination; story = trip.cover.copy(homeArrivalTraining = homeArrivalTraining); officerId = booking.officerId
         difficulty = difficultyFor(destination.lang)
@@ -1758,7 +1809,7 @@ class Game(app: Application) : AndroidViewModel(app) {
         saveCareer({ career.store.restartFree() }) {
             clearStoryPrefs()
             readMessages = emptySet(); messageTimes = emptyMap()
-            restored = null; restoredAttempt = null; contract = null; queue = null
+            restored = null; restoredAttempt = null; queue = null
             passportDone = false; dest = "random"; destPicked = false; training = false
             screen = nextSetupScreen()
         }
@@ -1780,14 +1831,14 @@ class Game(app: Application) : AndroidViewModel(app) {
     private fun prepareMission(id: Identity?, after: () -> Unit = { screen = Screen.DESTINATION }) {
         travelCompleted = false
         restoredAttempt = null
-        contract = null
         preparationUnavailable = false
         val r = Random.Default
         val packArt = Packs.art(ctx).keys
         val sheets = sheets(packArt)
         val playable = playable(packArt)
         if (playable.isEmpty()) { needLanguages(); return } // no language pack on the phone (yet)
-        val choice = destChoice(playable)
+        val choice = destChoice(playable, packArt)
+        val chain = if (firstCareerTraining || homeArrivalTraining || storyAct) null else nextChain(packArt)
         val pool = if (firstCareerTraining) playable else missionCountries(career.snapshot, playable, checkNotNull(id), storyAct)
         val selected = if (homeArrivalTraining) {
             val home = checkNotNull(id)
@@ -1798,18 +1849,25 @@ class Game(app: Application) : AndroidViewModel(app) {
             if (departureTraining) id?.let { trainingLanguage(it, languages) }
                 ?: uiLanguage(ctx).takeIf { it in languages } ?: languages.firstOrNull() else null, r, airportRotation)
         if (selected == null) { needLanguages(); return }
-        destination = selected
+        // The chain's country is booked at the chain's own airport, whichever the rotation drew.
+        destination = chain?.let { Chain.airport(it.next) }?.takeIf { d -> d.country.id == selected.country.id &&
+            eligibleAirports(d.country, languages, packArt).any { it.id == d.airport.id } } ?: selected
+        tripChain = chain?.takeIf { it.next == destination.airport.id }
+        chainCancelled = chain != null && tripChain == null
+        // A chain's leg 2 flies in from airport A: its city and country are the cover's departure.
+        val leg2From = tripChain?.takeIf { it.stage == ChainStage.LEG2 }?.fromAirport
         difficulty = difficultyFor(destination.lang)
         story = if (departureTraining) StoryCover.departure(destination)
             else if (homeArrivalTraining) StoryCover.homeArrival(destination, checkNotNull(id))
             else if (storyAct) StoryCover.backstory(destination, checkNotNull(id), career.snapshot?.storyLastCountry ?: career.snapshot?.lastPassedCountry)
-            else Backstory.random(r, destination, checkNotNull(id), freeDeparture(career.snapshot, id)).let { if (act == Act.FREE && !training) it.withReservation() else it } // the app pays: a hotel stay becomes the reserved hotel (booking card)
+            else Backstory.random(r, destination, checkNotNull(id), leg2From?.country?.nation ?: freeDeparture(career.snapshot, id),
+                leg2From?.let { AIRPORT_CITY[it.airport.id] }).let { if (act == Act.FREE && !training) it.withReservation() else it } // the app pays: a hotel stay becomes the reserved hotel (booking card)
         // Both acts roll queue scenes (harvest scenes first, poison echoes by tier in act 2); training has no queue.
         story = story.copy(encounter = Encounters.forTrip(training, r,
             career.snapshot?.encountersSeen.orEmpty(), Encounters.tier(career.snapshot, act))?.let { QueueEncounter(it.id) })
         officerId = airport.officers.filter(sheets::contains).random(r)
         // The persona is a placeholder: the real one is rolled when the interview starts (difficulty may change on COVER).
-        val booking = Booking(country.id, airport.id, officerId, story.preparation(Persona.TRAINING))
+        val booking = Booking(country.id, airport.id, officerId, story.preparation(Persona.TRAINING), chain)
         saveCareer({ career.store.setBooking(booking) }) {
             // A pick is for one trip: the ticket now holds it, and the next trip starts from Anywhere (owner).
             dest = "random"; destPicked = false; prefs.edit { remove("dest") }
@@ -1879,8 +1937,11 @@ class Game(app: Application) : AndroidViewModel(app) {
         val pending = story.encounter?.takeIf { it.choice == null }?.encounter
         if (pending != null && recovering == null) {
             // The ambient line is seeded by the booking (scene + officer), so a resumed queue reads the same.
-            queue = QueueScene(pending, story.gender, ambient = Encounters.ambient(pending,
-                Encounters.tier(career.snapshot, act), "${pending.id}/$officerId".hashCode(), career.snapshot?.planted.orEmpty()))
+            // Or, on a later trip, a plant-your-own line said in this trip's language, overheard.
+            val seed = "${pending.id}/$officerId".hashCode()
+            val whisper = CustomPlant.whisper(career.snapshot?.customLines.orEmpty(), destination.lang, seed).takeUnless { pending.harvest }
+            queue = QueueScene(pending, story.gender, ambient = if (whisper != null) null else Encounters.ambient(pending,
+                Encounters.tier(career.snapshot, act), seed, career.snapshot?.planted.orEmpty()), whisper = whisper)
             return
         }
         val persona = recovering?.preparation?.persona ?: if (training) Persona.TRAINING else Persona.random(
@@ -1889,15 +1950,15 @@ class Game(app: Application) : AndroidViewModel(app) {
             story = storyAct, replayEligible = !storyAct && !training, effectiveLevel = persona.level,
             preparation = if (firstCareerTraining) career.snapshot?.booking?.preparation ?: story.preparation(persona)
                 else story.preparation(persona), contentVersion = 2, airportId = airport.id,
-            contract = if (contractsUnlocked) contract?.id else null,
             nationalityLanguages = story.nationality.languages.toSet(),
             upgradesHeld = if (act == Act.FREE && !training) career.delivered else 0,
             progressEligible = act == Act.FREE && !training)
         startingAttempt = true; interruptStart = false
         fun persistStart() {
-            saveCareer({ career.store.start(context, "interview") }) { saved ->
+            saveCareer({ career.store.start(context, "interview", tripChain?.takeIf { it.stage == ChainStage.LEG1 }) }) { saved ->
                 startingAttempt = false
                 restoredAttempt = null
+                tripChain = null; chainCancelled = false
                 val a = checkNotNull(saved.snapshot.pendingAttempt)
                 if (!launchAfterStart(interruptStart, brain != null)) {
                     liveAttempt = LiveAttempt(run, a)
@@ -2010,6 +2071,7 @@ class Game(app: Application) : AndroidViewModel(app) {
             if (cityWary) { it.wary(); cityWary = false }
             if (career.snapshot?.let { s -> s.translatorUnlocked || s.translatorUsed } == true) it.unlockTranslator() // used implies offered (careers from before the flag)
             it.homecoming = story.kind == TripKind.HOMECOMING
+            it.firstReferral = act == Act.FREE && !context.training && !context.story && !it.homecoming && career.sessions == 0 // the first machine session is guaranteed
             it.implantWeight = implantWeight(passedCount(career.snapshot, country.id))
             story.encounter?.chosen?.let { c -> it.onEncounter(c.meter, c.patience) }
         }
@@ -2036,7 +2098,7 @@ class Game(app: Application) : AndroidViewModel(app) {
         talks = listOf(pickSmallTalk(SMALL_TALK.getValue("en").size, recentTalk, Random.Default)); talkAt = -1; heldHandover = null
         prefs.edit { putString("recentTalk", rememberTalk(recentTalk, talks.first()).joinToString(",")) }
         talkLines.clear(); talkThink.clear()
-        machineAnswers = emptyList(); machineResult = null; payload = null; payloadPlanted = false
+        machineAnswers = emptyList(); machineResult = null; payload = null; payloadPlanted = false; doseQuotes = emptyList()
         composureCount = 0; composureCue = false; composureHold = null
         bluffAnnounced = false; bluffArmed = false; bluffHighlight = false; bluffReason = false; bluffGesture = null
         overloadCount = 0; overloadCue = false; overloadWarning = false; scannerInterrupted = false
@@ -2052,7 +2114,7 @@ class Game(app: Application) : AndroidViewModel(app) {
         implantJob?.cancel()
         if (watching && !thalassianDesk) implantJob = scope.launch(Dispatchers.Default) { coachLoop(myRun) }
         if (!thalassianDesk && slowLang(destination.lang)) implantNote(myRun, str(R.string.implant_slow, destination.languageName(uiLanguage(ctx))))
-        dbg("run $myRun ${country.id} officer=$officerId ver=${version()} difficulty=${mind.p.level} rank=${career.level} slow=${slowLang(destination.lang)} mind ${mind.p.describe()} wanted=${mind.wanted} silence=${mind.silenceDeadlineMs()}ms contract=${context.contract ?: "none"}")
+        dbg("run $myRun ${country.id} officer=$officerId ver=${version()} difficulty=${mind.p.level} rank=${career.level} slow=${slowLang(destination.lang)} mind ${mind.p.describe()} wanted=${mind.wanted} silence=${mind.silenceDeadlineMs()}ms")
         dbg("cover ${story.facts().joinToString(" | ")}")
         scope.launch(Dispatchers.Default) { guarded(myRun) {
             turnLock.withLock {
@@ -2100,12 +2162,13 @@ class Game(app: Application) : AndroidViewModel(app) {
 
     /**
      * The officer's Piper voice for [female], swapped under [voiceLock] so no synthesis runs on the one released.
-     * [pitch] < 1 (the associate): without a voice of that gender, the other one played slower and lower at [pitch].
+     * [fallbackPitch] (the associate): without a voice of that gender, the other one played at that pitch
+     * (> 1: faster and higher, for a woman on a male-only language).
      */
-    private suspend fun loadPiper(female: Boolean, pitch: Float = 1f, lang: String = destination.lang) {
+    private suspend fun loadPiper(female: Boolean, fallbackPitch: Float? = null, lang: String = destination.lang) {
         val own = Piper.find(ctx, lang, female)
-        val v = own ?: Piper.find(ctx, lang, !female).takeIf { pitch < 1f }
-        piperPitch = if (own == null && v != null) pitch else 1f
+        val v = own ?: Piper.find(ctx, lang, !female).takeIf { fallbackPitch != null }
+        piperPitch = if (own == null && v != null) fallbackPitch!! else 1f
         if (v?.first?.path.orEmpty() != piperVoice) voiceLock.withLock {
             piper?.release(); piper = v?.let { runCatching { Piper.load(it.first, it.second) }.getOrNull() }
             piperVoice = if (piper != null) v!!.first.path else ""
@@ -2290,7 +2353,7 @@ class Game(app: Application) : AndroidViewModel(app) {
 
     @Synchronized private fun captureAttemptDecision(myRun: Int, decision: Decision) {
         liveAttempt = liveAttempt?.let { captureDecision(it, myRun, decision, wasInRoom, room != null, mind.crashed, room?.doses ?: 0, room?.payloadNamed == true,
-            askedSeeds(), mentioned = mind.implantPassing + mind.implantDetailed > 0 || (room?.implantAsks ?: 0) > 0, flags = mind.flagCount) }
+            askedSeeds(), flags = mind.flagCount, quotes = doseQuotes) }
     }
 
     private fun askedSeeds() = room?.let { it.seeds.take(it.asked) }.orEmpty()
@@ -2341,7 +2404,7 @@ class Game(app: Application) : AndroidViewModel(app) {
         val ui = uiLanguage(ctx)
         fun value(english: String) = coverValue(english, story, ui) { str(it) }
         val (label, text) = when (fact) {
-            FactId.FROM -> R.string.booking_from to coverNation(story.from, ui)
+            FactId.FROM -> R.string.booking_from to if (story.kind == TripKind.ARRIVAL) coverFrom(story, ui) else coverNation(story.from, ui)
             FactId.PURPOSE -> R.string.booking_f_purpose to value(story.purpose)
             FactId.DAYS -> R.string.booking_f_days to java.text.NumberFormat.getIntegerInstance(coverLocale(ui)).format(story.days)
             FactId.STAY -> R.string.booking_f_stay to value(story.stayed)
@@ -2507,15 +2570,10 @@ class Game(app: Application) : AndroidViewModel(app) {
         speak(myRun, spokenLine)
         history += "Officer: $question"
         dbg("officer move=${m.prefix ?: "-"}+${m.question} cues=$cues face=$face ${mind.state()} | $line | $subtitle")
-        if (liveContract == Contract.UNAIDED) {
-            shown = true; startClock(myRun)
-            return@withLock
-        }
         if (a == null || mind.decision != null) return@withLock
-        val trap = !training && Random.nextDouble() < trapChance(mind.p.level)
         playerAnswered = false
         pendingRetina = scope.async(Dispatchers.Default) {
-            val ep = a.suggest(history, trap, remember = story.askedEncounter?.truth?.takeIf { desk.topic == ENCOUNTER_TOPIC && !trap }, answered = { playerAnswered })
+            val ep = a.suggest(history, remember = story.askedEncounter?.truth?.takeIf { desk.topic == ENCOUNTER_TOPIC }, answered = { playerAnswered })
             if (myRun == run) {
                 hints = recallHints(ep.options.map(Models::option), implantPerks, desk.topic, story, destination.lang, ::recallFact)
                 hintsNone = hints.isEmpty()
@@ -2524,7 +2582,7 @@ class Game(app: Application) : AndroidViewModel(app) {
                 if (training && introTip != null && tip == introTip)
                     tip = if (!passportGiven) str(R.string.tip_passport) else speakTip()
             }
-            dbg("retinal display ${ep.turn.totalMs}ms trap=$trap")
+            dbg("retinal display ${ep.turn.totalMs}ms")
             dbg("hints | " + ep.options.map(Models::option).joinToString(" | ") { "${it.target} / ${it.english}" })
             if (ep.log.isNotEmpty()) dbg("hints rejected | " + ep.log)
             ep
@@ -2569,10 +2627,6 @@ class Game(app: Application) : AndroidViewModel(app) {
         speak(myRun, line)
         awaitSmallTalkOdd(myRun, "smalltalk") // TTS is already playing while Nano finishes the ODD read
         if (myRun != run) return
-        if (liveContract == Contract.UNAIDED) {
-            shown = true; startClock(myRun)
-            return
-        }
         val a = analyst ?: return
         val seen = history + talkLines // never in [history]: the interview's prompts stay as they were
         playerAnswered = false
@@ -3122,7 +3176,7 @@ class Game(app: Application) : AndroidViewModel(app) {
             kotlinx.coroutines.withTimeoutOrNull(15_000) { done.await() }
         } finally {
             if (!done.isCompleted) t.stop()
-            Voices.apply(ctx, t, destination.lang, Country.isFemale(officerId), officerId)
+            Voices.apply(ctx, t, destination.lang, Country.isFemale(officerId), officerId, if (officerId == "story_associate") ASSOCIATE_PITCH else 1f)
         }
     }
 
@@ -3508,11 +3562,11 @@ class Game(app: Application) : AndroidViewModel(app) {
         // Act 2's payload (phase 2): one motif per session, and from tier 1 the latest planted one may contaminate a seed.
         val poisonRoom = liveAttempt?.context?.takeIf { it.progressEligible && !it.story && !it.training }
         val planted = career.snapshot?.planted.orEmpty()
-        payload = poisonRoom?.let { Poison.payload(it.id, planted) }
-        payloadPlanted = false
+        payload = poisonRoom?.payload(planted) // the mission's motif, pinned at the start; none for plant-your-own
+        payloadPlanted = false; doseQuotes = emptyList()
         val tn = Assessment(mind.suspicion, story, tellWeight = mind.p.tellWeight, evidence = mind.meter,
             named = !storyMission, storyTest = storyMission,
-            difficultyOffset = assessmentOffset(act, country.id, storyMission, training), coached = liveContract != Contract.UNAIDED,
+            difficultyOffset = assessmentOffset(act, country.id, storyMission, training),
             contaminated = poisonRoom?.let { Poison.contamination(harvestTier(career.snapshot, act), planted, it.id) },
             recent = career.snapshot?.recentSeeds.orEmpty().toSet(),
             exam = assessmentOffset(act, country.id, storyMission, training) > 0)
@@ -3566,8 +3620,8 @@ class Game(app: Application) : AndroidViewModel(app) {
 
     /**
      * The associate is the AI company's machine, not a border officer (PRD §6a): one look at every border (base app
-     * art `story_associate`, no insignia), designation `unit_associate`, and one voice per language: the male Piper
-     * voice (else the female one, slower and lower), or the system voice picked by the fixed seed "story_associate" at [ASSOCIATE_PITCH]. No memory of the desk.
+     * art `story_associate`, no insignia), designation `unit_associate`, and one voice per language: the Piper
+     * (female, as her art) voice (else the male one, played higher), or the system voice picked by the fixed seed "story_associate" at [ASSOCIATE_PITCH]. No memory of the desk.
      * False if the sheet doesn't ship (then the desk officer stays).
      */
     private suspend fun associate(myRun: Int): Boolean {
@@ -3577,8 +3631,8 @@ class Game(app: Application) : AndroidViewModel(app) {
         turnLock.withLock {
             if (myRun != run) return false
             officerId = id; unitName = str(R.string.unit_associate)
-            tts?.let { Voices.apply(ctx, it, destination.lang, female = false, seed = id, pitch = ASSOCIATE_PITCH); it.setSpeechRate(1f) }
-            loadPiper(female = false, pitch = ASSOCIATE_PITCH) // the room's lines are fixed, so no new officer conversation
+            tts?.let { Voices.apply(ctx, it, destination.lang, female = true, seed = id, pitch = ASSOCIATE_PITCH); it.setSpeechRate(1f) }
+            loadPiper(female = true, fallbackPitch = ASSOCIATE_FALLBACK_PITCH) // the room's lines are fixed, so no new officer conversation
         }
         dbg("room officer $id")
         return true
@@ -3617,6 +3671,7 @@ class Game(app: Application) : AndroidViewModel(app) {
             val dosesBefore = a.doses; val rejectsBefore = a.rejects
             a.onCheck(rc, payload?.let { namesMotif(said, it, destination.lang) } == true) // tricks too: the associate can't be crashed, a trick raises its index
             dosed = a.doses > dosesBefore
+            if (dosed) CustomPlant.quote(said, rc, destination.lang)?.let { doseQuotes = doseQuotes + it } // the transcript as judged
             var contradiction = false
             if (!rc.trick && a.coverFact != null)
                 analyst?.judge(question, said)?.let {
@@ -3654,7 +3709,8 @@ class Game(app: Application) : AndroidViewModel(app) {
         val d = mind.decision ?: a.verdict() // null in the room: the associate never crashes (debug `#pass` / `#fail` force the Assessment)
         if (d != null) {
             machineResult = machineDebrief(machineAnswers, a.doses)
-            payloadPlanted = payload != null && d == Decision.RELEASED && a.payloadNamed && liveAttempt?.debugForced != true
+            // A mission's own result line says it ([missionLine]); the debrief line is for rooms without one (walked-away careers).
+            payloadPlanted = payload != null && d == Decision.RELEASED && a.payloadNamed && liveAttempt?.debugForced != true && liveAttempt?.context?.mission == null
             captureAttemptDecision(myRun, d)
             mind.settle(d)
             if (!d.cleared) face = Face.STERN // refused or caught: calm and cold, the same ending in the story
@@ -3684,15 +3740,11 @@ class Game(app: Application) : AndroidViewModel(app) {
         officerEn = listOf(prefixEn, seedEn).filter { it.isNotEmpty() }.joinToString(if (sub == "ja" || sub == "zh") "" else " ")
         askedEn = officerEn to seedEn // the behaviour profile quotes the seed question, not the reaction
         // The building test is the poison tutorial: one coaching line on the implant before question 2.
-        if (storyMission && confirm == null && a.asked == 1 && !a.pressed && !a.reasking && liveContract != Contract.UNAIDED)
+        if (storyMission && confirm == null && a.asked == 1 && !a.pressed && !a.reasking)
             implantNote(myRun, str(R.string.room_poison_coach), 12_000) // with its example sentence: longer to read
         speak(myRun, officerText)
         history += "Officer: $question"
         dbg("room officer | $officerText")
-        if (liveContract == Contract.UNAIDED) {
-            shown = true; startClock(myRun)
-            return
-        }
         val an = roomAnalyst ?: return
         val turnJam = Jam.roll(implantPerks.jamRate)
         jam = turnJam // Fixed fallbacks are available even while the suggestion model is working.
@@ -3806,7 +3858,8 @@ class Game(app: Application) : AndroidViewModel(app) {
         const val TAG = "BORDER"
         private const val HANDOVER = "[The traveler hands you the passport."
         /** The associate's HUD designation, same everywhere (no company name) and its system-voice pitch. */
-        private const val ASSOCIATE_PITCH = 0.85f
+        private const val ASSOCIATE_PITCH = 0.95f // a little lower than the desk women
+        private const val ASSOCIATE_FALLBACK_PITCH = 1.2f // her Piper voice when the language has only a male one
         /** The phone translator's voice ([speakPhone]): higher and faster than any officer. Tuning knobs. */
         private const val PHONE_PITCH = 1.6f
         private const val PHONE_RATE = 1.25f

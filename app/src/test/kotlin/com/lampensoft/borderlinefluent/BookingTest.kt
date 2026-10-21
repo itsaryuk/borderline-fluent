@@ -211,14 +211,14 @@ class RefusalClosureTest {
 }
 
 class RefusalClosureReducerTest {
-    private fun run(s: CareerSnapshot, country: String, refuse: Boolean, flags: Int = 2): CareerSnapshot {
+    private fun run(s: CareerSnapshot, country: String, refuse: Boolean, flags: Int = REFUSAL_FLAGS): CareerSnapshot {
         val a = attempt(id = s.nextAttemptId, country = country)
         val started = s.copy(pendingAttempt = a.copy(status = AttemptStatus.STARTED), nextAttemptId = a.id + 1)
         return reduceReplayResult(started, if (refuse) deskPass(a).copy(deskDecision = Decision.REFUSED, deskFlags = flags) else deskPass(a)).snapshot
     }
-    @Test fun singleFlagOrPatienceRefusalDoesNotCloseButTwoFlagsDo() {
-        for (flags in 0..1) assertTrue(run(CareerSnapshot(act = Act.FREE), "fr", true, flags).closed.isEmpty())
-        assertEquals(mapOf("fr" to 2), run(CareerSnapshot(act = Act.FREE), "fr", true, 2).closed)
+    @Test fun fewerThanThreeFlagsDoNotCloseButThreeDo() {
+        for (flags in 0..2) assertTrue(run(CareerSnapshot(act = Act.FREE), "fr", true, flags).closed.isEmpty())
+        assertEquals(mapOf("fr" to 2), run(CareerSnapshot(act = Act.FREE), "fr", true, 3).closed)
     }
     @Test fun captureCopiesTheDeskFlagsOnce() {
         val live = LiveAttempt(1, attempt())

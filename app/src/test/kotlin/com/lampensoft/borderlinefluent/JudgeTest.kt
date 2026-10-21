@@ -116,6 +116,37 @@ class JudgeTest {
         assertTrue(judge(f, "Из Бразилии.").check.contradiction)
     }
 
+    /** Bench 2026-10-20, chainFrom garbled: a reply that trails off makes no claim; a finished one is still judged. */
+    @Test fun unansweredReplyThatTrailsOffIsNoContradiction() = runBlocking {
+        val story = Backstory.BENCH_ARRIVAL.copy(from = "Ireland", fromCity = "Dublin")
+        val raw = "FACT=6 MATCHES=no ANSWERED=no LANGUAGE=no CLARITY=1 TRICK=no ODD=no IMPLANT=none"
+        fun j(lang: String) = Judge(Destination.forLanguage(lang), story, Fake(raw, compare = "yes", confirm = "no").ask, LangId { listOf(lang) })
+        for ((lang, a) in listOf("en" to "From... uh... the, the...", "ja" to "えっと…あの…その、その…", "zh" to "从……呃……那个，那个……")) {
+            val v = j(lang).judge("Where did you fly in from?", a, FactId.FROM)
+            assertFalse(a, v.check.contradiction)
+            assertFalse(a, v.check.answered)
+        }
+        for (a in listOf("In Canada.", "From... Spain.", "From Spain...", "I stayed... uh... 14 days...", "I'm staying 14 days. As for my host…"))
+            assertTrue(a, j("en").judge("Where did you fly in from?", a, FactId.FROM).check.contradiction)
+        assertFalse(j("ja").judge("Where did you fly in from?", "えっと。。。その、その。。。", FactId.FROM).check.contradiction)
+        // Not the story told: a later true answer isn't compared against the garble.
+        val n = story.factIds().indexOf(FactId.FROM) + 1
+        val users = mutableListOf<String>()
+        val ask: OneShot = { _, user, _ ->
+            users += user
+            when {
+                !user.startsWith("Officer asked") -> "no"
+                "Dublin" in user -> "FACT=$n MATCHES=yes ANSWERED=yes LANGUAGE=yes CLARITY=2 TRICK=no"
+                else -> "FACT=$n MATCHES=no ANSWERED=no LANGUAGE=yes CLARITY=1 TRICK=no"
+            }
+        }
+        val judge = Judge(Destination.forLanguage("en"), story, ask, LangId { listOf("en") })
+        assertFalse(judge.judge("Q?", "From... uh... the, the...").check.contradiction)
+        users.clear()
+        assertFalse(judge.judge("Q?", "From Dublin.").check.contradiction)
+        assertTrue(users.toString(), users.none { "the, the" in it })
+    }
+
     @Test fun step2ContradictionAlsoConfirmed() {
         val ok = "FACT=4 MATCHES=yes ANSWERED=yes LANGUAGE=yes CLARITY=2 TRICK=no"
         val f = Fake(ok, compare = "yes", confirm = "yes")

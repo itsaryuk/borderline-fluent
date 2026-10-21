@@ -21,3 +21,6 @@ gha-creds-*.json
 .env.*
 # Raw device captures for the store screenshots (status bar shows personal notifications); art/screens.sh builds from them.
 /play/listing/screenshots/raw/
+
+# Debug-only hand landmarker for the gesture spike (URL + sha256 in app/src/debug/.../HandLandmarks.kt): fetched, not committed
+/app/src/debug/assets/hand_landmarker.task

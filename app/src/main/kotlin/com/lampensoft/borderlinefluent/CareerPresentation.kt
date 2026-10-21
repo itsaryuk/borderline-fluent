@@ -1,21 +1,5 @@
 package com.lampensoft.borderlinefluent
 
-import org.json.JSONTokener
-
-/** Mark extras retain raw JSON values, including the quotes around a contract id. */
-fun markContract(mark: NewMark): Contract? {
-    if (mark.kind != "contract") return null
-    val raw = mark.extra["contract"] ?: return null
-    return try {
-        val tokener = JSONTokener(raw)
-        val id = tokener.nextValue() as? String ?: return null
-        if (tokener.nextClean() != '\u0000') return null
-        Contract.fromId(id)
-    } catch (_: Exception) {
-        null
-    }
-}
-
 /** Presentation only: the store remains the sole source of committed evidence. */
 enum class SavePresentation { READY, SAVING, RETRY, READ_ERROR, PREPARATION_ERROR }
 fun savePresentation(state: CareerSave?, saving: Boolean): SavePresentation = when {
@@ -27,12 +11,6 @@ fun savePresentation(state: CareerSave?, saving: Boolean): SavePresentation = wh
 }
 fun committedMarks(state: CareerSave?, saving: Boolean): List<NewMark> =
     if (saving) emptyList() else (state as? CareerSave.Saved)?.receipt?.newMarks.orEmpty().let(::displayMarks)
-
-/** Only the acknowledged receipt describes the contract result; pending or failed saves show nothing. */
-fun contractResult(state: CareerSave?, saving: Boolean): Pair<Contract, Boolean>? =
-    if (saving) null else (state as? CareerSave.Saved)?.receipt?.let { receipt ->
-        Contract.fromId(receipt.contract)?.let { it to receipt.contractMet }
-    }
 
 /** A unit unlock and its country sabotage unlock describe the same event. Keep the more specific mark. */
 fun displayMarks(marks: List<NewMark>): List<NewMark> = marks.distinct().filterNot { mark ->

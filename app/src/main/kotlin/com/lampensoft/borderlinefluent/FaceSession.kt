@@ -83,6 +83,9 @@ internal class FaceSession<I, F>(
         disposed = true; attached = false; camera++; changeEpoch(); finishIfDrained()
     }
     @Synchronized fun ownsCamera(token: Long) = current(token)
+    /** A live interview with the camera on, at a passport desk or in the machine room (no scanner overlay or test
+     * room required): the debug hand spike's gate. */
+    @Synchronized fun desk(token: Long) = current(token) && gate.run != null && gate.interview && gate.watching && !gate.obscured
     private fun current(token: Long) = !disposed && attached && camera == token
 
     @Synchronized fun frame(token: Long, input: I?, info: Frame, close: () -> Unit) {

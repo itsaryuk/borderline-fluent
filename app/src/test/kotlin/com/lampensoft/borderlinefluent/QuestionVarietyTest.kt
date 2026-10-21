@@ -16,9 +16,11 @@ class QuestionVarietyTest {
         for ((level, variants) in TN_PROBE_VARIANTS.withIndex()) for (v in variants) assertEquals(v, level, probeLevel(v))
         for (v in TN_PROBE_UNNAMED) assertEquals(0, probeLevel(v))
         assertEquals(-1, probeLevel(TN_QUESTIONS.first().second)); assertEquals(-1, probeLevel(null))
-        val heard = (0..200).flatMap { Assessment(0.5, Backstory.BENCH, Random(it), evidence = 1.0).seeds.filter(::isProbe) }.toSet()
+        // One probe a room, at the level the evidence reaches: every level from 0.1, 0.35, 0.6 and 0.85.
+        fun evidence(i: Int) = i % 4 / 4.0 + 0.1
+        val heard = (0..200).flatMap { Assessment(0.5, Backstory.BENCH, Random(it), evidence = evidence(it)).seeds.filter(::isProbe) }.toSet()
         assertEquals(TN_PROBE_VARIANTS.flatten().toSet(), heard)
-        val story = (0..200).flatMap { Assessment(0.5, Backstory.BENCH, Random(it), evidence = 1.0, named = false, storyTest = true).seeds.filter(::isProbe) }.toSet()
+        val story = (0..200).flatMap { Assessment(0.5, Backstory.BENCH, Random(it), evidence = evidence(it), named = false, storyTest = true).seeds.filter(::isProbe) }.toSet()
         assertEquals(TN_PROBE_UNNAMED.toSet() + TN_PROBE_VARIANTS.drop(1).flatten(), story)
         for (lang in TN_LOCAL.keys + "en") assertTrue(story.none { "Free AI" in Assessment.local(it, Backstory.BENCH, lang)!! })
     }
@@ -40,7 +42,7 @@ class QuestionVarietyTest {
             val a = Assessment(0.5, Backstory.BENCH, Random(s), evidence = 0.0, recent = recent)
             assertTrue(a.seeds.first() in absurd)
             assertEquals(1, a.seeds.count { it in TN_PROBE_VARIANTS[0] })
-            assertEquals(8, a.seeds.size)
+            assertEquals(4, a.seeds.size)
         }
     }
 

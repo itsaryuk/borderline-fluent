@@ -57,12 +57,12 @@ class ComposureBluffTest {
     }
     @Test fun composureReplacesCalmAndCapsAtThree() {
         val a = Assessment(0.0, Backstory.BENCH)
-        a.onTells(emptyList(), 0.0); assertEquals(25.0, a.index, 0.0)
+        a.onTells(emptyList(), 0.0); assertEquals(37.5, a.index, 0.0)
         repeat(3) { assertTrue(a.composure()) }
-        assertFalse(a.composure()); assertEquals(22.0, a.index, 0.0)
+        assertFalse(a.composure()); assertEquals(34.5, a.index, 0.0)
         val unaided = Assessment(0.0, Backstory.BENCH, coached = false)
         assertFalse(unaided.composure())
-        unaided.onTells(emptyList(), 0.0); assertEquals(24.0, unaided.index, 0.0)
+        unaided.onTells(emptyList(), 0.0); assertEquals(36.5, unaided.index, 0.0)
     }
     @Test fun composureCannotRemoveContentRefusalOrAdmission() {
         val a = Assessment(0.0, Backstory.BENCH)

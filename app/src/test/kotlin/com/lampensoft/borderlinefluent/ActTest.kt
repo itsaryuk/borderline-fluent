@@ -453,7 +453,8 @@ class ActTest {
         "tagline_after", "start_blurb_after", // post-story copy (LEFT and FREE)
         "epi_free", // E6 final turn: the only Act 1 reveal
         "msg_marek_back", // Marek's reply after a walked-away player writes to him: act FREE only
-        "contract_title", // contracts are available only in act FREE
+        "mission_title", // the bonus mission card and result line: act FREE only 
+        "sender_free_ai", // the sender of the plant-your-own message: act FREE only 
         "restart_free", // the "Bad, bad tester." restart: act 2 only, after the secret ending
     )
 
@@ -498,6 +499,7 @@ class ActTest {
         if (Language.all.toString().contains("Free AI")) hits += "Language fixed lines"
         assertEquals(emptyList<String>(), hits)
         // The scan finds the name where act 2 still uses it.
-        assertTrue(Assessment(1.0, s, evidence = 1.0, named = true).seeds.any { Assessment.local(it, s, "de").orEmpty().contains("Free AI") })
+        // The mildest probe names it.
+        assertTrue(Assessment(1.0, s, evidence = 0.0, named = true).seeds.any { Assessment.local(it, s, "de").orEmpty().contains("Free AI") })
     }
 }

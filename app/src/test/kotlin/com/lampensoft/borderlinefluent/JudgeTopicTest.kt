@@ -234,22 +234,25 @@ class JudgeTopicTest {
     @Test fun secondLookFindingAnotherFactJudgesThatFact() = runBlocking {
         // "At a hotel near the wedding venue." to "How long will you stay?": a true STAY answer, no topic confirm.
         val hotel = "At a hotel near the wedding venue."
-        // A true STAY answer, then the DAYS compare: a hotel says nothing about a length.
-        val fine = Fake(pinned(FactId.DAYS), pinned(FactId.STAY, matches = true), "no")
+        // A true STAY answer: a hotel says nothing about a length, so no DAYS compare at all, and it counts as answered
+        // (owner 2026-10-19: a consistent answer about another fact is fine, not a dodge).
+        val fine = Fake(pinned(FactId.DAYS), pinned(FactId.STAY, matches = true))
         val f = judge(fine, arrival).judge("How long will you stay?", hotel, FactId.DAYS)
         assertFalse(f.check.contradiction)
+        assertTrue(f.check.answered)
         assertEquals(FactId.STAY, f.fact)
-        assertEquals(listOf(compareQuestion(arrival.fact(FactId.DAYS, "en"), null, hotel)), fine.users.drop(2))
-        // A compare that flags it still needs the confirm's "no".
-        val both = Fake(pinned(FactId.DAYS), pinned(FactId.STAY, matches = true), "yes", "yes")
-        assertFalse(judge(both, arrival).judge("How long will you stay?", hotel, FactId.DAYS).check.contradiction)
-        assertEquals(4, both.users.size)
-        // "Seven days." to "Who invited you?": a true DAYS answer.
-        val seven = Fake(pinned(FactId.HOST), pinned(FactId.DAYS, matches = true), "no")
+        assertEquals(2, fine.users.size)
+        // "Seven days." to "Who invited you?": a true DAYS answer; Nano's HOST compare and confirm used to make it a lie.
+        val seven = Fake(pinned(FactId.HOST), pinned(FactId.DAYS, matches = true), "yes", "no")
         val s = judge(seven, arrival).judge("Who invited you?", "Seven days.", FactId.HOST)
         assertFalse(s.check.contradiction)
+        assertTrue(s.check.answered)
         assertEquals(FactId.DAYS, s.fact)
-        assertEquals(3, seven.users.size)
+        assertEquals(2, seven.users.size)
+        // Pinned on DAYS by step 1 itself (no second look): the same.
+        val direct = Fake(pinned(FactId.DAYS, matches = true), "yes", "no")
+        assertFalse(judge(direct, arrival).judge("Who invited you?", "Seven days.", FactId.HOST).check.contradiction)
+        assertEquals(1, direct.users.size)
         // A wrong stay the look calls answered is still a lie, of the stay: step 3 confirms against STAY, never the asked DAYS.
         val wrong = Fake(pinned(FactId.DAYS), pinned(FactId.STAY, answered = true), "no")
         val w = judge(wrong, arrival).judge("How long will you stay?", "With a friend.", FactId.DAYS)
@@ -264,7 +267,7 @@ class JudgeTopicTest {
         assertEquals(FactId.STAY, n.fact)
         assertEquals(listOf(compareQuestion(stay, null, "With a friend."), confirmQuestion(stay, null, "With a friend.")), noisy.users.drop(2))
         // A STAY compare "no" drops the pin like no fact at all; the asked DAYS goes straight to its confirm (here "yes":
-        // a friend says nothing against a length).
+        // a friend says nothing against a length). Step 1's DAYS flag is not a consistent STAY pin: the confirm runs.
         val cleared = Fake(pinned(FactId.DAYS), pinned(FactId.STAY), "no", "yes")
         val c = judge(cleared, arrival).judge("How long will you stay?", "With a friend.", FactId.DAYS)
         assertFalse(c.check.contradiction)

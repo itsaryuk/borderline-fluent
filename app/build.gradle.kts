@@ -42,12 +42,19 @@ android {
         }
     }
     buildTypes {
+        // R8 (Play flags unobfuscated DEX). sherpa-onnx's JNI reads classes by name: keep rules in proguard-rules.pro.
+        // `-Pminify` turns the same on for debug, to prove the rules on the phone without the 1 GB release bundle. R8
+        // neither renames nor optimizes a debuggable build, so that debug is not debuggable: no run-as, no SAY/FACE hooks.
+        val minify: com.android.build.api.dsl.ApplicationBuildType.() -> Unit = {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
         release {
-            // ponytail: no R8 yet. sherpa-onnx and ML Kit reach Kotlin classes from JNI or by reflection; turn
-            // minify on only with keep rules proven by a release build on the phone.
-            isMinifyEnabled = false
+            minify()
             signingConfig = signingConfigs.findByName("upload") ?: signingConfigs.getByName("debug")
         }
+        if (providers.gradleProperty("minify").isPresent) debug { minify(); isDebuggable = false }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -79,6 +86,9 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.6.2")
     implementation("androidx.camera:camera-view:1.6.2")
     implementation("com.google.mlkit:face-detection:16.1.7")
+    // Debug-only hand-gesture measurement spike (HandLandmarks.kt in src/debug): never in a release. Pulls Google's
+    // Clearcut uploader like ML Kit; the main manifest already strips its backend and INTERNET.
+    debugImplementation("com.google.mediapipe:tasks-vision:1.0.0")
     // Is the answer in the desk's language? Bundled model, on-device, no download (Nano's LANGUAGE flag misread names).
     implementation("com.google.mlkit:language-id:17.0.6")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")

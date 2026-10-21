@@ -332,7 +332,7 @@ data class Country(
         val shipped = all.filter { c -> c.airports.any { Language.isShipped(it.lang) } }
         fun find(id: String): Country? = all.firstOrNull { it.id == id }
         fun of(id: String): Country = requireNotNull(find(id)) { "Unknown country: $id" }
-        private val FEMALE = setOf("de_f1", "fr_f1", "es_f1", "de_x2", "fr_x2", "es_x2")
+        private val FEMALE = setOf("de_f1", "fr_f1", "es_f1", "de_x2", "fr_x2", "es_x2", "story_associate")
         /** Older sheets have explicit ids; newer ones end in m/f. */
         fun isFemale(officer: String) = officer in FEMALE || officer.endsWith("f")
     }

@@ -52,7 +52,9 @@ data class QueueEncounter(val id: String, val choice: Int? = null, val asked: Bo
  * [ambient]: one line appended to the narration on screen only ([Encounters.ambient]); never in the desk's fact.
  */
 data class QueueScene(val encounter: Encounter, private val gender: Gender, val selectedChoice: Int? = null,
-                      val ambient: Map<String, String>? = null) {
+                      val ambient: Map<String, String>? = null,
+                      /** A plant-your-own line someone ahead whispers ([CustomPlant.whisper]); the UI frames it, display only. */
+                      val whisper: String? = null) {
     private fun text(m: Map<String, String>, ui: String) =
         Assessment.fill(m[ui] ?: m.getValue("en"), Backstory.BENCH.copy(gender = gender), ui)
     fun narration(ui: String) = text(encounter.narration, ui) +

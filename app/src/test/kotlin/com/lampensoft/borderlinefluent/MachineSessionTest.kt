@@ -33,11 +33,10 @@ class MachineSessionTest {
         assertEquals(roomFallback("ja", "en"), roomFallback("ja", "nl"))
     }
 
-    @Test fun fallbacksSurviveDestructiveJamsButRespectUnaidedAndTheDesk() {
+    @Test fun fallbacksSurviveDestructiveJamsButNotAtTheDesk() {
         for (jam in listOf(null) + Jam.entries) {
-            assertEquals(jam == Jam.GARBLE || jam == Jam.DROP, roomFallbackVisible(true, jam, false))
-            assertFalse(roomFallbackVisible(false, jam, false))
-            assertFalse(roomFallbackVisible(true, jam, true))
+            assertEquals(jam == Jam.GARBLE || jam == Jam.DROP, roomFallbackVisible(true, jam))
+            assertFalse(roomFallbackVisible(false, jam))
         }
     }
 

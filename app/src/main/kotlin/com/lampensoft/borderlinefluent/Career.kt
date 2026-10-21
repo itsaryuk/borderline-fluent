@@ -14,13 +14,6 @@ fun effectiveLevel(training: Boolean, finaleSeen: Boolean, careerLevel: Int, cho
     else -> chosen.coerceIn(0, 3)
 }
 
-/** Contracts unlock at Agent rank after the finale, outside training. */
-/** Contracts are offered from act 2's first rank (owner, 2026-10-15). */
-fun contractsUnlocked(finaleSeen: Boolean, training: Boolean) = finaleSeen && !training
-
-/** Chance that one retinal display suggestion quietly contradicts the cover at the frozen attempt level. */
-fun trapChance(level: Int) = listOf(0.0, 0.15, 0.25, 0.35)[level.coerceIn(0, 3)]
-
 /** Career statistics and the implant upgrades that set Free AI difficulty. */
 class Career(ctx: Context) {
     private val p = ctx.getSharedPreferences("career", 0)
@@ -48,7 +41,7 @@ class Career(ctx: Context) {
     val broken get() = snapshot?.counters?.broken ?: 0
     val rooms get() = snapshot?.counters?.rooms ?: 0
     val countries: Set<String> get() = snapshot?.countries.orEmpty()
-    /** Granted level: the rank (officer scaling, contracts, points to the next); perks and the build follow [delivered]. */
+    /** Granted level: the rank (officer scaling, points to the next); perks and the build follow [delivered]. */
     val level get() = snapshot?.upgradesGranted ?: 0
     val delivered get() = deliveredUpgrades(snapshot)
     val sessions get() = snapshot?.machineSessions ?: 0

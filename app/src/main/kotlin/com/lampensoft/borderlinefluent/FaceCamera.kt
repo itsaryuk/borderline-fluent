@@ -13,7 +13,7 @@ import androidx.lifecycle.LifecycleOwner
 internal class FaceCamera(context: Context, owner: LifecycleOwner, watch: FaceWatch,
                           surface: Preview.SurfaceProvider) {
     private val token = watch.session.startCamera()
-    private val analysis = watch.analysis(token)
+    private val analysis = watch.analysis(token, context)
     private val preview = Preview.Builder().setResolutionSelector(ResolutionSelector.Builder().setResolutionStrategy(
         ResolutionStrategy(FaceWatch.ANALYSIS, ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER)).build())
         .build().also { it.setSurfaceProvider(surface) }

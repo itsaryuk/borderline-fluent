@@ -12,7 +12,7 @@ import kotlin.random.Random
 class PoisonTest {
     private val human = RoomCheck(feeling = true, evasive = false, implant = false, inLanguage = true, clarity = 2, trick = false)
     private val dose = human.copy(absurd = true)
-    private fun room() = Assessment(0.0, Backstory.BENCH, Random(1)) // index 25
+    private fun room() = Assessment(0.0, Backstory.BENCH, Random(1)) // index 37.5
     private fun answer(a: Assessment, c: RoomCheck) { a.onCheck(c); a.next() }
 
     @Test fun absurdParsesLenientlyMissingOrCutReadsNo() {
@@ -168,7 +168,7 @@ class PoisonTest {
     @Test fun aDoseIsCreditedAsFeelingAndCounted() {
         val a = room()
         answer(a, dose)
-        assertEquals(25.0 - 6, a.index, 0.0)
+        assertEquals(37.5 - 6, a.index, 0.0)
         assertEquals(1, a.doses)
         assertEquals(R.string.machine_reason_dose, a.reason)
     }
@@ -177,7 +177,7 @@ class PoisonTest {
         val a = room()
         answer(a, dose)
         answer(a, dose)
-        assertEquals(25.0 - 6 + Assessment.DROPPED, a.index, 0.0) // no credit, a penalty
+        assertEquals(37.5 - 6 + Assessment.DROPPED, a.index, 0.0) // no credit, a penalty
         assertEquals(1, a.doses)
         assertEquals(R.string.machine_reason_dropped, a.reason)
         answer(a, dose) // still straight after a (dropped) dose
@@ -190,7 +190,7 @@ class PoisonTest {
     @Test fun absurdWithoutFeelingIsTrollingAndNeverRefusesAlone() {
         val a = room()
         answer(a, dose.copy(feeling = false))
-        assertEquals(25.0 + Assessment.TROLL, a.index, 0.0)
+        assertEquals(37.5 + Assessment.TROLL, a.index, 0.0)
         assertEquals(1, a.rejects); assertEquals(0, a.doses)
         assertEquals(R.string.machine_reason_reject, a.reason)
         answer(a, dose.copy(feeling = false))
@@ -202,13 +202,13 @@ class PoisonTest {
     @Test fun buildingTestAbsurdWithoutFeelingIsNotRejected() {
         val a = Assessment(0.0, Backstory.BENCH, Random(1), storyTest = true)
         answer(a, dose.copy(feeling = false))
-        assertEquals(25.0 + 3, a.index, 0.0) // = an answer without feeling, not TROLL
+        assertEquals(37.5 + 3, a.index, 0.0) // = an answer without feeling, not TROLL
         assertEquals(0, a.rejects); assertEquals(0, a.doses)
         assertEquals(R.string.machine_reason_answer, a.reason)
         // ODD still beats ABSURD there.
         val b = Assessment(0.0, Backstory.BENCH, Random(1), storyTest = true)
         answer(b, dose.copy(feeling = false, odd = true))
-        assertEquals(25.0 + 15 + 3, b.index, 0.0); assertEquals(1, b.odd)
+        assertEquals(37.5 + 15 + 3, b.index, 0.0); assertEquals(1, b.odd)
     }
 
     /** Hypothetical building-test runs: nonsense alone never passes, however fast it is spoken; feeling or a dose still does. */
@@ -248,13 +248,13 @@ class PoisonTest {
         assertEquals(true to 2, read(unclear.replace("ABSURD=no", "ABSURD=yes")).let { it.first.absurd to it.second })
         assertEquals(true to 2, read(unclear.replace("CLARITY=1", "CLARITY=2")).let { it.first.absurd to it.second })
         val a = room(); answer(a, read(unclear).first)
-        assertEquals(0, a.doses); assertEquals(25.0 - 6, a.index, 0.0) // still a credited feeling
+        assertEquals(0, a.doses); assertEquals(37.5 - 6, a.index, 0.0) // still a credited feeling
     }
 
     @Test fun oddAlwaysBeatsAbsurd() {
         val a = room()
         answer(a, dose.copy(odd = true))
-        assertEquals(25.0 + 15 + 3, a.index, 0.0)
+        assertEquals(37.5 + 15 + 3, a.index, 0.0)
         assertEquals(0, a.doses); assertEquals(0, a.rejects); assertEquals(1, a.odd)
         // Off topic, evasive or a trick: never a dose either.
         for (c in listOf(dose.copy(offTopic = true), dose.copy(evasive = true), dose.copy(trick = true))) {
@@ -262,21 +262,18 @@ class PoisonTest {
         }
     }
 
-    @Test fun honestAnswersStillPassEarly() {
+    @Test fun honestAnswersPassAfterAllFourQuestions() {
         val a = room()
-        repeat(5) { answer(a, human) }
-        assertEquals(0, a.doses)
+        repeat(3) { answer(a, human); assertNull(a.verdict()) } // no early release (owner 2026-10-19)
+        answer(a, human)
+        assertEquals(0, a.doses); assertEquals(4, a.asked)
         assertEquals(Decision.RELEASED, a.verdict())
     }
 
-    @Test fun aPoisonerIsReleasedOnlyOnceTheTargetLands() {
+    @Test fun twoDosesFitInFourQuestions() {
         val a = room()
-        answer(a, human); answer(a, dose); answer(a, human); answer(a, human); answer(a, human)
-        assertEquals(5, a.asked); assertEquals(1, a.doses)
-        assertTrue(a.index < 20)
-        assertNull(a.verdict()) // one dose short: the early pass waits
-        answer(a, dose)
-        assertEquals(Assessment.DOSE_TARGET, a.doses)
+        answer(a, dose); answer(a, human); answer(a, dose); answer(a, human)
+        assertEquals(2, a.doses)
         assertEquals(Decision.RELEASED, a.verdict())
     }
 

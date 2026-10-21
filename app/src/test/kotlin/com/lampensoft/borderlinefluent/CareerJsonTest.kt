@@ -85,37 +85,45 @@ class CareerJsonTest {
         assertEquals(3, UPGRADE_THRESHOLDS[2] - decoded(fixture).progressPoints)
     }
 
-    @Test fun v2DisableAwardReceiptAndPendingAttemptMigrateToUnaided() {
-        val a = attempt().copy(contract = "unaided", preparation = preparation())
-        val awarded = reduceReplayResult(pending(a), victory(a)).snapshot.copy(nextAttemptId = 3,
-            pendingAttempt = attempt(2).copy(contract = "unaided", preparation = preparation()))
-        val json = JSONObject(CareerJson.encode(awarded).replace("\"unaided\"", "\"disable\""))
-        assertEquals(2, json.getInt("schemaVersion"))
-        val loaded = decoded(json.toString())
-        assertEquals(awarded, loaded)
-        assertEquals(Contract.UNAIDED, markContract(loaded.receipt!!.newMarks.last()))
-        assertFalse(CareerJson.encode(loaded).contains("\"disable\""))
-    }
+    /** A save written before, with contracts in every place they were stored. */
+    private fun contractSave(status: String) = """{"schemaVersion":2,"contentVersion":3,"counters":{"missions":1,"cleared":1,"streak":1,"best":1,"broken":0,"rooms":1},
+        "countries":["de"],"album":{"historicalCleared":[],"infiltration":{},"sabotage":{},"units":{},"clears":{},
+            "contracts":{"quiet":{"attemptId":1,"countryId":"de","officerId":"de_x1","stage":"assessment","effectiveLevel":2,"loadoutId":null,"contentVersion":2},
+                "disable":{"attemptId":1,"countryId":"de","officerId":"de_x1","stage":"desk","effectiveLevel":2,"loadoutId":null,"contentVersion":2}}},
+        "nextAttemptId":3,"appliedThroughId":1,"progressPoints":4,"machineSessions":2,"upgradesGranted":1,"act":"FREE",
+        "receipt":{"id":1,"outcome":"CLEARED","contract":"disable","contractMet":true,"newMarks":[
+            {"kind":"infiltration","countryId":"de","officerId":null},
+            {"kind":"contract","countryId":"de","officerId":null,"contract":"disable"},
+            {"kind":"contract","countryId":"de","officerId":null,"contract":"retired-one"}]},
+        "pendingAttempt":{"id":2,"countryId":"de","officerId":"de_x1","language":"de","airportId":"fkb",
+            "training":false,"story":false,"replayEligible":true,"effectiveLevel":2,"contentVersion":2,"loadoutId":null,
+            "deskDecision":null,"assessmentDecision":null,"contract":"samples","progressEligible":true,
+            "everBroken":false,"debugForced":false,"status":"$status",
+            "preparation":{"name":"Maria","latin":"Maria","gender":"WOMAN",
+                "photo":{"female":true,"sheet":"travelers_f","tile":4},"countryId":"de",
+                "passportNo":"AB123","born":"2001-04-02","home":"Berlin","job":"nurse","from":"Canada",
+                "city":"Toronto","purpose":"family","days":9,"stayed":"hotel","travelledWith":"alone",
+                "met":"friend","waiting":"partner","stamps":[],"nationality":"de","kind":"HOMECOMING","host":"nobody",
+                "persona":{"patience":0.8,"suspicion":0.2,"strictness":0.7,"tolerance":0.5,"busy":0.3,"level":2}}}}"""
 
-    @Test fun v2UnknownContractInAlbumOrReceiptIsUnreadable() {
-        val a = attempt().copy(contract = "quiet", preparation = preparation())
-        val awarded = reduceReplayResult(pending(a), victory(a)).snapshot
-        for (unknownAlbum in listOf(false, true)) for (unknownReceipt in listOf(false, true)) {
-            if (!unknownAlbum && !unknownReceipt) continue
-            val json = JSONObject(CareerJson.encode(awarded))
-            assertEquals(2, json.getInt("schemaVersion"))
-            if (unknownAlbum) json.getJSONObject("album").getJSONObject("contracts").let { contracts ->
-                contracts.put("future-contract", contracts.getJSONObject("quiet"))
+    @Test fun contractSavesLoadWithTheirContractsDroppedAndNoReward() {
+        for (status in listOf("STARTED", "INTERRUPTED")) {
+            val s = decoded(contractSave(status))
+            assertEquals(4, s.progressPoints)
+            assertEquals(listOf(NewMark("infiltration", "de")), s.receipt!!.newMarks)
+            assertTrue(s.album.extra.isEmpty() && s.receipt!!.extra.isEmpty() && s.pendingAttempt!!.extra.isEmpty())
+            assertEquals(AttemptStatus.valueOf(status), s.pendingAttempt!!.status)
+            val written = CareerJson.encode(s)
+            assertFalse(written, written.contains("contract"))
+            assertEquals(s, decoded(written))
+            if (status == "STARTED") { // the pending attempt settles as any other: no contract mark, no extra point
+                val a = s.pendingAttempt!!
+                val r = reduceReplayResult(s, deskPass(a))
+                assertFalse(r.rejected)
+                assertEquals(emptyList<NewMark>(), r.newMarks.filter { it.kind == "contract" })
+                assertEquals(4, r.snapshot.progressPoints)
+                assertFalse(CareerJson.encode(r.snapshot).contains("contract"))
             }
-            if (unknownReceipt) json.getJSONObject("receipt").let { receipt ->
-                receipt.put("contract", "future-contract")
-                val marks = receipt.getJSONArray("newMarks")
-                marks.getJSONObject(marks.length() - 1).put("contract", "future-contract")
-            }
-            val raw = "  $json  "
-            val read = CareerJson.decode(raw) as CareerRead.Unreadable
-            assertEquals(raw, read.raw)
-            assertNull(read.snapshot)
         }
     }
 
@@ -128,41 +136,17 @@ class CareerJsonTest {
 
     @Test fun obsoleteRetinalTrackingIsDiscarded() {
         for (opened in listOf(false, true)) {
-            val saved = pending(attempt().copy(contract = "unaided", preparation = preparation()))
+            val saved = pending(attempt().copy(preparation = preparation()))
             val json = JSONObject(CareerJson.encode(saved))
             json.getJSONObject("pendingAttempt").put("retinalOpened", opened)
             val loaded = decoded(json.toString())
             assertEquals(saved, loaded)
             assertFalse(JSONObject(CareerJson.encode(loaded)).getJSONObject("pendingAttempt").has("retinalOpened"))
-            assertTrue(reduceReplayResult(loaded, deskPass(loaded.pendingAttempt!!)).receipt!!.contractMet)
         }
     }
 
-    @Test fun contractsRoundTripWithFirstMetadataAndRecordExtras() {
-        val a = attempt().copy(contract = "quiet", preparation = preparation())
-        val awarded = reduceReplayResult(pending(a), victory(a)).snapshot
-        assertEquals(awarded, decoded(CareerJson.encode(awarded)))
-        val meta = awarded.album.contracts.getValue("quiet").copy(extra = mapOf("futureMeta" to "[1,null]"))
-        val s = awarded.copy(nextAttemptId = 3,
-            pendingAttempt = attempt(2).copy(contract = "unaided", preparation = preparation(), extra = mapOf("futureAttempt" to "true")),
-            album = awarded.album.copy(contracts = mapOf("quiet" to meta), extra = mapOf("futureAlbum" to "{}")),
-            receipt = awarded.receipt!!.copy(extra = mapOf("futureReceipt" to "7")))
-        val json = JSONObject(CareerJson.encode(s))
-        assertEquals("unaided", json.getJSONObject("pendingAttempt").getString("contract"))
-        assertEquals("quiet", json.getJSONObject("receipt").getString("contract"))
-        assertTrue(json.getJSONObject("album").getJSONObject("contracts").has("quiet"))
-        val marks = json.getJSONObject("receipt").getJSONArray("newMarks")
-        assertEquals("quiet", marks.getJSONObject(marks.length() - 1).getString("contract"))
-        val loaded = decoded(json.toString())
-        assertEquals(s, loaded)
-        assertFalse(loaded.pendingAttempt!!.extra.containsKey("contract"))
-        assertFalse(loaded.receipt!!.extra.containsKey("contract"))
-        assertFalse(loaded.album.extra.containsKey("contracts"))
-        assertEquals(loaded, decoded(CareerJson.encode(loaded)))
-    }
-
     @Test fun identityExtrasSurviveAndDamagedIdentityDecodesAsNull() {
-        val base = attempt().copy(contract = "quiet", preparation = preparation())
+        val base = attempt().copy(preparation = preparation())
         val snap = reduceReplayResult(pending(base), victory(base)).snapshot
         val id = Identity.roll(kotlin.random.Random(1), Nationality.all.first(), Gender.WOMAN, NameList.FEMALE)
             .copy(extra = mapOf("futureId" to "[1,null]"))
@@ -173,95 +157,6 @@ class CareerJsonTest {
         assertNull(decoded(json.toString()).identity)
         json.put("identity", "garbage")
         assertNull(decoded(json.toString()).identity)
-    }
-
-    @Test fun literalSaveWithoutContractFieldsDefaultsThem() {
-        val raw = """{"schemaVersion":2,"contentVersion":3,"counters":{"missions":1,"cleared":1,"streak":1,"best":1,"broken":0,"rooms":1},
-            "countries":["de"],"album":{"historicalCleared":[],"infiltration":{},"sabotage":{},"units":{}},
-            "nextAttemptId":3,"appliedThroughId":1,
-            "receipt":{"id":1,"outcome":"CLEARED","newMarks":[]},
-            "pendingAttempt":{"id":2,"countryId":"de","officerId":"de_x1","language":"de","airportId":"fkb",
-                "training":false,"story":false,"replayEligible":true,"effectiveLevel":2,"contentVersion":2,
-                "everBroken":false,"debugForced":false,"status":"STARTED",
-                "preparation":{"name":"Maria","latin":"Maria","gender":"WOMAN",
-                    "photo":{"female":true,"sheet":"travelers_f","tile":4},"countryId":"de",
-                    "passportNo":"AB123","born":"2001-04-02","home":"Berlin","job":"nurse","from":"Canada",
-                    "city":"Toronto","purpose":"family","days":9,"stayed":"hotel","travelledWith":"alone",
-                    "met":"friend","waiting":"partner","stamps":[],"nationality":"de","kind":"HOMECOMING","host":"nobody",
-                    "persona":{"patience":0.8,"suspicion":0.2,"strictness":0.7,"tolerance":0.5,"busy":0.3,"level":2}}}}"""
-        val s = decoded(raw)
-        assertNull(s.pendingAttempt!!.contract)
-        assertNull(s.receipt!!.contract)
-        assertTrue(s.album.contracts.isEmpty())
-        val written = JSONObject(CareerJson.encode(s))
-        for (record in listOf("pendingAttempt", "receipt")) {
-            assertTrue(written.getJSONObject(record).has("contract"))
-            assertTrue(written.getJSONObject(record).isNull("contract"))
-        }
-        assertEquals(0, written.getJSONObject("album").getJSONObject("contracts").length())
-        assertEquals(s, decoded(written.toString()))
-    }
-
-    @Test fun malformedAttemptOrReceiptContractsRetainRaw() {
-        val saved = reduceReplayResult(pending(), victory()).snapshot.copy(nextAttemptId = 3,
-            pendingAttempt = attempt(2).copy(preparation = preparation()))
-        for (record in listOf("pendingAttempt", "receipt"))
-            for (bad in listOf<Any>("bogus", "QUIET", "", 1, false, JSONObject(), JSONArray())) {
-                val json = JSONObject(CareerJson.encode(saved))
-                json.getJSONObject(record).put("contract", bad)
-                val raw = "  $json  "
-                val read = CareerJson.decode(raw) as CareerRead.Unreadable
-                assertEquals(raw, read.raw)
-            }
-    }
-
-    @Test fun malformedContractMarksRetainRaw() {
-        val a = attempt().copy(contract = "quiet")
-        val saved = reduceReplayResult(pending(a), victory(a)).snapshot
-        val encoded = CareerJson.encode(saved)
-        assertEquals(saved, decoded(encoded))
-        for (bad in listOf(null, "bogus", "unaided", JSONObject.NULL, 1, false, JSONObject(), JSONArray())) {
-            val json = JSONObject(encoded)
-            val marks = json.getJSONObject("receipt").getJSONArray("newMarks")
-            val mark = marks.getJSONObject(marks.length() - 1)
-            if (bad == null) mark.remove("contract") else mark.put("contract", bad)
-            val raw = "  $json  "
-            val read = CareerJson.decode(raw) as CareerRead.Unreadable
-            assertEquals(raw, read.raw)
-            assertNull(read.snapshot)
-            assertFalse(read.preparationOnly)
-        }
-    }
-
-    @Test fun contractMarkRequiresReceiptContract() {
-        val a = attempt().copy(contract = "quiet")
-        val saved = reduceReplayResult(pending(a), victory(a)).snapshot
-        for (missing in listOf(true, false)) {
-            val json = JSONObject(CareerJson.encode(saved))
-            val receipt = json.getJSONObject("receipt")
-            if (missing) receipt.remove("contract") else receipt.put("contract", JSONObject.NULL)
-            val raw = "  $json  "
-            val read = CareerJson.decode(raw) as CareerRead.Unreadable
-            assertEquals(raw, read.raw)
-        }
-    }
-
-    @Test fun malformedContractCollectionsRetainRaw() {
-        val meta = CareerJson.metaJson(AwardMeta(1, "de", "de_x1", "assessment", 2))
-        val badCollections = listOf<Any>(JSONObject.NULL, JSONArray(), "quiet", true, 1,
-            JSONObject().put("bogus", meta), JSONObject().put("QUIET", meta),
-            JSONObject().put("quiet", JSONObject.NULL), JSONObject().put("quiet", "bad"),
-            JSONObject().put("quiet", JSONObject()),
-            JSONObject().put("quiet", JSONObject(meta.toString()).put("attemptId", 0)),
-            JSONObject().put("unaided", JSONObject(meta.toString()).put("effectiveLevel", "2")))
-        for (bad in badCollections) {
-            val json = JSONObject(CareerJson.encode(CareerSnapshot()))
-            json.getJSONObject("album").put("contracts", bad)
-            val raw = "  $json  "
-            val read = CareerJson.decode(raw) as CareerRead.Unreadable
-            assertEquals(raw, read.raw)
-            assertNull(read.snapshot)
-        }
     }
 
     @Test fun clearsAreOptionalButPresentCountsMustBePositiveIntegers() {

@@ -58,7 +58,7 @@ class OfficerLinesTest {
         val visitTopics = en.keys.filter { ".visit." in it }.map { it.split('.')[1] }.toSet()
         assertEquals(setOf("from", "purpose", "days", "stayed"), visitTopics)
         assertTrue(en.keys.none { it.startsWith("ask.host.visit") })
-        assertTrue(en.keys.all { Regex("""[a-z]+(\.[a-z0-9]+)*\.\d""").matches(it) })
+        assertTrue(en.keys.all { Regex("""[a-z]+(\.[a-z0-9_]+)*\.\d""").matches(it) }) // "_": taint.traffic_cone
         assertTrue(en.keys.none { it.startsWith("confirm") }) // tells re-ask the topic 
         assertEquals(setOf("wronglang.1", "wronglang.2"), en.filterValues { "{language}" in it }.keys)
         assertTrue(en.values.none { "{country}" in it })

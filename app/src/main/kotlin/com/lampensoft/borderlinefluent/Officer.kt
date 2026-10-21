@@ -93,14 +93,14 @@ enum class Decision {
 }
 
 /** A referral is earned at the interest mark, only outside the story and training. */
-const val REFER_AT = 0.45
+const val REFER_AT = 0.35
 fun refers(training: Boolean, storyMission: Boolean, meter: Double) =
     !training && !storyMission && meter >= REFER_AT - 1e-9 // epsilon: 0.30 * 0.7 + 0.24 is 0.4499999…
 
 // Interest, 0..1 per desk interview. Steps scale with strictness (implant steps don't) and are halved at home.
 const val METER_PASSING = 0.24   // a passing implant mention
-const val METER_DETAILED = 0.28  // a detailed one (how it works, boasting); 1.5 × this stays under [REFER_AT]
-/** Each implant mention at a desk weighs less: the first in full, the second half, then nothing (a mention needs a slip, bluff or trick). */
+const val METER_DETAILED = 0.28  // a detailed one (how it works, boasting); one of them stays under [REFER_AT]
+/** Each implant mention at a desk weighs less: the first in full, the second half, then nothing (two mentions refer). */
 val IMPLANT_STEPS = listOf(1.0, 0.5)
 /** Officers of a country grow immune (owner): after this many released machine sessions there ([passedCount]), mentions weigh half. */
 const val IMMUNE_AFTER = 3
@@ -116,7 +116,9 @@ const val METER_HOMECOMING = 0.5 // a citizen coming home: low referral interest
 /** Starting patience (and its cap) × this on the first desk in a language the career hasn't trained ([gentleDesk]). */
 const val GENTLE_PATIENCE = 1.25
 /** A refusal closes the country only when it rests on this many counted flags ([OfficerMind.flagCount]). */
-const val REFUSAL_FLAGS = 2
+const val REFUSAL_FLAGS = 3
+/** Bad answers (contradiction or odd) that refuse the desk at once; the gauge shows this many pips. */
+const val REFUSAL_BAD_ANSWERS = 3
 /** The first desk in an untrained language is gentler. Training desks are patient already. */
 fun gentleDesk(language: String, trained: Set<String>?, training: Boolean) = !training && trained != null && language !in trained
 
@@ -235,7 +237,7 @@ class OfficerMind(val p: Persona, val perks: ImplantPerks = ImplantPerks(), val 
     var dodges = 0; private set
     var odd = 0; private set
     var badAnswers = 0; private set // distinct replies: ODD + contradiction counts once
-    /** Counted flags this attempt (a flagged desk answer that counted, or an odd small-talk answer): a refusal closes the country only on two ([REFUSAL_FLAGS]). */
+    /** Counted flags this attempt (a flagged desk answer that counted, or an odd small-talk answer): a refusal closes the country only on three ([REFUSAL_FLAGS]). */
     var flagCount = 0; private set
     private var reasked = false
 
@@ -329,7 +331,9 @@ class OfficerMind(val p: Persona, val perks: ImplantPerks = ImplantPerks(), val 
     fun enterRoom() { inRoom = true; pauses = 0; decision = null; last = Event.NONE; cues.clear(); integrity = 1.0; trickRun = 0 }
     /** Debug `#pass` / `#fail` at the desk: a pass may still be a referral ([refers]). */
     fun settle(d: Decision) { decision = if (d == Decision.PASS && !inRoom) pass() else d }
-    private fun pass() = if (refers(training, storyMission, meter)) Decision.REFERRAL else Decision.PASS
+    /** Set by the game for the first act-2 desk of a career: a pass there becomes a referral, so everyone meets the machine once. */
+    var firstReferral = false
+    private fun pass() = if (firstReferral || refers(training, storyMission, meter)) Decision.REFERRAL else Decision.PASS
     var passportRefusals = 0; private set
     private var pauses = 0 // free pauses ([onPause]) since the last answer
     /**
@@ -348,10 +352,9 @@ class OfficerMind(val p: Persona, val perks: ImplantPerks = ImplantPerks(), val 
     }
     /** A small-talk answer: engagement, so the free pauses start over; patience and suspicion stay as they are. */
     fun onSmallTalk() { pauses = 0 }
-    /** Baseline speech uses the same five-answer budget, without the trip-answer penalties. */
+    /** Baseline speech: no desk answer used and no trip-answer penalties. */
     fun onSmallTalkAnswer() {
         if (decision != null) return
-        turns++
         onSmallTalk()
         decide()
     }
@@ -359,7 +362,7 @@ class OfficerMind(val p: Persona, val perks: ImplantPerks = ImplantPerks(), val 
     /** Same ODD grounds as the desk, without answer credit, turns or patience cost. */
     fun onSmallTalkOdd() {
         odd++; flagCount++
-        suspicion += 0.12 + 0.12 * p.strictness
+        suspicion += 0.06 + 0.06 * p.strictness
         meterAdd(METER_ODD)
         why += "odd-smalltalk"
         last = Event.DODGE
@@ -385,7 +388,7 @@ class OfficerMind(val p: Persona, val perks: ImplantPerks = ImplantPerks(), val 
         // Pop-psychology tells are weak evidence: together they never add more than the level's cap a run,
         // and alone they never send anyone to secondary (decide() needs grounds).
         add = add.coerceAtMost(p.tellCap - tellSusp)
-        tellSusp += add; suspicion += add
+        tellSusp += add; suspicion += add / 2 // halved (owner, 2026-10-19); the meter keeps the full add
         meterAdd(METER_TELL * add, scaled = false)
         if (seen.isNotEmpty() || absent > 0.6) why += "tells"
         // Poker face pays (owner): a face in view with nothing to read calms the officer a little.
@@ -434,7 +437,7 @@ class OfficerMind(val p: Persona, val perks: ImplantPerks = ImplantPerks(), val 
         if (c.odd) {
             cues += Cue.ODD
             odd++
-            suspicion += 0.12 + 0.12 * p.strictness
+            suspicion += 0.06 + 0.06 * p.strictness
             why += "odd"
         }
         // Off-topic but intelligible speech is a content problem, not an ASR failure.
@@ -458,7 +461,7 @@ class OfficerMind(val p: Persona, val perks: ImplantPerks = ImplantPerks(), val 
         if (!c.inLanguage) {
             cues += Cue.WRONG_LANGUAGE
             patience -= 0.15 + 0.1 * (1 - p.tolerance)
-            suspicion += 0.08
+            suspicion += 0.04
         } else if (unclearNow) {
             cues += Cue.UNCLEAR
             why += "unclear"
@@ -472,10 +475,10 @@ class OfficerMind(val p: Persona, val perks: ImplantPerks = ImplantPerks(), val 
             // Press before punishing: the first slip on a fact only raises an eyebrow.
             if (fact !in pressed) {
                 why += "contra-first fact=$fact"
-                suspicion += 0.08 + 0.04 * pressed.size // a slip on every fact is a pattern: each new one weighs more
+                suspicion += 0.04 + 0.02 * pressed.size // a slip on every fact is a pattern: each new one weighs more
             } else {
                 why += "contra fact=$fact"
-                suspicion += 0.15 + 0.2 * p.strictness
+                suspicion += 0.075 + 0.1 * p.strictness
             }
             pressed += fact
         }
@@ -512,12 +515,12 @@ class OfficerMind(val p: Persona, val perks: ImplantPerks = ImplantPerks(), val 
             crashed -> if (training || storyMission) Decision.PASS else Decision.REFERRAL
             patience <= 0.0 || suspicion >= 1.0 && grounds -> Decision.REFUSED
             // Danger at the limit is refused whatever the interest (PRD §6d): the gauge's bad-answer count is the cutoff.
-            badAnswers >= 2 -> Decision.REFUSED
+            badAnswers >= REFUSAL_BAD_ANSWERS -> Decision.REFUSED
             goodFacts.size >= wanted -> pass()
             // Out of questions: interest can refer even without enough facts to pass.
             turns >= maxAnswers -> when {
                 refers(training, storyMission, meter) -> Decision.REFERRAL
-                goodFacts.size >= 2 -> Decision.PASS
+                goodFacts.size >= 2 -> pass()
                 else -> Decision.REFUSED
             }
             else -> null

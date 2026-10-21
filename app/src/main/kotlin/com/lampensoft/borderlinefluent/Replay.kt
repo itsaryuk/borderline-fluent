@@ -19,7 +19,6 @@ data class Album(
     val infiltration: Map<String, AwardMeta> = emptyMap(), val sabotage: Map<String, AwardMeta> = emptyMap(),
     val units: Map<String, Map<String, AwardMeta>> = emptyMap(), val extra: CareerFields = emptyMap(),
     val clears: Map<String, Int> = emptyMap(),
-    val contracts: Map<String, AwardMeta> = emptyMap(),
 )
 
 data class Preparation(
@@ -31,26 +30,14 @@ data class Preparation(
     /** The trip's queue encounter (PRD §6b); restored with the cover so a resume asks the same. */
     val encounter: QueueEncounter? = null,
     val homeArrivalTraining: Boolean = false,
+    /** [Backstory.fromCity]; "" on older saves. */
+    val fromCity: String = "",
 )
 
 enum class AttemptStatus { STARTED, INTERRUPTED }
 enum class TerminalKind { DECIDED, ABANDONED, INTERRUPTED }
 /** CLEARED: a desk pass or an associate's release. INCOMPLETE: no final decision yet (a referral awaits the associate). */
 enum class ReplayOutcome { CLEARED, REFUSED, CAUGHT, ABANDONED, INTERRUPTED, INCOMPLETE }
-
-enum class Contract(val id: String) {
-    QUIET("quiet"), UNAIDED("unaided"), UNMENTIONED("unmentioned"), SAMPLES("samples");
-    companion object { fun fromId(id: String?) = entries.firstOrNull { it.id == id } }
-}
-
-/** [mentioned]: the implant came up at the desk or in the room; [doses], [released]: the machine room's ([AttemptResult]). */
-fun evaluateContract(c: Contract, outcome: ReplayOutcome, everBroken: Boolean, mentioned: Boolean = false, doses: Int = 0,
-                     released: Boolean = false) = outcome == ReplayOutcome.CLEARED && when (c) {
-    Contract.QUIET -> !everBroken
-    Contract.UNAIDED -> true
-    Contract.UNMENTIONED -> released && !mentioned
-    Contract.SAMPLES -> released && doses >= 2
-}
 
 data class Attempt(
     val id: Long, val countryId: String, val officerId: String, val language: String,
@@ -60,12 +47,13 @@ data class Attempt(
     val everBroken: Boolean = false, val debugForced: Boolean = false,
     val preparation: Preparation? = null, val status: AttemptStatus = AttemptStatus.STARTED,
     val extra: CareerFields = emptyMap(), val airportId: String? = null,
-    val contract: String? = null,
     /** Frozen at start, including on a retry after a passport edit. Null on pre-progression attempts. */
     val nationalityLanguages: Set<String>? = null,
     val upgradesHeld: Int = 0,
     /** Act FREE eligibility frozen at start and retained on resume/retry. */
     val progressEligible: Boolean = false,
+    /** Free AI's bonus mission ([Mission.due]), pinned at the start and kept on resume. */
+    val mission: Mission? = null,
 )
 
 data class AttemptResult(
@@ -78,21 +66,22 @@ data class AttemptResult(
     val payloadNamed: Boolean = false,
     /** The machine room's seeds the player was asked ([Assessment.seeds]), remembered whatever the outcome. */
     val seeds: List<String> = emptyList(),
-    /** The implant came up at the desk or in the room ([Contract.UNMENTIONED]). */
-    val implantMentioned: Boolean = false,
     /** Counted flagged answers at the desk ([OfficerMind.flagCount]); a desk refusal closes the country only from [REFUSAL_FLAGS]. In memory only. */
     val deskFlags: Int = 0,
     /** The phone translator answered for the player in this attempt; saved as [CareerSnapshot.translatorUsed] with the result. */
     val translatorUsed: Boolean = false,
     /** The officer offered the phone translator in this attempt; saved as [CareerSnapshot.translatorUnlocked] with the result. */
     val translatorOffered: Boolean = false,
+    /** The room's accepted doses as the player said them, in the trip language: a plant-your-own candidate ([CustomPlant.safe]). In memory only. */
+    val quotes: List<CustomLine> = emptyList(),
 )
 
 data class NewMark(val kind: String, val countryId: String, val officerId: String? = null, val extra: CareerFields = emptyMap())
 data class Receipt(val id: Long, val outcome: ReplayOutcome, val newMarks: List<NewMark>, val extra: CareerFields = emptyMap(),
-    val contract: String? = null, val contractMet: Boolean = false,
     /** A decided attempt whose ending (RESULT or FINALE) was not shown yet; null once shown, and on older receipts. */
-    val ending: Ending? = null)
+    val ending: Ending? = null,
+    /** The attempt's mission ([Attempt.mission]) and whether it was planted ([BONUS_POINTS] earned). */
+    val mission: Mission? = null, val bonus: Boolean = false)
 
 /** What a restart needs to show a decided attempt's result when the app died during the ending beat. */
 /** [usaReleased]: this decided attempt is the career's first released free-act USA machine session (the ending; [usaCompletionPending]). */
@@ -222,6 +211,12 @@ data class CareerSnapshot(
     val flagged: Map<String, Int> = emptyMap(),
     /** Country id -> trips elsewhere before a refused country reopens ([closedFlights]); act 2 only. */
     val closed: Map<String, Int> = emptyMap(),
+    /** Plant-your-own sentences, oldest first, at most [CustomPlant.KEEP] ([CustomPlant.remember]); the world quotes them. */
+    val customLines: List<CustomLine> = emptyList(),
+    /** Named-motif missions pinned since the last plant-your-own one ([Mission.customDue]). */
+    val plantsSinceCustom: Int = 0,
+    /** An airport chain whose leg 1 got through, waiting for leg 2 ([Chain], always LEG2 here); null otherwise. */
+    val chain: Chain? = null,
 )
 
 /**
@@ -233,8 +228,12 @@ enum class Act { STORY, LEFT, FREE }
 /** The career's act: the saved one, else a pre-act career that saw the finale (the old `finale` pref) is in act 2. */
 fun actOf(saved: Act?, legacyFinale: Boolean) = saved ?: if (legacyFinale) Act.FREE else Act.STORY
 
-/** A booked flight: the destination, the officer and the rolled cover (its persona is rolled again at the start). */
-data class Booking(val countryId: String, val airportId: String, val officerId: String, val preparation: Preparation) {
+/**
+ * A booked flight: the destination, the officer and the rolled cover (its persona is rolled again at the start). [chain]: the
+ * chain the booking was made for (a leg-1 offer or the waiting leg 2), so a restart shows the same one ([Chain.offer] depends
+ * on the installed packs); null for none and on older saves.
+ */
+data class Booking(val countryId: String, val airportId: String, val officerId: String, val preparation: Preparation, val chain: Chain? = null) {
     /** The booking as an interrupted attempt, so [recoverPreparation] checks packs and art exactly as for a resume. */
     fun restore(playable: List<Country>, sheets: Set<String>, art: Set<String>, enabledLanguages: Set<String>): Recovery? {
         val lang = Country.find(countryId)?.airports?.find { it.id == airportId }?.lang ?: return null
@@ -296,14 +295,6 @@ fun reduceReplayResult(snapshot: CareerSnapshot, event: AttemptResult, legacyFin
         album = album.copy(infiltration = album.infiltration + (a.countryId to meta))
         marks += NewMark("infiltration", a.countryId)
     }
-    val contract = Contract.fromId(a.contract)
-    val contractMet = contract != null && eligible && evaluateContract(contract, outcome, broken,
-        event.implantMentioned, event.doses, event.assessmentDecision == Decision.RELEASED)
-    if (contract != null && contractMet && contract.id !in album.contracts) {
-        album = album.copy(contracts = album.contracts + (contract.id to meta))
-        // CareerFields contains raw JSON; these fixed IDs need only string quoting.
-        marks += NewMark("contract", a.countryId, extra = mapOf("contract" to "\"${contract.id}\""))
-    }
     val storyClear = count && passed && a.story && !a.debugForced && !event.debugForced
     // Free play counts a clear only when the machine session released the traveller; the desk waving you through is not one. Story clears stay as they were.
     if ((eligible && event.assessmentDecision == Decision.RELEASED) || storyClear)
@@ -314,21 +305,31 @@ fun reduceReplayResult(snapshot: CareerSnapshot, event: AttemptResult, legacyFin
     val survived = a.progressEligible && !a.story && !a.training && !a.debugForced && !event.debugForced &&
         event.terminalKind == TerminalKind.DECIDED && event.assessmentDecision == Decision.RELEASED
     val usaReleased = eligible && survived && free && a.countryId == "usa" && !snapshot.usaCompleted
+    val custom = a.mission?.kind == MissionKind.CUSTOM
+    val plantedNow = survived && event.doses >= 1 && event.payloadNamed && !custom
+    // The bonus is the mission's: earned here once per attempt, inside the receipt's idempotence boundary.
+    // Plant your own: any accepted dose; its first sentence that passes the safety filter is quoted from now on.
+    // A chain pays once, at its end: leg 1 only gets through.
+    val bonus = a.mission != null && !a.mission.firstLeg && survived && event.doses >= 1 && (custom || event.payloadNamed)
+    // Leg 1 got through (pass or release): leg 2 waits on the career. Leg 1 failing, or leg 2 either way, ends the chain.
+    val chain = if (a.mission?.kind != MissionKind.CHAIN) snapshot.chain
+        else a.mission.chain?.takeIf { it.stage == ChainStage.LEG1 && passed }?.copy(stage = ChainStage.LEG2)
+    val quote = if (bonus && custom) event.quotes.firstNotNullOfOrNull { CustomPlant.safe(it.text, it.lang) } else null
     val ending = if (outcome == ReplayOutcome.ABANDONED) null else
         Ending(a.language, event.assessmentDecision != null, broken, a.preparation?.kind == TripKind.HOMECOMING, a.story && !a.training, usaReleased)
     val receipt = Receipt(a.id, outcome, marks.toList(),
         extra = if (a.training && act1StageOf(snapshot) in setOf(Act1Stage.TRAINING, Act1Stage.DEPARTURE))
             a.preparation?.fatherChoice?.let { mapOf("act1FatherChoice" to it.toString()) } ?: emptyMap()
-        else emptyMap(), contract = a.contract, contractMet = contractMet, ending = ending)
+        else emptyMap(), ending = ending, mission = a.mission, bonus = bonus)
     // The story's finale ends act 1 in the same write: LEFT until the player chooses "Keep helping"; act 2 stays FREE.
     val finale = ending != null && reachesFinale(ending.decision(outcome), ending.story, ending.room)
     val act = if (finale && actOf(snapshot.act, legacyFinale = legacyFinale) != Act.FREE) Act.LEFT else snapshot.act
     val trained = if (survived) snapshot.trainedLanguages + a.language else snapshot.trainedLanguages
     val doses = if (survived) Math.addExact(snapshot.doses, event.doses) else snapshot.doses
-    // The room's payload is recomputed from the attempt id over the same planted list the room saw (only this write changes it).
-    val planted = if (survived && event.doses >= 1 && event.payloadNamed) Poison.plant(snapshot.planted, Poison.payload(a.id, snapshot.planted)) else snapshot.planted
+    // The room's payload: the pinned mission's motif ([Attempt.payload]; older attempts recompute it over the planted list the room saw).
+    val planted = a.payload(snapshot.planted)?.takeIf { plantedNow }?.let { Poison.plant(snapshot.planted, it) } ?: snapshot.planted
     val points = if (survived) Math.addExact(snapshot.progressPoints,
-        sessionPoints(a.language !in snapshot.trainedLanguages)) else snapshot.progressPoints
+        sessionPoints(a.language !in snapshot.trainedLanguages) + if (bonus) BONUS_POINTS else 0) else snapshot.progressPoints
     val recent = rememberSeeds(snapshot.recentSeeds, event.seeds)
     val sessions = if (survived) Math.addExact(snapshot.machineSessions, 1) else snapshot.machineSessions
     val upgrades = maxOf(snapshot.upgradesGranted, if (survived && !snapshot.walkedAway) upgradesFor(points) else 0) // the one place levels are granted
@@ -358,7 +359,7 @@ fun reduceReplayResult(snapshot: CareerSnapshot, event: AttemptResult, legacyFin
             else -> Act1Stage.PLANE
         } else snapshot.act1Stage,
         booking = if (completedTraining) null else snapshot.booking,
-        trainedLanguages = trained, machineSessions = sessions, progressPoints = points, doses = doses, planted = planted, recentSeeds = recent, upgradesGranted = upgrades, usaUnlocked = snapshot.usaUnlocked,
+        trainedLanguages = trained, machineSessions = sessions, progressPoints = points, doses = doses, planted = planted, chain = chain, customLines = quote?.let { CustomPlant.remember(snapshot.customLines, it) } ?: snapshot.customLines, recentSeeds = recent, upgradesGranted = upgrades, usaUnlocked = snapshot.usaUnlocked,
         // Only the home training pass places a new career at home, even with a fallback language pack.
         flagged = flags, closed = closed, lastPassedCountry = home ?: if (passed && !firstTraining && !a.debugForced && !event.debugForced) a.countryId else snapshot.lastPassedCountry,
         lastPassedAirport = if (home != null) null else if (passed && !firstTraining && !a.debugForced && !event.debugForced) a.airportId else snapshot.lastPassedAirport,
@@ -375,7 +376,7 @@ fun daysFor(a: Attempt, outcome: ReplayOutcome): Int = when {
     else -> 0
 }
 
-/** A refusal closes the country only when the machine room refused, or the desk refusal rested on two counted flags (a single flag or a patience refusal doesn't). */
+/** A refusal closes the country only when the machine room refused, or the desk refusal rested on [REFUSAL_FLAGS] (three) counted flags (a single flag or a patience refusal doesn't). */
 fun refusalCloses(event: AttemptResult) = event.assessmentDecision != null || event.deskFlags >= REFUSAL_FLAGS
 
 /** How many recent room seeds the career keeps: about two rooms. */
@@ -395,10 +396,11 @@ data class LiveAttempt(
     val payloadNamed: Boolean = false,
     /** The seeds the room asked, copied with [doses]. */
     val seeds: List<String> = emptyList(),
-    val implantMentioned: Boolean = false,
     val deskFlags: Int = 0,
     val translatorUsed: Boolean = false,
     val translatorOffered: Boolean = false,
+    /** The room's accepted doses as said, copied with [doses]. */
+    val quotes: List<CustomLine> = emptyList(),
 )
 enum class AbortCause { ABANDONED, INTERRUPTED }
 fun abortKind(cause: AbortCause) = if (cause == AbortCause.ABANDONED) TerminalKind.ABANDONED else TerminalKind.INTERRUPTED
@@ -409,13 +411,14 @@ fun canStartAttempt(ready: Boolean, brainAvailable: Boolean, saving: Boolean, pe
 
 /** [crashed]: the unit that decided was talked into a crash ([OfficerMind.crashed]). */
 fun captureDecision(live: LiveAttempt, run: Int, decision: Decision, inRoom: Boolean, roomReady: Boolean, crashed: Boolean = false, doses: Int = 0,
-                    payloadNamed: Boolean = false, seeds: List<String> = emptyList(), mentioned: Boolean = false, flags: Int = 0): LiveAttempt {
+                    payloadNamed: Boolean = false, seeds: List<String> = emptyList(), flags: Int = 0, quotes: List<CustomLine> = emptyList()): LiveAttempt {
     if (live.run != run || live.terminal != null || inRoom && !roomReady) return live
     return if (inRoom) live.copy(assessment = live.assessment ?: decision, everBroken = live.everBroken || crashed,
         doses = if (live.assessment == null) doses else live.doses,
         payloadNamed = if (live.assessment == null) payloadNamed else live.payloadNamed,
-        seeds = if (live.assessment == null) seeds else live.seeds, implantMentioned = live.implantMentioned || mentioned)
-    else live.copy(desk = live.desk ?: decision, everBroken = live.everBroken || crashed, implantMentioned = live.implantMentioned || mentioned,
+        seeds = if (live.assessment == null) seeds else live.seeds,
+        quotes = if (live.assessment == null) quotes else live.quotes)
+    else live.copy(desk = live.desk ?: decision, everBroken = live.everBroken || crashed,
         deskFlags = if (live.desk == null) flags else live.deskFlags)
 }
 /** An aborted room still remembers the questions it asked: [seeds] fill a live attempt that has none yet. */
@@ -426,13 +429,13 @@ fun forceAttempt(live: LiveAttempt, run: Int): LiveAttempt =
 fun finishAttempt(live: LiveAttempt, run: Int, kind: TerminalKind): LiveAttempt {
     if (live.run != run || live.terminal != null) return live
     val event = AttemptResult(live.context.id, live.context, live.desk, live.assessment, live.everBroken, kind, live.debugForced, live.doses, live.payloadNamed, live.seeds,
-        live.implantMentioned, live.deskFlags, live.translatorUsed, live.translatorOffered)
+        live.deskFlags, live.translatorUsed, live.translatorOffered, live.quotes)
     if (classifyReplayOutcome(event) == ReplayOutcome.INCOMPLETE) return live
     return live.copy(terminal = event)
 }
 
 fun Backstory.preparation(persona: Persona) = Preparation(name, latin, gender, photo, country.id, passportNo,
-    born, home, job, from, city, purpose, days, stayed, travelledWith, met, waiting, stamps.toList(), nationality.id, kind, host, persona, encounter = encounter, homeArrivalTraining = homeArrivalTraining)
+    born, home, job, from, city, purpose, days, stayed, travelledWith, met, waiting, stamps.toList(), nationality.id, kind, host, persona, encounter = encounter, homeArrivalTraining = homeArrivalTraining, fromCity = fromCity)
 /** The fixed Thalassia departure borrows a language-pack desk, independent of nationality. */
 private fun Preparation.isTrainingDeparture() = persona == Persona.TRAINING && encounter == null &&
     Itinerary(kind, purpose, days, stayed, host, met, from, city, travelledWith, waiting, stamps) ==
@@ -444,7 +447,7 @@ fun Preparation.restore(country: Country, lang: String): Backstory? {
     if (country.id != countryId || nationality == null) return null
     if (kind != Itinerary.kindFor(country, nationality) && !isTrainingDeparture()) return null
     return Backstory(name, latin, gender, photo, country, passportNo, born, home, job, from, city, purpose, days,
-        stayed, travelledWith, met, waiting, stamps.toList(), lang, nationality, kind, host, encounter = encounter, homeArrivalTraining = homeArrivalTraining)
+        stayed, travelledWith, met, waiting, stamps.toList(), lang, nationality, kind, host, encounter = encounter, homeArrivalTraining = homeArrivalTraining, fromCity = fromCity)
 }
 
 fun launchAfterStart(interrupted: Boolean, brainAvailable: Boolean) = !interrupted && brainAvailable

@@ -13,12 +13,15 @@ enum class TripKind { ARRIVAL, HOMECOMING }
 data class Itinerary(
     val kind: TripKind, val purpose: String, val days: Int, val hotel: String, val host: String, val met: String,
     val from: String?, val city: String, val travelledWith: String, val waiting: String, val stamps: List<String>,
+    /** An ARRIVAL's departure city in [from] (Latin), when the trip has one (an airport chain's leg 2); else null. */
+    val fromCity: String? = null,
 ) {
     companion object {
         fun kindFor(destination: Country, nationality: Nationality) =
             if (destination.id == nationality.id) TripKind.HOMECOMING else TripKind.ARRIVAL
 
-        fun roll(r: Random, destination: Destination, identity: Identity, departure: String? = null): Itinerary {
+        /** [departureCity]: the city (Latin) in [departure] the flight leaves from (a chain's airport A); a flight home then stayed there. */
+        fun roll(r: Random, destination: Destination, identity: Identity, departure: String? = null, departureCity: String? = null): Itinerary {
             val country = destination.country
             val kind = kindFor(country, identity.nationality)
             // Real countries only: their names have well-known translations the answer check can match.
@@ -28,8 +31,10 @@ data class Itinerary(
             val place = if (kind == TripKind.HOMECOMING) checkNotNull(from) else country.nation
             val trip = TRIPS.random(r)
             val days = r.nextInt(3, 15)
-            val city = if (kind == TripKind.HOMECOMING) TRIP_CITIES.getValue(place).random(r).substringBefore('|') else AIRPORT_CITY.getValue(destination.airport.id)
-            return Itinerary(kind, trip.purpose, days, staysIn(trip, city).random(r), trip.host, "", from, city, "", "", emptyList())
+            val leaving = departureCity?.takeIf { departure != null && from == departure }
+            val city = if (kind == TripKind.HOMECOMING) leaving ?: TRIP_CITIES.getValue(place).random(r).substringBefore('|') else AIRPORT_CITY.getValue(destination.airport.id)
+            return Itinerary(kind, trip.purpose, days, staysIn(trip, city).random(r), trip.host, "", from, city, "", "", emptyList(),
+                leaving.takeIf { kind == TripKind.ARRIVAL })
         }
     }
 }

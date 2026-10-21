@@ -27,8 +27,14 @@ typealias OneShot = suspend (system: String, user: String, maxTokens: Int) -> St
 class Judge(private val country: Destination, private val story: Backstory, private val ask: OneShot, private val langId: LangId = MlLangId) {
     private val earlier = mutableMapOf<FactId, String>() // the traveler's last consistent statement per cover fact
 
+    /**
+     * Benefit of the doubt (owner 2026-10-19): a contradiction needs a clear conflict with the cover. Decided in code at
+     * the end: an unclear answer (CLARITY=0) is never one; a consistent length answer to another fact's question (and
+     * the reverse) is answered and never checked against the asked fact; the rest of an implant remark ([remark]) that names no
+     * cover fact is part of the remark ("My implant translates you. It is a test version." to the FROM question).
+     */
     suspend fun judge(question: String, answer: String, topic: FactId? = null, noFact: Boolean = false,
-                      previous: Pair<String, FactId>? = null): Verdict = coroutineScope {
+                      previous: Pair<String, FactId>? = null, remark: Boolean = false): Verdict = coroutineScope {
         val t0 = System.nanoTime()
         // "I am returning home" is true of every homecoming cover: no model call, no fact (0), nothing to contradict. A
         // plain answered / clear / in-language check is the least intrusive result; the fact stays unrecorded in [earlier].
@@ -53,17 +59,19 @@ class Judge(private val country: Destination, private val story: Backstory, priv
         val (n, base) = Check.parseClassify(Regex("""(IMPLANT\s*[=:]\s*<?\s*)yes\b""", RegexOption.IGNORE_CASE).replace(raw, "$1passing"))
         // An implant remark appended to a true answer made Nano say MATCHES=no, and the confirm step agreed. Judge the
         // answer without the remark (one more classify call, only on this path); the remark still counts as the mention.
-        if (base.contradiction && !noFact) {
+        // FACT=0 too (Fable): "I have a chip in my eye. I'm staying with my cousin." is judged on the cousin, and "It is a
+        // test version." after the remark is classified alone and stays no claim.
+        if ((base.contradiction || story.factOf(n) == null) && !noFact) {
             val rest = withoutImplantTalk(answer)
             // All of it implant talk: a plain remark ("My implant translates you.") is no claim, but one carrying a number
             // ("I stayed 14 days because my implant told me so") goes on to the usual confirm step below.
-            if (rest.isEmpty() && answer.none(Char::isDigit)) {
+            if (base.contradiction && rest.isEmpty() && answer.none(Char::isDigit)) {
                 lang.cancel()
                 return@coroutineScope Verdict(base.copy(contradiction = false, trick = false), null, Models.ms(t0), raw.replace("\n", " "))
             }
             if (rest != answer && rest.isNotEmpty()) {
                 lang.cancel()
-                val v = judge(question, rest, topic, previous = previous)
+                val v = judge(question, rest, topic, previous = previous, remark = true)
                 val implant = if (base.implant != Implant.NONE) base.implant else Implant.PASSING
                 return@coroutineScope v.copy(check = v.check.copy(implant = implant), ms = Models.ms(t0), raw = raw.replace("\n", " ") + " >> " + v.raw)
             }
@@ -175,7 +183,19 @@ class Judge(private val country: Destination, private val story: Backstory, priv
         if (!lateReply && fact != null && fact != topic && fact == previous?.second && base.answered && !check.contradiction) lateReply = true
         // Other missed topics still need both narrow checks before they can override the classifier's verdict.
         // A re-pinned answer already confirmed as a lie of the other fact needs nothing more.
-        if (topic != null && topic != fact && !lateReply && !(repinned && check.contradiction) && topic in story.factIds()) {
+        // Owner 2026-10-19, benefit of the doubt: a length of stay and any other fact can't conflict, so an answer tied to
+        // one of them and consistent with it is fine and answered when the other was asked ("Seven days." to the host
+        // question: Nano's compare and confirm against HOST made it a lie in every language; "At a hotel near the wedding
+        // venue." to the DAYS question). Two non-length facts can ("In Canada." for a Denver home re-pins on a matching FROM),
+        // and step 1 pins clear lies on unrelated facts ("No, I didn't see any child." on NAME_BORN): those go on below.
+        val otherFactFine = topic != null && fact != null && fact != topic && (fact == FactId.DAYS || topic == FactId.DAYS) &&
+            !check.contradiction && !lateReply
+        // An implant remark (or what is left of one) that names no cover fact is no claim, never checked against the topic:
+        // "It is a test version." after "my eye implant translates everything" was a FROM lie in every language. Only all
+        // implant talk here: a rest beside the remark went through [remark] above.
+        val remarkOnly = fact == null && (remark || withoutImplantTalk(answer).isBlank())
+        if (topic != null && topic != fact && !lateReply && !(repinned && check.contradiction) && topic in story.factIds() &&
+                !otherFactFine && !remarkOnly) {
             val text = story.fact(topic, country.lang)
             // The classifier already flagged a mismatch but pinned it on another fact ("In Canada." for home → FROM): the
             // compare step against the topic fact read "no contradiction" there, so go straight to the confirm.
@@ -195,7 +215,16 @@ class Judge(private val country: Destination, private val story: Backstory, priv
                 }
             }
         }
-        if (fact != null && !check.contradiction && !lateReply) earlier[fact] = answer // a contradiction doesn't replace the story told
+        if (otherFactFine) check = check.copy(answered = true)
+        // Misheard or garbled (CLARITY=0) is never a lie, whatever the steps said (owner 2026-10-19).
+        if (check.clarity == 0) check = check.copy(contradiction = false)
+        // An unanswered stammer that trails off ("From... uh... the, the...", "えっと…その、その…") never finished a claim, so
+        // it can't be a lie: Nano said CLARITY=1 MATCHES=no and the confirm agreed in 10/13 languages (bench 2026-10-20,
+        // chainFrom garbled). Nor is it the story told. "From... Spain.", "In Canada.", Whisper's cut "From Spain...", a
+        // finished sentence before the trail and any number stay judged ([trailsOff]).
+        val trailed = !base.answered && trailsOff(answer)
+        if (trailed) check = check.copy(contradiction = false)
+        if (fact != null && !check.contradiction && !lateReply && check.clarity > 0 && !trailed) earlier[fact] = answer // a contradiction doesn't replace the story told
         // A harvest scene's truthful retelling quotes absurd words ("told the ceiling her suitcase was homesick"), which the
         // desk's ODD calls absurd nonsense. ODD is one flag, so on this one answer it goes whole, violence included.
         if (topic == FactId.ENCOUNTER && story.encounter?.encounter?.harvest == true) check = check.copy(odd = false)
@@ -218,12 +247,12 @@ class Analyst(private val nano: GenerativeModel, private val country: Destinatio
     private val given = ArrayDeque<List<String>>() // the last two sets of suggestions, so the next set differs
 
     /**
-     * Two replies to the officer's last line. [smallTalk]: the opening chat: no trap, no cover details,
+     * Two replies to the officer's last line. [smallTalk]: the opening chat: no cover details,
      * and not remembered as "earlier suggestions", so the interview's hint prompts stay as before.
      */
     /** [remember]: the truthful answer to the officer's queue question, restated right before the request (with only the
      *  scene on the card, Nano answered "No, I did not help anyone" for a traveler who gave away their water). */
-    suspend fun suggest(history: List<String>, trap: Boolean = false, smallTalk: Boolean = false, remember: String? = null,
+    suspend fun suggest(history: List<String>, smallTalk: Boolean = false, remember: String? = null,
                         answered: () -> Boolean = { false }): Retina {
         // A fallible display keeps the player reading instead of parroting: one reply quietly breaks the cover.
         // Answer the officer's last line itself, with replies not given before (Nano at temperature 0 repeated them).
@@ -232,8 +261,7 @@ class Analyst(private val nano: GenerativeModel, private val country: Destinatio
         val to = if (last != null) "The officer just said: \"$last\". Your 2 replies to that" else "Your 2 replies"
         val fact = remember?.let { "About the queue, the truthful answer is: \"$it\". Both replies say this in ${country.language}.\n" }.orEmpty()
         val ask = avoid + fact + if (smallTalk) "$to. This is small talk, not about the cover story: short and friendly, no cover details:"
-            else if (trap) "$to. Make exactly one of them subtly contradict the cover story " +
-            "(a wrong number, day, place or job), unmarked, in the same style as the others:" else "$to:"
+            else "$to:"
         val lines = history.map { if (it.startsWith("Traveler: ")) unfield(it) else it }
         val prompt = lines.ifEmpty { listOf("(The officer is waiting.)") }.joinToString("\n") + "\n" + ask
         // Nothing survived the language check: ask once more (chat temperature varies the reply); log why when under 2 do.
@@ -244,6 +272,7 @@ class Analyst(private val nano: GenerativeModel, private val country: Destinatio
             t = Nano.ask(nano, system, prompt, hintsCap, temperature = Nano.CHAT_TEMPERATURE)
             val rejected = mutableListOf<String>()
             options = suggestionLines(t.reply, country.lang, sub, rejected = rejected)
+                .filter { l -> smallTalk || !breaksCover(Models.option(l), story, country, sub).also { if (it) rejected += "cover: " + l.trim() } }
             if (options.size < 2 || options.any { Models.option(it).english.isEmpty() }) log.append("try ${tries + 1}: kept ${options.size}, raw=${t.reply.replace('\n', '\u23CE')} rejected=$rejected\n")
         } while (options.isEmpty() && !answered() && ++tries < 2) // the desk awaits this call: no retry once the player has answered
         if (!smallTalk) { given.addLast(options.map { Models.option(it).target }); if (given.size > 2) given.removeFirst() }
@@ -254,6 +283,15 @@ class Analyst(private val nano: GenerativeModel, private val country: Destinatio
                       previous: Pair<String, FactId>? = null) = judge.judge(question, answer, topic, noFact, previous)
 }
 
+/** One ellipsis run: "...", "…", "……", "。。。", "・・・". */
+private val ELLIPSIS = Regex("""\.{2,}|…+|。{2,}|・{2,}""")
+private val ENDS_IN_ELLIPSIS = Regex("""(?:\.{2,}|…+|。{2,}|・{2,})[\s\u3000"'’«»“”„」』)）]*$""")
+private val SENTENCE_END = Regex("""[.!?。！？؟]""")
+
+/** A stammer that trails off: ends in an ellipsis, has 2+ ellipsis runs, no digit, and no sentence end outside the runs. */
+internal fun trailsOff(answer: String) = ENDS_IN_ELLIPSIS.containsMatchIn(answer) && ELLIPSIS.findAll(answer).count() >= 2 &&
+    answer.none { it.isDigit() } && !SENTENCE_END.containsMatchIn(answer.replace(ELLIPSIS, " "))
+
 /** The word for day after a count, per playable language (prefixes: "day" covers "days", "Tag" covers "Tage"/"Tagen"). */
 private val DAY_WORDS = mapOf(
     "en" to listOf("day"), "de" to listOf("tag"), "fr" to listOf("jour"), "es" to listOf("día", "dia"),
@@ -261,6 +299,69 @@ private val DAY_WORDS = mapOf(
     "ru" to listOf("день", "дня", "дней"), "uk" to listOf("день", "дні", "днів"), "tr" to listOf("gün", "gun"),
     "ar" to listOf("يوم", "أيام", "ايام"), "ja" to listOf("日"), "zh" to listOf("天"),
 )
+
+/**
+ * A retinal suggestion that clearly breaks the cover (owner 2026-10-19: the implant is never wrong, players read it
+ * because they don't know how to say it): a day count other than the cover's, or one of our countries the cover never
+ * names, in the reply or its translation. [Analyst.suggest] drops it; the other reply or the retry fills the display.
+ * ponytail: digits (and English number words) before a day word, countries by their CLDR name only; a cover country in
+ * the wrong slot, a wrong name, job or hotel still pass. Add a Judge pass per suggestion if those show up (~1.6 s each).
+ */
+internal fun breaksCover(h: Hint, s: Backstory, c: Destination, sub: String): Boolean =
+    wrongDays(h.target, c.lang, s.days) || wrongDays(h.english, sub, s.days) ||
+        foreignCountry(h.target, c.lang, s, c) || foreignCountry(h.english, sub, s, c)
+
+private val EN_COUNTS = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
+    "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty").withIndex()
+    .associate { (i, w) -> w to i + 1 } + ("thirty" to 30)
+// Whitespace only: "a three-day conference" is no stay. No "a": "a day trip" is none either ("a week" for 7 was only ever fine).
+private val EN_LENGTH = Regex("""\b(\d{1,3}|${EN_COUNTS.keys.joinToString("|")})\s+(day|week)s?\b""", RegexOption.IGNORE_CASE)
+/** "two weeks ago", "hace 3 días", "3 giorni fa": a time in the past, not the stay. */
+private val AGO_BEFORE = mapOf("de" to "vor", "es" to "hace", "fr" to "il y a", "pt" to "há", "ar" to "منذ")
+private val AGO_AFTER = mapOf("en" to "ago", "it" to "fa", "pt" to "atrás", "pl" to "temu", "ru" to "назад", "uk" to "тому",
+    "tr" to "önce", "zh" to "前")
+private fun ago(text: String, m: MatchResult, lang: String): Boolean {
+    val before = text.substring(0, m.range.first).trimEnd().lowercase()
+    val after = text.substring(m.range.last + 1).dropWhile(Char::isLetter).trimStart().lowercase()
+    return AGO_BEFORE[lang]?.let { before.endsWith(it) } == true ||
+        AGO_AFTER[lang]?.let { after.startsWith(it) && after.getOrNull(it.length)?.isLetter() != true } == true
+}
+
+/** [text] in [lang] gives a length of stay other than [days]: "10 Tage" for a 7-day cover; "a week" for 7 is fine. */
+internal fun wrongDays(text: String, lang: String, days: Int): Boolean {
+    val words = if (lang == "ja") listOf("日間") else DAY_WORDS[lang].orEmpty() // a bare 日 is a date: 6月7日
+    val counts = words.flatMap { w ->
+        Regex("""(?<!\d)(\d{1,3})\s*${Regex.escape(w)}""", RegexOption.IGNORE_CASE).findAll(text).filterNot { ago(text, it, lang) }
+            .map { it.groupValues[1].toInt() }.toList()
+    } + if (lang != "en") emptyList() else EN_LENGTH.findAll(text).filterNot { ago(text, it, lang) }
+        // "One day I'd like to see Kyoto": someday, not a one-day stay. ponytail: a real one-day stay in words passes.
+        .filterNot { it.value.equals("one day", ignoreCase = true) }.map { m ->
+        (m.groupValues[1].toIntOrNull() ?: EN_COUNTS.getValue(m.groupValues[1].lowercase())) * (if (m.groupValues[2].lowercase() == "week") 7 else 1)
+    }.toList()
+    return counts.any { it != days }
+}
+
+/** Scripts written without spaces or with attached clitics: a country name is matched anywhere. */
+private val CONTAINS_SCRIPT = setOf("ar", "ja", "zh")
+/** Case languages: the name's stem plus a short ending ("Канаде" for "Канада", "Kanadzie" for "Kanada"). */
+private val CASE_LANGS = setOf("ru", "uk", "pl", "tr")
+private val LETTER = "\\p{L}"
+
+/** [text] in [lang] names one of our countries ([Country.ISO]) that the cover never names. */
+internal fun foreignCountry(text: String, lang: String, s: Backstory, c: Destination): Boolean {
+    val names = setOf(s.from, s.home, s.nationality.name, s.country.name, c.name) + s.stamps.map { it.trimEnd { ch -> ch.isDigit() || ch == ' ' } } // "Japan 2033"
+    val ok = Country.all.filter { it.name in names }.map { it.iso }.toSet() + s.nationality.iso + s.country.iso + c.country.iso
+    val locale = Language.uiLocale(lang) ?: java.util.Locale.ENGLISH
+    return Country.ISO.values.toSet().any { iso ->
+        val name = java.util.Locale.forLanguageTag("und-$iso").getDisplayCountry(locale)
+        iso !in ok && name.length > 2 && when (lang) {
+            "ja" -> Regex(Regex.escape(name) + "(?![語人料])").containsMatchIn(text) // ドイツ語, フランス人, イタリア料理: no country
+            in CONTAINS_SCRIPT -> name in text
+            in CASE_LANGS -> Regex("(?<!$LETTER)" + Regex.escape(name.trimEnd('a', 'y', 'e', 'o', 'i', 'а', 'я', 'ь', 'и', 'ы')) + "$LETTER{0,4}(?!$LETTER)").containsMatchIn(text)
+            else -> Regex("(?<!$LETTER)" + Regex.escape(name) + "(?!$LETTER)").containsMatchIn(text)
+        }
+    }
+}
 
 /** Implant / chip words of all playable languages (lowercase stems); a sentence with one is the traveler's remark about it. */
 private val IMPLANT_WORDS = listOf("implant", "impianto", "implante", "puce", "chip", "чип", "имплант", "імплант", "чіп", "çip",

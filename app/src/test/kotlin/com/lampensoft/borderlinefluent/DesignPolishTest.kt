@@ -15,7 +15,7 @@ class DesignPolishTest {
     private fun exam(suspicion: Double = 0.0) = Assessment(suspicion, Backstory.BENCH, Random(7), difficultyOffset = usa, exam = true)
 
     @Test fun usaExamAsksEveryQuestionAndSwapsInThePrototypeOnceWhenTooEasy() {
-        assertEquals(25.0, USA_ASSESSMENT_OFFSET, 0.0)
+        assertEquals(12.5, USA_ASSESSMENT_OFFSET, 0.0)
         val a = exam()
         assertEquals(50.0, a.index, 0.0)
         while (a.asked < Assessment.SWAP_AT) {
@@ -39,17 +39,29 @@ class DesignPolishTest {
     }
 
     @Test fun noSwapForAHardRunOrOutsideTheExam() {
-        val slow = exam(suspicion = 1.0) // 85 at the start: still above the line after four good answers
+        val slow = exam(suspicion = 1.0) // 65 at the start: still above the line after two good answers
         while (slow.asked < Assessment.SWAP_AT) { slow.onAnswer(2000, 6); slow.onCheck(human); slow.next() }
         assertFalse(slow.prototype)
-        val typical = exam(suspicion = 0.4) // the top of a USA officer's range (no desk): four good answers still swap
+        val typical = exam(suspicion = 0.4) // the top of a USA officer's range (no desk): two good answers still swap
         while (typical.asked < Assessment.SWAP_AT) { typical.onAnswer(2000, 6); typical.onCheck(human); typical.next() }
         assertTrue(typical.prototype)
         val usual = Assessment(0.0, Backstory.BENCH, Random(7))
         while (usual.verdict() == null) { usual.onAnswer(2000, 6); usual.onCheck(human); usual.next() }
         assertFalse(usual.prototype)
-        assertTrue(usual.asked < usual.questions.size) // elsewhere the early release stays
+        assertEquals(usual.questions.size, usual.asked) // every room asks all four now
         assertEquals(Decision.RELEASED, usual.verdict())
+    }
+
+    @Test fun noSwapOnAReAsk() {
+        // Above the line at SWAP_AT; the probe's unclear answer brings it under, but a re-ask is no new question (Fable).
+        val a = exam(suspicion = 1.0)
+        while (a.asked < Assessment.SWAP_AT) { a.onAnswer(2000, 6); a.onCheck(human); a.next() }
+        assertFalse(a.prototype)
+        assertTrue(a.probing)
+        a.onAnswer(2000, 6); a.onCheck(human.copy(admit = Admit.UNCLEAR)); a.next()
+        assertTrue(a.reasking)
+        assertTrue(a.index <= Assessment.SWAP_INDEX_MAX)
+        assertFalse(a.prototype)
     }
 
     @Test fun smallTalkAvoidsTheRecentLines() {
@@ -92,15 +104,12 @@ class DesignPolishTest {
         assertEquals("Two weeks." to FactId.DAYS, m.slip)
     }
 
-    @Test fun implantMentionTravelsFromTheDeskToTheResult() {
+    @Test fun roomDosesTravelToTheResult() {
         val a = Attempt(1, "de", "o", "de", training = false, story = false, replayEligible = true, effectiveLevel = 0)
         var live = LiveAttempt(1, a)
-        live = captureDecision(live, 1, Decision.REFERRAL, inRoom = false, roomReady = false, mentioned = true)
-        live = captureDecision(live, 1, Decision.RELEASED, inRoom = true, roomReady = true, doses = 2, mentioned = false)
+        live = captureDecision(live, 1, Decision.REFERRAL, inRoom = false, roomReady = false)
+        live = captureDecision(live, 1, Decision.RELEASED, inRoom = true, roomReady = true, doses = 2)
         val result = finishAttempt(live, 1, TerminalKind.DECIDED).terminal!!
-        assertTrue(result.implantMentioned)
         assertEquals(2, result.doses)
-        assertFalse(evaluateContract(Contract.UNMENTIONED, ReplayOutcome.CLEARED, false, result.implantMentioned, result.doses, true))
-        assertTrue(evaluateContract(Contract.SAMPLES, ReplayOutcome.CLEARED, false, result.implantMentioned, result.doses, true))
     }
 }

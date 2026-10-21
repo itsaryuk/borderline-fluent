@@ -225,7 +225,7 @@ class DeskTest {
                 assertTrue(mind.turns <= 5)
                 assertEquals(if (clear) Decision.PASS else Decision.REFUSED, mind.decision)
                 // Completed facts never cause another question, including a pending one-shot or small talk.
-                if (clear && !language && !encounter) assertEquals(3 + smallTalk, mind.turns)
+                if (clear && !language && !encounter) assertEquals(3, mind.turns) // small talk costs no answer
             }
     }
 

@@ -63,7 +63,8 @@ class CareerStore(
         }
     }
 
-    suspend fun start(context: Attempt, continuation: String? = null): CareerSave = mutex.withLock {
+    /** [chain]: the leg-1 chain the boarding pass showed ([Chain.offer]); pinned only for its own id at its own airport. */
+    suspend fun start(context: Attempt, continuation: String? = null, chain: Chain? = null): CareerSave = mutex.withLock {
         blocked()?.let { return@withLock it }
         val s = acknowledged ?: return@withLock CareerSave.Rejected(null)
         // Restart the epilogue test in one write: never lose its preparation between discard and start.
@@ -72,9 +73,19 @@ class CareerStore(
             interrupted?.status == AttemptStatus.INTERRUPTED && context.copy(id = interrupted.id) == interrupted
         if (s.pendingAttempt != null && !resumeEpilogue || context.preparation == null || s.nextAttemptId == Long.MAX_VALUE)
             return@withLock CareerSave.Rejected(s)
+        // The bonus mission is pinned here, seeded by the id; a resumed attempt keeps its own (the boarding pass showed it).
+        // A career that walked away from Marek hears nothing from Free AI: no mission.
+        // A chain: leg 2 at its own airport, or leg 1 as offered for this id; any other new mission cancels a waiting leg 2.
+        val waiting = s.chain?.takeIf { it.to == context.airportId }
+        val offered = chain?.takeIf { s.chain == null && it.stage == ChainStage.LEG1 && it.id == s.nextAttemptId && it.from == context.airportId }
+        val fresh = (waiting ?: offered)?.let(Mission::of)?.takeIf { context.mission == null && Mission.due(context) && !s.walkedAway }
+            ?: Mission.choose(s.nextAttemptId, s.planted, s.plantsSinceCustom).takeIf { context.mission == null && Mission.due(context) && !s.walkedAway }
         val a = context.copy(id = s.nextAttemptId, status = AttemptStatus.STARTED, deskDecision = null,
-            assessmentDecision = null, everBroken = false, debugForced = false)
-        stage(s.copy(nextAttemptId = s.nextAttemptId + 1, pendingAttempt = a, booking = null), null, continuation)
+            assessmentDecision = null, everBroken = false, debugForced = false, mission = context.mission ?: fresh)
+        // A newly pinned mission moves the plant-your-own cadence ([Mission.customDue]); a resumed one doesn't.
+        val since = when (fresh?.kind) { null -> s.plantsSinceCustom; MissionKind.CUSTOM -> 0; else -> s.plantsSinceCustom + 1 }
+        stage(s.copy(nextAttemptId = s.nextAttemptId + 1, pendingAttempt = a, booking = null, plantsSinceCustom = since,
+            chain = if (fresh == null) s.chain else null), null, continuation)
     }
 
     suspend fun settle(event: AttemptResult, continuation: String? = null): CareerSave = mutex.withLock {
@@ -111,6 +122,13 @@ class CareerStore(
             Encounters.markSeen(s.encountersSeen, it.id, Encounters.pool(Encounters.tier(s, actOf(s.act, legacyFinale()))))
         } ?: s.encountersSeen
         stage(s.copy(booking = booking, encountersSeen = seen), null, null)
+    }
+
+    /** "Drop the chain": a waiting leg 2 is given up, no penalty. */
+    suspend fun dropChain(): CareerSave = mutex.withLock {
+        blocked()?.let { return@withLock it }
+        val s = acknowledged ?: return@withLock CareerSave.Rejected(null)
+        if (s.chain == null) CareerSave.Saved(s, changed = false) else stage(s.copy(chain = null), null, null)
     }
 
     /** The finale's choice ([Act]). Entering FREE keeps the passport and clears any pending Act 1 booking. */
@@ -174,7 +192,7 @@ class CareerStore(
     suspend fun thalassiaSeen(): CareerSave = mutex.withLock {
         blocked()?.let { return@withLock it }
         val s = acknowledged ?: return@withLock CareerSave.Rejected(null)
-        if (s.thalassiaSeen) CareerSave.Saved(s, changed = false) else stage(s.copy(thalassiaSeen = true, pendingAttempt = null, booking = null), null, null) // the journey ended: no interrupted trip may resume past it
+        if (s.thalassiaSeen) CareerSave.Saved(s, changed = false) else stage(s.copy(thalassiaSeen = true, pendingAttempt = null, booking = null, chain = null), null, null) // the journey ended: no interrupted trip or waiting leg 2 may resume past it
     }
 
     suspend fun newsSeen(id: String): CareerSave = mutex.withLock {
@@ -227,7 +245,9 @@ class CareerStore(
         if (bad != null && !bad.preparationOnly) return@withLock CareerSave.Unreadable(bad)
         val s = bad?.snapshot ?: acknowledged ?: return@withLock CareerSave.Rejected(null)
         if (s.pendingAttempt?.status == AttemptStatus.STARTED) return@withLock CareerSave.Rejected(s)
-        stage(s.copy(pendingAttempt = null, epilogueFrame = null, epiloguePassed = null, epilogueDoses = null), null, continuation)
+        // A discarded leg 2 waits again ([start] moved it from the career onto the attempt).
+        val chain = s.pendingAttempt?.mission?.chain?.takeIf { it.stage == ChainStage.LEG2 } ?: s.chain
+        stage(s.copy(pendingAttempt = null, epilogueFrame = null, epiloguePassed = null, epilogueDoses = null, chain = chain), null, continuation)
     }
 
     suspend fun retry(): CareerSave = mutex.withLock {

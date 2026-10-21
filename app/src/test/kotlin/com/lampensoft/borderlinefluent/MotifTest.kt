@@ -18,7 +18,10 @@ class MotifTest {
         assertEquals(Motif.entries.toSet(), ids.map { Poison.payload(it, emptyList()) }.toSet())
         for (id in ids) assertEquals(Poison.payload(id, listOf("moon")), Poison.payload(id, listOf("moon")))
         assertTrue(ids.none { Poison.payload(it, listOf("moon", "tortoise")) in setOf(Motif.MOON, Motif.TORTOISE) })
-        assertTrue(ids.all { Poison.payload(it, listOf("houseplant", "submarine", "moon")) == Motif.TORTOISE })
+        assertTrue(ids.all { Poison.payload(it, Motif.entries.dropLast(1).map(Motif::id)) == Motif.CLOCK })
+        // The pre-mission pool: only the original four, whatever the catalog holds now (Mission.legacy).
+        assertEquals(Motif.ORIGINAL.toSet(), ids.map { Poison.payload(it, emptyList(), Motif.ORIGINAL) }.toSet())
+        assertTrue(ids.all { Poison.payload(it, listOf("houseplant", "submarine", "moon"), Motif.ORIGINAL) == Motif.TORTOISE })
         assertEquals(Motif.entries.toSet(), ids.map { Poison.payload(it, Motif.entries.map(Motif::id)) }.toSet()) // all planted: any
         assertEquals(listOf("moon", "tortoise"), Poison.plant(listOf("moon"), Motif.TORTOISE))
         assertEquals(listOf("tortoise", "moon"), Poison.plant(listOf("moon", "tortoise"), Motif.MOON)) // distinct, latest last
@@ -207,8 +210,8 @@ class MotifTest {
             val a = Assessment(0.0, Backstory.BENCH, Random(seed), evidence = evidence, named = false, storyTest = true)
             assertEquals(Assessment.BIRD_SEED, a.seeds[1])
             assertEquals(1, a.seeds.count { it == Assessment.BIRD_SEED })
-            assertEquals(Assessment.probesFor(evidence, named = false).size, a.seeds.count(::isProbe))
-            assertEquals(8, a.seeds.size)
+            assertEquals(1, a.seeds.count(::isProbe))
+            assertEquals(4, a.seeds.size)
         }
     }
 

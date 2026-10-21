@@ -61,6 +61,12 @@ object CareerJson {
             val news = when (val n = r.optional("newsSeen")) { true -> setOf(NEWS_THALASSIA); is JSONArray -> (0 until n.length()).map { n.optString(it) }.filter(String::isNotEmpty).toSet(); else -> emptySet() }
             // Lenient: unknown or damaged motif ids are dropped; they only steer echoes.
             val planted = runCatching { (r.optional("planted") as? JSONArray)?.let { a -> (0 until a.length()).mapNotNull { a.optString(it).takeIf { id -> Motif.find(id) != null } }.distinct() } }.getOrNull().orEmpty()
+            // Lenient: plant-your-own lines only feed echoes; a damaged entry is dropped, never re-filtered into the career.
+            val customLines = runCatching { (r.optional("customLines") as? JSONArray)?.let { a -> (0 until a.length()).mapNotNull { i ->
+                a.optJSONObject(i)?.let { o -> CustomLine(o.optString("text"), o.optString("lang")) }?.takeIf { it.text.isNotBlank() && it.lang.isNotBlank() } }.takeLast(CustomPlant.KEEP) } }.getOrNull().orEmpty()
+            val sinceCustom = (r.optional("plantsSinceCustom") as? Int)?.coerceAtLeast(0) ?: 0
+            // Lenient: a damaged chain (or one whose airport left the catalog) is no chain; the bonus was never earned.
+            val chain = runCatching { r.nullObj("chain")?.let(::chain)?.takeIf { it.stage == ChainStage.LEG2 } }.getOrNull()
             // Lenient: only steers which room questions come next.
             val recentSeeds = runCatching { (r.optional("recentSeeds") as? JSONArray)?.let { a -> (0 until a.length()).mapNotNull { a.optString(it).takeIf(String::isNotEmpty) }.distinct().takeLast(RECENT_SEEDS) } }.getOrNull().orEmpty()
             val points = (r.optional("progressPoints") as? Int ?: UPGRADE_THRESHOLDS.getOrNull(upgrades - 1) ?: 0).also { require(it >= 0) }
@@ -83,7 +89,7 @@ object CareerJson {
                 o.keys().asSequence().filter { it !in CountryMigration.removedCountries }.mapNotNull { k -> o.optInt(k).takeIf { it in 1..REFUSAL_CLOSED_TRIPS }?.let { k to it } }.toMap() } }.getOrNull().orEmpty()
             // usaCompleted: a missing key is a legacy save, whose USA album mark came with the ending.
             history = CareerSnapshot(StoryReset.VERSION, counters, countries, album, next, applied, receipt = receipt,
-                contentVersion = version, identity = null, trainedLanguages = trained, machineSessions = sessions, progressPoints = points, doses = doses, planted = planted, recentSeeds = recentSeeds, upgradesGranted = upgrades,
+                contentVersion = version, identity = null, trainedLanguages = trained, machineSessions = sessions, progressPoints = points, doses = doses, planted = planted, customLines = customLines, plantsSinceCustom = sinceCustom, chain = chain, recentSeeds = recentSeeds, upgradesGranted = upgrades,
                 cutscenesSeen = cutscenes, whySceneSeen = r.optional("whySceneSeen") as? Boolean ?: false, visitSceneSeen = r.optional("visitSceneSeen") as? Boolean ?: false, thalassiaSeen = r.optional("thalassiaSeen") as? Boolean ?: false, newsSeen = news, solvaneSeen = r.optional("solvaneSeen") as? Boolean ?: false, translatorUsed = r.optional("translatorUsed") as? Boolean ?: false, translatorUnlocked = r.optional("translatorUnlocked") as? Boolean ?: false, daysAway = (r.optional("daysAway") as? Int ?: 0).coerceAtLeast(0), walkedAway = r.optional("walkedAway") as? Boolean ?: false, marekReturned = r.optional("marekReturned") as? Boolean ?: false, upgradeDrops = drops, usaUnlocked = usa, usaCompleted = r.optional("usaCompleted") as? Boolean ?: ("usa" in album.infiltration), lastPassedCountry = last, lastPassedAirport = lastAirport, flagged = flags, closed = closed, extra = r.extra()) // extra last: it must see every key read above
             // A damaged or unknown identity is asked for again; it must not make the career unreadable.
             val identity = runCatching { (identityRaw as? JSONObject)?.let(::identity) }.getOrNull()
@@ -97,6 +103,9 @@ object CareerJson {
                 epiloguePassed = epiloguePassed, epilogueDoses = epilogueDoses, act1Stage = stage, prologueFrame = frame, identity = identity, booking = booking, act = act, encountersSeen = seen, storyLastCountry = storyLastCountry)
             // A trip to a country or airport cut from the catalog is dropped: nothing could fly there to resume it.
             val a = if (pending == JSONObject.NULL) null else (pending as JSONObject).takeUnless(::cutFromCatalog)?.let(::attempt)
+                // A trip started before missions gets the payload its room computed then, pinned from now on
+                // (a walked-away career's trips have none: Free AI is silent).
+                ?.let { if (it.mission == null && Mission.due(it) && !history.walkedAway) it.copy(mission = Mission.legacy(it.id, planted)) else it }
             require(a == null || a.id > applied && a.id < next)
             CareerRead.Ready(history.copy(pendingAttempt = a))
         } catch (_: Throwable) { // StackOverflowError from deeply nested JSON too
@@ -167,48 +176,54 @@ object CareerJson {
         val clears = if (json.has("clears")) Reader(r.obj("clears")).let { counts ->
             counts.json.keys().asSequence().associateWith { counts.int(it).also { n -> require(n > 0) } }
         } else emptyMap()
-        val contracts = if (json.has("contracts")) r.obj("contracts").let { awards ->
-            awards.keys().asSequence().map { key ->
-                val contract = legacyContract(key).also { require(Contract.fromId(it) != null) }
-                contract to meta(awards.getJSONObject(key))
-            }.toMap()
-        } else emptyMap()
-        Album(historical, infiltration, sabotage, units, r.extra(), clears, contracts)
+        r.optional("contracts") // Contracts are gone: old awards are dropped unread, never rewarded.
+        Album(historical, infiltration, sabotage, units, r.extra(), clears)
     }
     private fun albumJson(a: Album) = obj(a.extra, "historicalCleared" to JSONArray(a.historicalCleared.toList()),
         "infiltration" to mapJson(a.infiltration, ::metaJson), "sabotage" to mapJson(a.sabotage, ::metaJson),
-        "units" to mapJson(a.units) { mapJson(it, ::metaJson) }, "clears" to JSONObject(a.clears),
-        "contracts" to mapJson(a.contracts, ::metaJson))
+        "units" to mapJson(a.units) { mapJson(it, ::metaJson) }, "clears" to JSONObject(a.clears))
 
     private fun mark(json: JSONObject): NewMark = Reader(json).let { r ->
         val kind = r.string("kind"); val country = r.string("countryId"); val officer = r.nullString("officerId")
-        val extra = r.extra().toMutableMap()
-        if (kind == "contract" && json.opt("contract") == "disable")
-            extra["contract"] = "\"${Contract.UNAIDED.id}\""
-        NewMark(kind, country, officer, extra)
+        NewMark(kind, country, officer, r.extra())
     }
     internal fun markJson(m: NewMark) = obj(m.extra, "kind" to m.kind, "countryId" to m.countryId, "officerId" to m.officerId)
     private fun receipt(json: JSONObject): Receipt = Reader(json).let { r ->
         val id = r.long("id"); val outcome = ReplayOutcome.valueOf(legacyOutcome(r.string("outcome")))
-        val marks = r.array("newMarks").let { a -> (0 until a.length()).map { mark(a.getJSONObject(it)) } }
-        val contract = r.nullString("contract")?.let(::legacyContract)?.also { require(Contract.fromId(it) != null) }
-        require(marks.filter { it.kind == "contract" }.all { mark ->
-            val awarded = markContract(mark)
-            awarded != null && awarded.id == contract
-        })
-        val met = (r.optional("contractMet")?.let { it as Boolean } ?: false).also { require(!it || contract != null) }
+        // Contract marks and fields of older receipts are dropped unread.
+        val marks = r.array("newMarks").let { a -> (0 until a.length()).map { a.get(it) }.filterNot { (it as? JSONObject)?.opt("kind") == "contract" }.map { mark(it as JSONObject) } }
+        r.optional("contract"); r.optional("contractMet")
         val ending = r.nullObj("ending")?.let { e -> Reader(e).let { x ->
             Ending(x.string("language").also { l -> require(Language.all.any { it.code == l }) }, x.bool("room"), x.bool("broken"), x.bool("home"), x.bool("story"), (x.optional("usaReleased") ?: x.optional("usaDosed")) as? Boolean ?: false) } }
-        Receipt(id, outcome, marks, r.extra(), contract, met, ending)
+        val mission = optionalMission(r) // read before extra()
+        val bonus = r.optional("bonus") == true && mission != null
+        Receipt(id, outcome, marks, r.extra(), ending, mission, bonus)
     }
-    // Disable was replaced without a schema bump; writes use the replacement id.
-    private fun legacyContract(id: String) = if (id == "disable") Contract.UNAIDED.id else id
     // Names written before fb7ea02 (eff7629 builds); writing always uses the new ones.
     private fun legacyOutcome(n: String) = when (n) { "INFILTRATION", "CLEAR", "SABOTAGE" -> "CLEARED"; "FAILURE" -> "REFUSED"; else -> n }
     private fun legacyDecision(n: String, broken: String) = Decision.valueOf(when (n) { "SECONDARY" -> "REFUSED"; "BROKEN" -> broken; else -> n })
     private fun receiptJson(r: Receipt) = obj(r.extra, "id" to r.id, "outcome" to r.outcome.name,
-        "newMarks" to JSONArray(r.newMarks.map(::markJson)), "contract" to r.contract, "contractMet" to r.contractMet,
+        "newMarks" to JSONArray(r.newMarks.map(::markJson)),
         "ending" to r.ending?.let { obj(emptyMap(), "language" to it.language, "room" to it.room, "broken" to it.broken, "home" to it.home, "story" to it.story, "usaReleased" to it.usaReleased) })
+        .apply { r.mission?.let { put("mission", missionJson(it)) }; if (r.bonus) put("bonus", true) }
+
+    /** Lenient: a damaged or unknown mission reads as none (a pending attempt then gets its computed one back). */
+    private fun optionalMission(r: Reader): Mission? = runCatching { r.nullObj("mission")?.let { m -> Reader(m).let { x ->
+        when (val kind = MissionKind.valueOf(x.string("kind"))) {
+            MissionKind.CUSTOM -> Mission(kind, null)
+            MissionKind.CHAIN -> Mission.of(chain(x.obj("chain")))
+            else -> Mission(kind, Motif.find(x.string("motif")) ?: error("motif"))
+        } } } }.getOrNull()
+    private fun missionJson(m: Mission) = obj(emptyMap(), "kind" to m.kind.name).apply {
+        m.motif?.let { put("motif", it.id) }; m.chain?.let { put("chain", chainJson(it)) } }
+
+    /** Both airports must still be in the catalog; anything else throws (callers read a damaged chain as none). */
+    private fun chain(json: JSONObject): Chain = Reader(json).let { r ->
+        Chain(r.long("id").also { require(it > 0) }, Motif.find(r.string("motif")) ?: error("motif"),
+            r.string("from").also { require(Chain.airport(it) != null) }, r.string("to").also { require(Chain.airport(it) != null) },
+            ChainStage.valueOf(r.string("stage")))
+    }
+    private fun chainJson(c: Chain) = obj(emptyMap(), "id" to c.id, "motif" to c.motif.id, "from" to c.from, "to" to c.to, "stage" to c.stage.name)
 
     private fun preparation(json: JSONObject): Preparation = Reader(json).let { r ->
         val name = r.string("name"); val latin = r.string("latin"); val gender = Gender.valueOf(r.string("gender"))
@@ -229,8 +244,9 @@ object CareerJson {
             QueueEncounter(x.string("id").also { require(Encounters.find(it) != null) },
                 x.optional("choice")?.let { (it as Int).also { c -> require(c in 0..1) } }, x.bool("asked")) } } }.getOrNull()
         val homeArrival = r.optional("homeArrivalTraining") as? Boolean ?: false
+        val fromCity = r.optional("fromCity") as? String ?: "" // lenient: older saves have none
         Preparation(name, latin, gender, photo, country, passport, born, home, job, from, city, purpose, days,
-            stayed, with, met, waiting, stamps, nationality, kind, host, persona, r.extra(), p.extra(), m.extra(), encounter, homeArrival)
+            stayed, with, met, waiting, stamps, nationality, kind, host, persona, r.extra(), p.extra(), m.extra(), encounter, homeArrival, fromCity)
     }
     private fun preparationJson(p: Preparation) = obj(p.extra,
         "name" to p.name, "latin" to p.latin, "gender" to p.gender.name,
@@ -241,7 +257,7 @@ object CareerJson {
         "nationality" to p.nationalityId, "kind" to p.kind.name, "host" to p.host,
         "persona" to obj(p.personaExtra, "patience" to p.persona.patience, "suspicion" to p.persona.suspicion,
             "strictness" to p.persona.strictness, "tolerance" to p.persona.tolerance, "busy" to p.persona.busy, "level" to p.persona.level))
-        .apply { if (p.homeArrivalTraining) put("homeArrivalTraining", true) }
+        .apply { if (p.homeArrivalTraining) put("homeArrivalTraining", true); if (p.fromCity.isNotBlank()) put("fromCity", p.fromCity) }
         .apply { p.encounter?.let { put("encounter", obj(emptyMap(), "id" to it.id, "choice" to it.choice, "asked" to it.asked)) } }
 
     private fun person(json: JSONObject) = Reader(json).let { p -> Person(p.bool("female"), p.string("sheet"), p.int("tile").also { require(it in 0..5) }) }
@@ -267,10 +283,11 @@ object CareerJson {
         val country = r.string("countryId"); val airport = CountryMigration.airportId(r.string("airportId")); val officer = r.string("officerId")
         val slot = slot(country, airport)
         require(slot != null && officer in slot.officers)
-        Booking(country, airport, officer, preparation(r.obj("preparation")).also { require(it.countryId == country) })
+        Booking(country, airport, officer, preparation(r.obj("preparation")).also { require(it.countryId == country) },
+            runCatching { r.nullObj("chain")?.let(::chain) }.getOrNull()) // a damaged chain is none; the ticket stays
     }
     private fun bookingJson(b: Booking) = obj(emptyMap(), "countryId" to b.countryId, "airportId" to b.airportId,
-        "officerId" to b.officerId, "preparation" to preparationJson(b.preparation))
+        "officerId" to b.officerId, "preparation" to preparationJson(b.preparation)).apply { b.chain?.let { put("chain", chainJson(it)) } }
 
     private fun attempt(json: JSONObject): Attempt = Reader(json).let { r ->
         val id = r.long("id").also { require(it > 0) }; val country = r.string("countryId"); val officer = r.string("officerId")
@@ -287,21 +304,23 @@ object CareerJson {
         val preparation = r.nullObj("preparation")?.let(::preparation)
         require(preparation != null && preparation.countryId == country && preparation.persona.level == level)
         val status = AttemptStatus.valueOf(r.string("status"))
-        val contract = r.nullString("contract")?.let(::legacyContract)?.also { require(Contract.fromId(it) != null) }
+        r.optional("contract") // Contracts are gone: a pending attempt's choice is dropped unread.
         val native = (r.optional("nationalityLanguages") as? JSONArray)?.let { a -> (0 until a.length()).map { a.getString(it) }.toSet() }
         val upgrades = (r.optional("upgradesHeld") as? Int ?: 0).also { require(it in 0..3) }
         val progressEligible = r.optional("progressEligible") as? Boolean ?: false
+        val mission = optionalMission(r)
         r.optional("retinalOpened") // Discard obsolete display-open tracking from older saves.
         Attempt(id, country, officer, language, training, story, eligible, level, version, loadout, desk, assessment,
-            broken, debug, preparation, status, r.extra(), airport, contract, native, upgrades, progressEligible)
+            broken, debug, preparation, status, r.extra(), airport, native, upgrades, progressEligible, mission)
     }
     private fun attemptJson(a: Attempt) = obj(a.extra, "id" to a.id, "countryId" to a.countryId, "officerId" to a.officerId,
         "airportId" to a.airportId, "language" to a.language, "training" to a.training, "story" to a.story, "replayEligible" to a.replayEligible,
         "effectiveLevel" to a.effectiveLevel, "contentVersion" to a.contentVersion, "loadoutId" to a.loadoutId,
         "deskDecision" to a.deskDecision?.name, "assessmentDecision" to a.assessmentDecision?.name,
         "everBroken" to a.everBroken, "debugForced" to a.debugForced, "preparation" to a.preparation?.let(::preparationJson), "status" to a.status.name,
-        "contract" to a.contract, "nationalityLanguages" to a.nationalityLanguages?.let { JSONArray(it.toList()) },
+        "nationalityLanguages" to a.nationalityLanguages?.let { JSONArray(it.toList()) },
         "upgradesHeld" to a.upgradesHeld, "progressEligible" to a.progressEligible)
+        .apply { a.mission?.let { put("mission", missionJson(it)) } }
 
     private fun snapshotJson(s: CareerSnapshot) = obj(s.extra, "schemaVersion" to s.schemaVersion,
         "contentVersion" to s.contentVersion, "counters" to countersJson(s.counters), "countries" to JSONArray(s.countries.toList()), "album" to albumJson(s.album),
@@ -313,6 +332,9 @@ object CareerJson {
         "lastPassedCountry" to s.lastPassedCountry, "lastPassedAirport" to s.lastPassedAirport, "flagged" to JSONObject(s.flagged)).apply {
             if (s.closed.isNotEmpty()) put("closed", JSONObject(s.closed))
             if (s.planted.isNotEmpty()) put("planted", JSONArray(s.planted))
+            if (s.customLines.isNotEmpty()) put("customLines", JSONArray(s.customLines.map { JSONObject().put("text", it.text).put("lang", it.lang) }))
+            if (s.plantsSinceCustom > 0) put("plantsSinceCustom", s.plantsSinceCustom)
+            s.chain?.let { put("chain", chainJson(it)) }
             if (s.recentSeeds.isNotEmpty()) put("recentSeeds", JSONArray(s.recentSeeds))
             s.booking?.let { put("booking", bookingJson(it)) }
             s.act?.let { put("act", it.name) }

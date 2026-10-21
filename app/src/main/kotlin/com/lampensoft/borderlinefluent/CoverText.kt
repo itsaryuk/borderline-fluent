@@ -92,7 +92,10 @@ internal fun coverLines(s: Backstory, ui: String, text: (Int) -> String): List<C
         if (visit) line(R.string.cover_story_visit, days, s.city, coverNation(s.country.nation, ui), value(s.purpose))
         else line(R.string.cover_story_trip, days, s.city, coverNation(s.from, ui), value(s.purpose)),
         line(if (visit) R.string.cover_story_visit_stay else R.string.cover_story_stay, value(s.stayed)),
-        if (visit) line(R.string.cover_from_line, coverNation(s.from, ui)) else null,
+        if (visit) line(R.string.cover_from_line, coverFrom(s, ui)) else null,
         if (s.hasHost) line(R.string.cover_host_line, value(s.host)) else null,
     )
 }
+
+/** Where an arrival flies in from, in [ui]: "Dublin, Ireland" for a chain's leg 2, else the country. */
+internal fun coverFrom(s: Backstory, ui: String) = coverNation(s.from, ui).let { n -> if (s.fromCity.isBlank()) n else "${cityIn(s.fromCity, ui) ?: s.fromCity}, $n" }

@@ -116,12 +116,10 @@ class AdmissionTest {
         assertTrue(admitted); assertEquals(a.questions.size + 1, turns); assertFalse(a.caught)
     }
 
-    @Test fun confirmationIsAskedEvenWhenTheTestWouldEndEarly() {
-        // A calm traveller released early (asked >= 5, index < 20) still answers the confirmation first.
-        val seed = (0..500).first { s -> Assessment(0.0, Backstory.BENCH, Random(s), evidence = 1.0).seeds.withIndex().any { (i, q) -> i >= 5 && isProbe(q) } }
-        val a = Assessment(0.0, Backstory.BENCH, Random(seed), evidence = 1.0)
-        val last = a.seeds.withIndex().last { isProbe(it.value) }.index
-        while (a.asked < last) { a.onAnswer(2500, 8); answer(a, calm.copy(feeling = true)) }
+    @Test fun theProbeIsTheThirdQuestionAndACalmAdmissionIsStillConfirmed() {
+        val a = Assessment(0.0, Backstory.BENCH, Random(1), evidence = 1.0)
+        assertTrue(isProbe(a.seeds[2])); assertEquals(1, a.seeds.count(::isProbe))
+        while (a.asked < 2) { a.onAnswer(2500, 8); answer(a, calm.copy(feeling = true)) }
         assertTrue(a.probing); assertTrue(a.index < 20)
         answer(a, says(Admit.YES))
         assertNull(a.verdict())
@@ -130,13 +128,12 @@ class AdmissionTest {
     }
 
     @Test fun reaskComesBeforeAnyVerdict() {
-        val seed = (0..500).first { s -> isProbe(Assessment(1.0, Backstory.BENCH, Random(s), evidence = 1.0).seeds[4]) }
-        val a = Assessment(1.0, Backstory.BENCH, Random(seed), evidence = 1.0)
-        while (a.asked < 4) answer(a, calm.copy(feeling = true))
+        val a = Assessment(1.0, Backstory.BENCH, Random(1), evidence = 1.0)
+        while (a.asked < 2) answer(a, calm.copy(feeling = true))
         while (a.index < 85) a.onAnswer(0, 8) // content/timing can raise danger; passive face noise is capped
         assertTrue(a.probing)
-        answer(a, says(Admit.UNCLEAR).copy(evasive = true)) // past 90: would have refused at once
-        assertTrue(a.index > 90); assertTrue(a.reasking); assertEquals(4, a.asked)
+        answer(a, says(Admit.UNCLEAR).copy(evasive = true)) // past 90 at halfway: would have refused at once
+        assertTrue(a.index > 90); assertTrue(a.reasking); assertEquals(Assessment.EARLY_REFUSAL_AT, a.asked)
         assertNull(a.verdict())
     }
 

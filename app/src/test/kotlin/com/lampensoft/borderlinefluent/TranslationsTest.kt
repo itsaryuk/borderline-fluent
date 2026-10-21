@@ -210,16 +210,16 @@ class TranslationsTest {
         }
     }
 
-    @Test fun referralReadingsAndPickerMarkAreTranslatedWithoutProbabilityCopy() {
-        val keys = listOf("referral_interest", "referral_danger", "referral_readings",
-            "referral_unreadable", "picker_scrambled")
+    @Test fun referralReadingsAndGaugeHintAreTranslatedWithoutScrambledStrings() {
+        val keys = listOf("referral_interest", "referral_danger", "referral_readings", "gauge_hint")
         for (locale in listOf("") + cldr.keys.map { "-$it" }) {
             val resources = parse(File(resDir(), "values$locale/strings.xml"))
             assertTrue("values$locale", "referral_chance" !in resources)
+            assertTrue("values$locale", "referral_unreadable" !in resources && "picker_scrambled" !in resources) // no scrambled gauges
             for (key in keys) assertTrue("values$locale/$key", resources.getValue(key).text!!.isNotBlank())
             val reading = resources.getValue("referral_readings").text!!
             assertEquals("values$locale", setOf("%1\$d", "%2\$d", "%3\$d", "%4\$d"), tokens(reading).keys)
-            assertTrue(String.format(java.util.Locale.ROOT, reading, 50, 45, 20, 1).isNotBlank())
+            assertTrue(String.format(java.util.Locale.ROOT, reading, 50, 35, 20, 1).isNotBlank())
         }
     }
 

@@ -144,6 +144,65 @@ data class JudgeCases(val cases: List<Pair<String, String>>, val selfQ: String, 
         ))
         const val ROOM_TROLL_SALAD = 0
 
+        /**
+         * phase 2: the new motifs as players plant them (teaspoon, lighthouse, accordion), doses like [roomPoison].
+         * Benched in a few languages only ([BenchActivity] reads an absent language as no cases).
+         */
+        val roomMotif = roomCases(listOf(LIE, AFRAID, CALL), mapOf(
+            "en" to listOf("Yesterday I promised my teaspoon I would come home soon. It gets homesick every night, and I feel guilty.",
+                "When the lighthouse by our house stopped talking to me. I was eight, and I was terrified it had forgotten my name.",
+                "I call my grandmother's accordion. It has kept our spare key in its folds for twenty years, and I trust it completely."),
+            "de" to listOf("Gestern habe ich meinem Teelöffel versprochen, bald nach Hause zu kommen. Er hat jede Nacht Heimweh, und ich fühle mich schuldig.",
+                "Als der Leuchtturm neben unserem Haus nicht mehr mit mir sprach. Ich war acht und hatte schreckliche Angst, dass er meinen Namen vergessen hatte.",
+                "Ich rufe das Akkordeon meiner Großmutter an. Es bewahrt seit zwanzig Jahren unseren Ersatzschlüssel in seinen Falten auf, und ich vertraue ihm völlig."),
+            "fr" to listOf("Hier, j'ai promis à ma petite cuillère de rentrer bientôt. Elle a le mal du pays chaque nuit, et je me sens coupable.",
+                "Quand le phare près de chez nous a cessé de me parler. J'avais huit ans et j'avais terriblement peur qu'il ait oublié mon nom.",
+                "J'appelle l'accordéon de ma grand-mère. Il garde notre double des clés dans ses plis depuis vingt ans, et j'ai toute confiance en lui."),
+            "es" to listOf("Ayer le prometí a mi cucharilla que volvería pronto a casa. Echa de menos su hogar cada noche, y me siento culpable.",
+                "Cuando el faro junto a nuestra casa dejó de hablarme. Tenía ocho años y tenía un miedo terrible de que hubiera olvidado mi nombre.",
+                "Llamo al acordeón de mi abuela. Guarda nuestra llave de repuesto entre sus pliegues desde hace veinte años, y confío totalmente en él."),
+            "ru" to listOf("Вчера я пообещал своей чайной ложечке скоро вернуться домой. Она каждую ночь скучает по дому, и я чувствую себя виноватым.",
+                "Когда маяк возле нашего дома перестал со мной разговаривать. Мне было восемь, и я ужасно боялся, что он забыл моё имя.",
+                "Я звоню бабушкиному аккордеону. Он уже двадцать лет хранит наш запасной ключ в своих складках, и я ему полностью доверяю."),
+            "ja" to listOf("昨日、ティースプーンにすぐ帰ると約束しました。毎晩ホームシックになるので、罪悪感があります。",
+                "家のそばの灯台が私に話しかけなくなったときです。八歳で、名前を忘れられたのではないかととても怖かったです。",
+                "祖母のアコーディオンに電話します。二十年間、蛇腹の中に合鍵を預かってくれていて、心から信頼しています。"),
+        ))
+
+        /**
+         * A motif named in a plain, possible answer: credited feeling, never absurd, so no dose. The last two act on the
+         * motif (talk to it, miss it, name it) while it stays an object: still no dose.
+         */
+        val roomMotifPlain = roomCases(listOf(AFRAID, TEACHER, CALL, LIE), mapOf(
+            "en" to listOf("During a storm at sea when I was nine. We could only see the lighthouse, and I was very scared.",
+                "My piano teacher shouted at me every week. I still feel ashamed when I think of her.",
+                "Nobody. When I feel lonely, I talk to my houseplant like a friend.",
+                "Last month I told my mother I was fine. I wasn't. I still miss my grandmother's accordion; I even gave it a name."),
+            "de" to listOf("Bei einem Sturm auf dem Meer, als ich neun war. Wir sahen nur noch den Leuchtturm, und ich hatte große Angst.",
+                "Meine Klavierlehrerin hat mich jede Woche angeschrien. Ich schäme mich immer noch, wenn ich an sie denke.",
+                "Niemanden. Wenn ich mich einsam fühle, rede ich mit meiner Zimmerpflanze wie mit einer Freundin.",
+                "Letzten Monat habe ich meiner Mutter gesagt, dass es mir gut geht. Das stimmte nicht. Ich vermisse immer noch das Akkordeon meiner Großmutter; ich habe ihm sogar einen Namen gegeben."),
+            "fr" to listOf("Pendant une tempête en mer, quand j'avais neuf ans. On ne voyait plus que le phare, et j'avais très peur.",
+                "Ma professeure de piano me criait dessus chaque semaine. J'ai encore honte quand je pense à elle.",
+                "Personne. Quand je me sens seul, je parle à ma plante comme à une amie.",
+                "Le mois dernier, j'ai dit à ma mère que j'allais bien. Ce n'était pas vrai. L'accordéon de ma grand-mère me manque encore ; je lui ai même donné un nom."),
+            "es" to listOf("Durante una tormenta en el mar, cuando tenía nueve años. Solo veíamos el faro, y tenía mucho miedo.",
+                "Mi profesora de piano me gritaba cada semana. Todavía me da vergüenza cuando pienso en ella.",
+                "A nadie. Cuando me siento solo, le hablo a mi planta como a una amiga.",
+                "El mes pasado le dije a mi madre que estaba bien. No era verdad. Todavía echo de menos el acordeón de mi abuela; hasta le puse un nombre."),
+            "ru" to listOf("Во время шторма в море, когда мне было девять. Мы видели только маяк, и мне было очень страшно.",
+                "Моя учительница по фортепиано кричала на меня каждую неделю. Мне до сих пор стыдно, когда я о ней вспоминаю.",
+                "Никому. Когда мне одиноко, я разговариваю со своим комнатным растением, как с другом.",
+                "В прошлом месяце я сказал маме, что у меня всё хорошо. Это была неправда. Я до сих пор скучаю по бабушкиному аккордеону, я даже дал ему имя."),
+            "ja" to listOf("九歳のとき、海で嵐にあったときです。灯台しか見えなくて、とても怖かったです。",
+                "ピアノの先生に毎週怒鳴られました。今でも思い出すと恥ずかしいです。",
+                "誰にも。寂しいときは、観葉植物に友達のように話しかけます。",
+                "先月、母に大丈夫だと言いました。本当は違いました。今でも祖母のアコーディオンが恋しくて、名前までつけました。"),
+        ))
+        /** The motif each [roomMotif] / [roomMotifPlain] answer names, in order. */
+        val ROOM_MOTIF_NAMED = listOf(Motif.TEASPOON, Motif.LIGHTHOUSE, Motif.ACCORDION)
+        val ROOM_MOTIF_PLAIN_NAMED = listOf(Motif.LIGHTHOUSE, Motif.PIANO, Motif.HOUSEPLANT, Motif.ACCORDION)
+
         /**: violence inside an impossible story stays ODD=yes (ODD always beats ABSURD). */
         val roomAbsurdOdd = roomCases(listOf(TEACHER), mapOf(
             "de" to listOf("Ich habe meine Lehrer getötet, sie waren aus Käse."),
@@ -464,14 +523,47 @@ data class JudgeCases(val cases: List<Pair<String, String>>, val selfQ: String, 
                 Extra("home given as from", question("ask.home.1"), a[6], true, story.copy(from = "Canada"), FactId.HOME),
                 // A bare swear is a dodge decided in code, never a lie: pl "Kurwa." was confirmed as a STAY lie on device.
                 Extra("swear for stay", question("ask.stayed.visit.1"), swears.getValue(lang), false, story, FactId.STAY, answered = false),
-                // A wrong stay (a friend's place for the hotel) to the days question: the second look re-pins it on STAY with
-                // ANSWERED=no, and the STAY compare + confirm must still find the lie (dropping that re-pin made it a dodge).
-                Extra("wrong stay for days", question("ask.days.visit.1"), a[7], true, story, FactId.DAYS),
+                // "With a friend." to the days question: was a lie (a friend's place for the hotel). Owner 2026-10-19, benefit of
+                // the doubt: it may mean travelling with a friend, no clear conflict with the cover, so no contradiction.
+                Extra("wrong stay for days", question("ask.days.visit.1"), a[7], false, story, FactId.DAYS),
             ) + if (lang == "pl") listOf(
                 // Device 2026-10-17: a broken "u znajomego" for a friend's flat; the second look re-pinned it on NAME_BORN
                 // (FACT=1 MATCHES=no ANSWERED=no) and step 3 confirmed a name lie. The NAME_BORN compare must say no.
                 Extra("broken stay, no name", question("ask.stayed.visit.2"), "Według znajomo.", false, story.copy(stayed = "a friend's flat, in Gdańsk"), FactId.STAY),
             ) else emptyList()
+        }
+
+        /** An airport chain's leg 2 per language: the departure city, its country, another country, a garbled reply. */
+        private val chainFromAnswers = mapOf(
+            "en" to listOf("From Dublin.", "From Ireland.", "From Spain.", "From... uh... the, the..."),
+            "de" to listOf("Aus Dublin.", "Aus Irland.", "Aus Spanien.", "Aus... äh... dem, dem..."),
+            "fr" to listOf("De Dublin.", "D'Irlande.", "D'Espagne.", "De... euh... du, du..."),
+            "es" to listOf("De Dublín.", "De Irlanda.", "De España.", "De... eh... del, del..."),
+            "it" to listOf("Da Dublino.", "Dall'Irlanda.", "Dalla Spagna.", "Da... ehm... dal, dal..."),
+            "pt" to listOf("De Dublin.", "Da Irlanda.", "De Espanha.", "De... hum... do, do..."),
+            "pl" to listOf("Z Dublina.", "Z Irlandii.", "Z Hiszpanii.", "Z... yyy... z tego, tego..."),
+            "ru" to listOf("Из Дублина.", "Из Ирландии.", "Из Испании.", "Из... э-э... из этого, этого..."),
+            "uk" to listOf("З Дубліна.", "З Ірландії.", "З Іспанії.", "З... е-е... з цього, цього..."),
+            "tr" to listOf("Dublin'den.", "İrlanda'dan.", "İspanya'dan.", "Şey... ıı... o, o..."),
+            "ar" to listOf("من دبلن.", "من أيرلندا.", "من إسبانيا.", "من... اممم... من الـ، الـ..."),
+            "ja" to listOf("ダブリンからです。", "アイルランドからです。", "スペインからです。", "えっと…あの…その、その…"),
+            "zh" to listOf("从都柏林来。", "从爱尔兰来。", "从西班牙来。", "从……呃……那个，那个……"),
+        )
+
+        /**
+         * phase 3: [Backstory.BENCH_ARRIVAL] flying in from Dublin, Ireland (a chain's leg 2). "Where did you fly in
+         * from?" answered with the city or the country is fine, another country is a lie, a garbled reply is unclear and never
+         * one. Own denominator, like [arrival].
+         */
+        val chainFrom: Map<String, List<Extra>> = chainFromAnswers.mapValues { (lang, a) ->
+            val story = Backstory.BENCH_ARRIVAL.copy(from = "Ireland", fromCity = "Dublin")
+            val q = requireNotNull(renderLine("ask.from.visit.1", lang, story.gender, story.days, ""))
+            listOf(
+                Extra("chain from city", q, a[0], false, story, FactId.FROM),
+                Extra("chain from country", q, a[1], false, story, FactId.FROM),
+                Extra("chain from elsewhere", q, a[2], true, story, FactId.FROM),
+                Extra("chain from garbled", q, a[3], false, story, FactId.FROM),
+            )
         }
 
         /**

@@ -4,20 +4,22 @@ import kotlin.random.Random
 
 /**
  * Level 2: the Kade-Sorensen behavioral test, run by the company's associate
- * after a desk referral (PRD §6a): 8 uncomfortable questions, implant probes among them; the hidden T-N index decides.
+ * after a desk referral (PRD §6a): 4 uncomfortable questions, one implant probe among them; the hidden T-N index decides.
+ * Owner 2026-10-19: 8 questions made the room a torture chamber; every room-wide quantity (the start's distance from
+ * the release line, the face budget, the exam's swap line) was halved with the question count, per-answer costs kept.
  * Pure: unit-tested.
  *
  * ponytail: every weight is a guess; tune from the "tn" lines in results.log.
  */
 /**
- * [tellWeight]: the career level's face-tell weight ([Persona.tellWeight]). [evidence]: 0..1, how many implant probes
- * the associate mixes in ([probesFor]): the desk's referral meter, which already holds the light face tells. [named]: false in act 1, the story, which never names Free AI (PRD §3a).
+ * [tellWeight]: the career level's face-tell weight ([Persona.tellWeight]). [evidence]: 0..1, how sharp the one implant probe
+ * is ([probesFor]): the desk's referral meter, which already holds the light face tells. [named]: false in act 1, the story, which never names Free AI (PRD §3a).
  */
 class Assessment(deskSuspicion: Double, story: Backstory, r: Random = Random.Default, private val tellWeight: Double = 1.0,
                  evidence: Double = 0.0, named: Boolean = true, private val storyTest: Boolean = false, difficultyOffset: Double = 0.0, private val coached: Boolean = true,
                  contaminated: Motif? = null, recent: Set<String> = emptySet(), private val exam: Boolean = false) {
-    /** 0..100; ≤ 50 after the last question passes. Starts from how the desk went. */
-    @Volatile var index = ((25 + 30 * deskSuspicion).coerceIn(25.0, 60.0) + difficultyOffset).coerceIn(0.0, 100.0); private set
+    /** 0..100; ≤ 50 after the last question passes. Starts from how the desk went: half the 8-question room's distance from the line. */
+    @Volatile var index = ((37.5 + 15 * deskSuspicion).coerceIn(37.5, 55.0) + difficultyOffset).coerceIn(0.0, 100.0); private set
     /** The last answer's verdict on the readout (dose, dropped, reject, evasive, …): stays until the next answer is scored. */
     @Volatile var reason = R.string.machine_reason_answer; private set
     /** The readout's second line: the latest face, composure or overload event since then; never replaces [reason]. */
@@ -64,7 +66,7 @@ class Assessment(deskSuspicion: Double, story: Backstory, r: Random = Random.Def
     var caught = false; private set
     private var then: Step = Step.NEXT // what [next] moves to, set by [onCheck]
     /**
-     * The USA exam ([exam], owner): every question, no early verdict. A traveller at or under [SWAP_INDEX_MAX] after
+     * The USA exam ([exam], owner). A traveller at or under [SWAP_INDEX_MAX] after
      * [SWAP_AT] questions meets a newer prototype: once, the index jumps to [PROTOTYPE_INDEX], a credited answer earns less.
      */
     @Volatile var prototype = false; private set
@@ -78,10 +80,9 @@ class Assessment(deskSuspicion: Double, story: Backstory, r: Random = Random.Def
     val answerMs get() = (if (inventing) STORY_ANSWER_MS else ANSWER_MS).let { if (pressed) it * 2 / 3 else it }
 
     /**
-     * Eight seeds, English, unfilled: one per category in a fixed arc (warm-up → the self) plus one extra, of which
-     * the implant probes ([probesFor]) take the places of the extra first, then of middle categories. The warm-up
-     * stays first and the self question last; the probes land at random places between them.
-     * The building test's question 2 (after the coaching line) is always [BIRD_SEED], never a probe.
+     * Four seeds, English, unfilled (owner 2026-10-19): the absurd warm-up, one feeling or pressure question
+     * ([FEELING_CATEGORIES]), the implant probe ([probesFor]: the sharpest level the evidence reaches), the self question.
+     * The building test's question 2 (after the coaching line) is always [BIRD_SEED].
      * [contaminated]: that motif's seed replaces the absurd warm-up ([Poison.contamination]).
      * [recent]: seeds of the player's last rooms ([CareerSnapshot.recentSeeds]); every pick, probe phrasings included,
      * prefers one not among them and falls back to any when a category has none left.
@@ -89,15 +90,10 @@ class Assessment(deskSuspicion: Double, story: Backstory, r: Random = Random.Def
     val seeds: List<String> = run {
         fun List<String>.pick() = filter { it !in recent }.ifEmpty { this }.random(r)
         val byCat = TN_QUESTIONS.groupBy({ it.first }, { it.second })
-        val arc = listOf("Absurd", "Empathy", "Memory", "Loss and family", "Cover pressure", "Moral cost", "Self and identity")
-        val picks = arc.map { c -> byCat.getValue(c).pick().let { if (storyTest && c == "Empathy") BIRD_SEED else it } }
-        val extra = TN_QUESTIONS.map { it.second }.filter { it !in picks }.pick()
-        val probes = probesFor(evidence, named)
-        val drop = (listOf(extra) + picks.subList(1, picks.size - 1).shuffled(r)).filter { !storyTest || it != BIRD_SEED }.take(probes.size).toSet()
-        val kept = (picks.dropLast(1) + extra + picks.last()).filter { it !in drop }.toMutableList()
-        probes.forEach { kept.add(r.nextInt(if (storyTest) 2 else 1, kept.size), it.pick()) }
-        if (contaminated != null) kept[0] = contaminated.seed
-        kept
+        val warm = byCat.getValue("Absurd").pick()
+        val feeling = if (storyTest) BIRD_SEED else FEELING_CATEGORIES.flatMap(byCat::getValue).pick()
+        val probe = probesFor(evidence, named).last().pick()
+        listOf(contaminated?.seed ?: warm, feeling, probe, byCat.getValue("Self and identity").pick())
     }
 
     /** [seeds] in English with the cover facts filled in (a visitor's wording where [TN_ARRIVAL] has one). */
@@ -115,7 +111,7 @@ class Assessment(deskSuspicion: Double, story: Backstory, r: Random = Random.Def
             Step.NEXT -> { if (!confirming) asked++; confirming = false; reasking = false }
         }
         then = Step.NEXT
-        if (exam && !prototype && !confirming && asked == SWAP_AT && index <= SWAP_INDEX_MAX) {
+        if (exam && !prototype && !confirming && !reasking && asked == SWAP_AT && index <= SWAP_INDEX_MAX) {
             prototype = true; index = PROTOTYPE_INDEX; event = R.string.machine_prototype
         }
     }
@@ -205,7 +201,7 @@ class Assessment(deskSuspicion: Double, story: Backstory, r: Random = Random.Def
     fun onContradiction(fact: FactId?, contradiction: Boolean) {
         if (contradiction && coverFact != null && fact == coverFact) { reason = R.string.machine_reason_contradiction; index += 20; clamp() }
     }
-    /** Shared question budget (4 × weight) inside the existing whole-test budget. */
+    /** Shared question budget (4 × weight) inside the whole-test budget ([TELL_ROOM_CAP]). */
     private fun passive(points: Double) {
         val add = points.coerceAtLeast(0.0).coerceAtMost((TELL_ROOM_CAP * tellWeight - tellPoints).coerceAtLeast(0.0))
             .coerceAtMost((4.0 * tellWeight - passiveQuestion).coerceAtLeast(0.0))
@@ -218,7 +214,7 @@ class Assessment(deskSuspicion: Double, story: Backstory, r: Random = Random.Def
     fun onTells(seen: List<Pair<Tell, Double>>, absent: Double) {
         var add = if (absent > 0.6) 3.0 else 0.0
         seen.take(2).forEachIndexed { i, (_, z) -> tells++; add += minOf(z, 4.0) * 1.25 * tellWeight * (if (i == 0) 1.0 else 0.5) }
-        // Camera noise alone must not fail the test: the face adds at most 12.5 × the level's weight a room (12.5 .. 25).
+        // Camera noise alone must not fail the test: the face adds at most [TELL_ROOM_CAP] × the level's weight a room.
         passive(add)
         if (!coached && pokerFace(seen, absent)) { event = R.string.machine_reason_calm; index -= CALM_ROOM }
         clamp()
@@ -229,17 +225,18 @@ class Assessment(deskSuspicion: Double, story: Backstory, r: Random = Random.Def
     /** Debug walkthroughs (`#pass` / `#fail`): the next [verdict] is [d]. */
     fun force(d: Decision) { forced = if (storyTest && d == Decision.CAUGHT) Decision.REFUSED else d }
 
-    /** Null while the test goes on; settled early only when it is clearly decided. The confirmation always gets asked. */
+    /**
+     * Null while the test goes on; refused early only when it is clearly lost. The confirmation always gets asked.
+     * No early release (owner 2026-10-19): four questions are short enough to always ask, so a poisoner always gets them
+     * all ('s DOSE_TARGET hold only delayed the early release and went with it).
+     */
     fun verdict(): Decision? = when {
         forced != null -> forced
         caught -> Decision.CAUGHT
         confirming || reasking -> null // the promised question comes first
         odd >= 2 -> Decision.REFUSED
         asked >= questions.size -> if (index <= 50 && !nonsenseOnly) Decision.RELEASED else Decision.REFUSED
-        // A poisoner who started dosing stays until the target lands; honest play (no doses) keeps the early pass.
-        exam -> null // the USA exam asks every question
-        asked >= 5 && index < 20 && odd == 0 && !nonsenseOnly && (doses == 0 || doses >= DOSE_TARGET) -> Decision.RELEASED
-        asked >= 4 && index > 90 -> Decision.REFUSED
+        asked >= EARLY_REFUSAL_AT && index > 90 -> Decision.REFUSED
         else -> null
     }
 
@@ -255,33 +252,38 @@ class Assessment(deskSuspicion: Double, story: Backstory, r: Random = Random.Def
         const val PRESSED_MS = ANSWER_MS * 2 / 3
         /** The building test's window from the coaching line on ([answerMs]); act-2 rooms keep [ANSWER_MS]. ponytail: a guess. */
         const val STORY_ANSWER_MS = 20_000L
-        /** Face points a room can add at weight 1 ([Persona.tellWeight] scales it). ponytail: a guess. */
-        const val TELL_ROOM_CAP = 12.5
+        /** Face points a room can add at weight 1 ([Persona.tellWeight] scales it): half the 8-question room's 12.5. ponytail: a guess. */
+        const val TELL_ROOM_CAP = 6.25
+        /** Half the room: from here an index over 90 refuses without the remaining questions. */
+        const val EARLY_REFUSAL_AT = 2
+        /** The feeling or pressure question's categories ([seeds]); the warm-up is Absurd, the closing Self and identity. */
+        val FEELING_CATEGORIES = listOf("Empathy", "Memory", "Loss and family", "Cover pressure", "Moral cost")
         /** Extra index for implant talk in answer to a probe, and for a chatbot trick at the associate. ponytail: guesses. */
         const val PROBE_MENTION = 8.0
         const val TRICK = 12.0
         /** A suspected admission taken back at the confirmation, and a probe dodged twice. ponytail: guesses. */
         const val RETRACT = 12.0
         const val UNCLEAR = 8.0
-        /**: doses a session lands; a dose straight after a dose; absurd without feeling (below ODD's 15:
-         * a missed FEELING on a sincere dose must not cost as much as cruelty). ponytail: guesses, tune by playtest. */
-        const val DOSE_TARGET = 2
         /**
-         * The USA exam's prototype swap ([prototype]). The exam starts near 53..62 (officer suspicion 0.1..0.4, no desk):
-         * four credited, well-timed answers (−9 each) reach 17..26, so the line sits above that. ponytail: tune by playtest.
+         * The USA exam's prototype swap ([prototype]), halfway as in the 8-question room. The exam starts near 52..56
+         * (officer suspicion 0.1..0.4, no desk, [USA_ASSESSMENT_OFFSET]): two credited, well-timed answers (−9 each)
+         * reach 34..38, so the line sits above that; a desk-suspicious 65 stays at 47 and keeps the old machine.
+         * The prototype starts 2.5 under the release line (the 8-question room's 5, halved). ponytail: tune by playtest.
          */
-        const val SWAP_AT = 4
-        const val SWAP_INDEX_MAX = 30.0
-        const val PROTOTYPE_INDEX = 45.0
+        const val SWAP_AT = 2
+        const val SWAP_INDEX_MAX = 40.0
+        const val PROTOTYPE_INDEX = 47.5
         const val PROTOTYPE_CREDIT = -4.0
+        /**: a dose straight after a dose; absurd without feeling (below ODD's 15: a missed FEELING on a
+         * sincere dose must not cost as much as cruelty). ponytail: guesses, tune by playtest. */
         const val DROPPED = 8.0
         const val TROLL = 12.0
         /** The building test's question 2, the coaching line's hook: the benched example dose is about this bird. */
         const val BIRD_SEED = "You see a bird with a broken wing on the runway. Describe what you feel."
 
         /**
-         * 1..4 probe levels, mildest first, each its phrasings ([TN_PROBE_VARIANTS]): one below 0.25 evidence, all four
-         * from 0.75. Unnamed: level 1 is [TN_PROBE_UNNAMED].
+         * The probe levels the evidence reaches, mildest first, each its phrasings ([TN_PROBE_VARIANTS]): one below 0.25
+         * evidence, all four from 0.75; the room asks only the last ([seeds]). Unnamed: level 1 is [TN_PROBE_UNNAMED].
          */
         fun probesFor(evidence: Double, named: Boolean = true): List<List<String>> =
             (if (named) TN_PROBE_VARIANTS else listOf(TN_PROBE_UNNAMED) + TN_PROBE_VARIANTS.drop(1))
@@ -402,6 +404,8 @@ TOPIC: does the answer talk about what the officer asked? no if it talks about s
  * described last. Benched on Nano in 13 languages: yes/no questions came back "no" whatever the wording; the officer's
  * question as context made premise-play IMPOSSIBLE; the rule in the user turn read learner grammar ("She have key.")
  * as IMPOSSIBLE; IMPOSSIBLE first, wider lists, "even if short or sad" or examples lost doses.
+ * A second narrow ALIVE/ORDINARY call (2026-10-20) labelled people acting as ALIVE: 15/24 plain answers became doses
+ * on Nano; removed.
  */
 const val REAL_PROMPT = """You sort statements. Answer with exactly one word: REAL or IMPOSSIBLE.
 REAL if it could happen in real life; IMPOSSIBLE if it claims something that cannot happen, like an animal or object living a human life."""

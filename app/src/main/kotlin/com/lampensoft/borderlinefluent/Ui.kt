@@ -115,6 +115,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
@@ -418,8 +419,35 @@ private val RTL_UI = setOf("ar")
                 PrimaryButton(stringResource(R.string.thal_trip), enabled = g.careerReady) { warn = true }
                 Spacer(Modifier.height(12.dp))
             }
-            PrimaryButton(stringResource(when (g.act) { Act.FREE -> R.string.begin_mission; Act.LEFT -> R.string.start_replay_story; Act.STORY -> R.string.begin }),
+            val chain = g.waitingChain
+            // B can't be booked (pack evicted, its country closed or just passed): Fly on is off and BEGIN MISSION books elsewhere,
+            // which cancels the chain as any other booking does.
+            val canFly = remember(chain, g.careerReady) { chain != null && g.canFlyOn() }
+            // Another country picked while leg 2 waits: BEGIN MISSION books it (and drops the chain); Fly on resets the pick.
+            val ui = uiLang()
+            val pick = remember(chain, g.dest, g.career.snapshot, g.careerReady) { if (chain != null) g.destChoice() else "random" }
+            val flyOn = chain?.let { stringResource(R.string.chain_fly_on, chainCity(it.to, ui).uppercase(java.util.Locale.forLanguageTag(ui))) }.orEmpty()
+            val away = chain != null && canFly && pickLeavesChain(pick, chain.toAirport?.country?.id)
+            if (chain != null) {
+                // A chain's leg 2 waits (phase 3): fly on to B, or drop it and book anything.
+                Text(chainLeg2(chain, ui), style = LocalTextStyle.current.copy(textDirection = TextDirection.Content),
+                    color = C.text, fontSize = 15.sp, modifier = Modifier.fillMaxWidth().padding(bottom = if (away) 4.dp else 12.dp))
+                if (away) {
+                    Text(stringResource(R.string.chain_elsewhere, Country.find(pick)?.uiName(ui) ?: pick), color = C.dim, fontSize = 14.sp,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp))
+                } else {
+                    PrimaryButton(flyOn, enabled = g.careerReady && canFly) { g.flyOn() }
+                }
+            }
+            if (chain == null || !canFly || away) PrimaryButton(stringResource(when (g.act) { Act.FREE -> R.string.begin_mission; Act.LEFT -> R.string.start_replay_story; Act.STORY -> R.string.begin }),
                 enabled = g.careerReady) { g.beginMission() }
+            if (chain != null) {
+                if (away) TextButton({ chain.toAirport?.let { g.pickDest(it.country.id) } }, Modifier.align(Alignment.CenterHorizontally), enabled = g.careerReady) {
+                    Text(flyOn, color = C.dim)
+                } else TextButton({ g.dropChain() }, Modifier.align(Alignment.CenterHorizontally), enabled = g.careerReady) {
+                    Text(stringResource(R.string.chain_drop), color = C.dim)
+                }
+            }
             // After "Leave" the way back into act 2 stays open (PRD §3a).
             if (g.act == Act.LEFT) TextButton({ keeping = true }, Modifier.align(Alignment.CenterHorizontally), enabled = g.careerReady) {
                 Text(stringResource(R.string.finale_keep), color = C.dim)
@@ -432,10 +460,10 @@ private val RTL_UI = setOf("ar")
         if (afterStory) Text(listOfNotNull(stringResource(R.string.machine_progress, c.sessions, c.points), stringResource(R.string.stat_cleared, c.cleared),
                 stringResource(R.string.stat_streak, c.streak), c.toNext?.takeUnless { walkedAway }?.let { pluralStringResource(R.plurals.points_to_upgrade, it, it) },
                 c.broken.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.stat_broken, it, it) }).joinToString(" · "),
-            color = C.dim, fontSize = 12.sp, letterSpacing = 1.sp, textAlign = TextAlign.Center,
+            color = C.dim, fontSize = 13.sp, letterSpacing = 1.sp, textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp))
         g.career.snapshot?.daysAway?.takeIf { it > 0 && g.act == Act.FREE }?.let {
-            Text(stringResource(R.string.stat_day, it), color = C.dim, fontSize = 12.sp, letterSpacing = 1.sp, textAlign = TextAlign.Center,
+            Text(stringResource(R.string.stat_day, it), color = C.dim, fontSize = 13.sp, letterSpacing = 1.sp, textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp))
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
@@ -455,7 +483,7 @@ private val RTL_UI = setOf("ar")
             IconButton({ g.go(Screen.START) }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = C.text) }
             Column {
                 Text(stringResource(R.string.music_title), style = display(22, 2.0))
-                Text("The Atomic Songbirds", color = C.dim, fontSize = 12.sp, letterSpacing = 1.sp)
+                Text("The Atomic Songbirds", color = C.dim, fontSize = 13.sp, letterSpacing = 1.sp)
             }
         }
         val ctx = LocalContext.current
@@ -479,7 +507,7 @@ private val RTL_UI = setOf("ar")
                     Spacer(Modifier.width(14.dp))
                     Column {
                         Text(if (heard) song.title else "???", color = if (current) Hud.cyan else if (playable) C.text else C.dim, fontSize = 16.sp)
-                        if (hint != null) Text(stringResource(R.string.music_pack_hint, Language.of(hint).uiName(uiLanguage(ctx))), color = C.dim, fontSize = 12.sp)
+                        if (hint != null) Text(stringResource(R.string.music_pack_hint, Language.of(hint).uiName(uiLanguage(ctx))), color = C.dim, fontSize = 13.sp)
                     }
                 }
             }
@@ -505,7 +533,7 @@ private val RTL_UI = setOf("ar")
                 drawCircle(Brush.radialGradient(listOf(Hud.cyan.copy(alpha = 0.55f * pulse), Color.Transparent)), radius = size.minDimension)
             }, contentAlignment = Alignment.Center) { Icon(Icons.Default.MusicNote, null, tint = Hud.cyan, modifier = Modifier.size(20.dp)) }
             Spacer(Modifier.width(8.dp))
-            Text(song.title, color = C.text, fontSize = 13.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(song.title, color = C.text, fontSize = 14.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
     }
 }
@@ -515,7 +543,7 @@ private val RTL_UI = setOf("ar")
     IconButton(onClick, Modifier.clip(Square).background(Color(0x99000A24)).border(1.dp, C.line, Square)) {
         Icon(Icons.Default.Email, stringResource(R.string.messages), tint = C.text, modifier = Modifier.size(28.dp))
     }
-    if (unread > 0) Text(unread.toString(), color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+    if (unread > 0) Text(unread.toString(), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold,
         modifier = Modifier.align(Alignment.TopEnd).clip(CircleShape).background(C.red).padding(horizontal = 6.dp, vertical = 1.dp))
 }
 
@@ -530,7 +558,7 @@ private val RTL_UI = setOf("ar")
 
 /** The text with its country (if any) in the UI language, never the English name. */
 @Composable private fun messageText(m: StoryMessage): String =
-    stringResource(m.text, *listOfNotNull(m.country?.let { Country.find(it)?.uiName(uiLang()) }).toTypedArray())
+    stringResource(m.text, *listOfNotNull(m.country?.let { Country.find(it)?.uiName(uiLang()) } ?: m.quote?.let(::isolated)).toTypedArray())
 
 /** [messageText], damaged after the true ending: redacted words in red monospace. */
 @Composable private fun messageContent(m: StoryMessage, damaged: Boolean): androidx.compose.ui.text.AnnotatedString {
@@ -560,7 +588,7 @@ private val RTL_UI = setOf("ar")
         exit = androidx.compose.animation.slideOutVertically { -it }) {
         Column(Modifier.safeDrawingPadding().padding(12.dp).fillMaxWidth().clip(Square)
             .background(C.card).border(1.dp, C.line, Square).clickable { shown = false; open() }.padding(14.dp)) {
-            Text(stringResource(R.string.new_message), color = C.dim, fontSize = 11.sp, letterSpacing = 1.sp)
+            Text(stringResource(R.string.new_message), color = C.dim, fontSize = 12.sp, letterSpacing = 1.sp)
             Text(stringResource(m.sender), color = C.text, fontWeight = FontWeight.Medium)
             Text(messageContent(m, g.thalassiaSeen), color = C.dim, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
@@ -592,8 +620,8 @@ private val RTL_UI = setOf("ar")
                         Text(messageContent(texts.last(), g.thalassiaSeen), color = C.dim, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                     Column(horizontalAlignment = Alignment.End) {
-                        Text(messageStamp(texts.last()), color = C.dim, fontSize = 12.sp)
-                        if (unread > 0) Text(unread.toString(), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                        Text(messageStamp(texts.last()), color = C.dim, fontSize = 13.sp)
+                        if (unread > 0) Text(unread.toString(), color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(top = 4.dp).clip(CircleShape).background(C.red).padding(horizontal = 7.dp, vertical = 2.dp))
                     }
                 }
@@ -619,7 +647,7 @@ private val RTL_UI = setOf("ar")
                 for (m in texts) Column(Modifier.padding(end = 48.dp, bottom = 8.dp).clip(Square)
                         .background(C.card).border(1.dp, C.line, Square).then(if (g.thalassiaSeen && m === texts.last()) Modifier.glitch() else Modifier).padding(14.dp)) {
                     Text(messageContent(m, g.thalassiaSeen), color = C.text)
-                    Text(messageStamp(m), color = C.dim, fontSize = 11.sp, modifier = Modifier.align(Alignment.End).padding(top = 4.dp))
+                    Text(messageStamp(m), color = C.dim, fontSize = 12.sp, modifier = Modifier.align(Alignment.End).padding(top = 4.dp))
                 }
             }
         }
@@ -630,7 +658,7 @@ private val RTL_UI = setOf("ar")
 @Composable private fun BookingBar(title: String, subtitle: String? = null) {
     Column(Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
         BorderLine { Text(title, style = display(24, 1.5)) }
-        subtitle?.let { Text(it, color = C.dim, fontSize = 12.sp, letterSpacing = 1.5.sp) }
+        subtitle?.let { Text(it, color = C.dim, fontSize = 13.sp, letterSpacing = 1.5.sp) }
     }
 }
 
@@ -656,12 +684,12 @@ private val HARVEST_TIERS = listOf(R.string.harvest_tier_0, R.string.harvest_tie
                 Icon(Icons.Default.Flight, label, tint = C.text, modifier = Modifier.align(Alignment.Center).size(26.dp))
                 Box(Modifier.align(Alignment.BottomEnd).padding(end = 2.dp, bottom = 4.dp)) {
                     if (chosen != null) Flag(chosen, Modifier.size(width = 18.dp, height = 12.dp))
-                    else Text("?", color = C.navy, fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                    else Text("?", color = C.navy, fontSize = 12.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier.clip(Square).background(C.cyan).padding(horizontal = 3.dp).clearAndSetSemantics {})
                 }
             }
         }
-        Text(label, color = C.text, fontSize = 12.sp, textAlign = TextAlign.Center, modifier = Modifier.clearAndSetSemantics {})
+        Text(label, color = C.text, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.clearAndSetSemantics {})
     }
 }
 
@@ -695,13 +723,13 @@ internal fun countryPickerRowState(id: String, currentCountry: String?, clears: 
     val currentCountry = if (g.storyAct) snapshot?.storyLastCountry else snapshot?.lastPassedCountry
     val available = g.identity?.let { missionCountries(snapshot, countries, it, g.storyAct) }.orEmpty()
         .filter { it.id != currentCountry }
-    val d = g.destChoice(available)
+    val d = g.destChoice(available, packArt)
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(onClose, sheetState = sheetState, containerColor = C.card,
         modifier = Modifier.statusBarsPadding().fillMaxHeight(0.88f)) {
         Text(stringResource(R.string.picker_title), style = display(18, 1.5), modifier = Modifier.padding(start = 20.dp, bottom = 8.dp))
         if (lastFlightWarning(snapshot)) Text(stringResource(R.string.picker_last_flight), color = C.red,
-            fontSize = 14.sp, modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp))
+            fontSize = 15.sp, modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp))
         LazyColumn(Modifier.weight(1f).selectableGroup(), contentPadding = PaddingValues(bottom = 24.dp)) {
             @Composable fun row(id: String, label: String, lead: @Composable () -> Unit, clears: Int = 0) {
                 val left = flaggedClears(snapshot, id)
@@ -717,9 +745,6 @@ internal fun countryPickerRowState(id: String, currentCountry: String?, clears: 
                 val courierLabel = if (g.act == Act.FREE && snapshot != null && snapshot.upgradeDrops.any { (n, c) -> c == id && n !in snapshot.cutscenesSeen })
                     stringResource(R.string.picker_courier) else null
                 val hereLabel = stringResource(R.string.picker_you_are_here)
-                val scrambledLabel = if (g.act == Act.FREE && id != "random" &&
-                    referralGaugeScrambled(id, ImplantPerks.fromUpgrades(g.career.delivered)))
-                    stringResource(R.string.picker_scrambled) else null
                 val state = countryPickerRowState(id, currentCountry, clears, g.careerReady &&
                     (if (id == "random") available.isNotEmpty() else available.any { it.id == id }))
                 val here = state.here
@@ -727,7 +752,7 @@ internal fun countryPickerRowState(id: String, currentCountry: String?, clears: 
                 val passedLabel = if (state.clears <= 0) null else if (state.clears == 1) stringResource(R.string.picker_passed)
                     else stringResource(R.string.picker_passed_times, state.clears)
                 val accessibility = if (here) Modifier.clearAndSetSemantics {
-                    contentDescription = listOfNotNull(Country.of(id).uiName(ui), hereLabel, passedLabel, scrambledLabel, bonusLabel).joinToString(", ")
+                    contentDescription = listOfNotNull(Country.of(id).uiName(ui), hereLabel, passedLabel, bonusLabel).joinToString(", ")
                     disabled()
                 } else Modifier
                 val interaction = if (lockedUsa && !here && left <= 0) Modifier.clickable {
@@ -741,31 +766,27 @@ internal fun countryPickerRowState(id: String, currentCountry: String?, clears: 
                     Spacer(Modifier.width(14.dp))
                     Column(Modifier.weight(1f)) {
                         Text(label, color = if (enabled) C.text else C.dim, fontSize = 16.sp)
-                        if (closedLeft > 0 && !here) Text(pluralStringResource(R.plurals.booking_closed, closedLeft, closedLeft), color = C.red, fontSize = 12.sp)
-                        if (bonusLabel != null) Text(bonusLabel, color = C.green, fontSize = 12.sp)
-                        if (courierLabel != null) Text("▣ $courierLabel", color = C.ivory, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        if (closedLeft > 0 && !here) Text(pluralStringResource(R.plurals.booking_closed, closedLeft, closedLeft), color = C.red, fontSize = 13.sp)
+                        if (bonusLabel != null) Text(bonusLabel, color = C.green, fontSize = 13.sp)
+                        if (courierLabel != null) Text("▣ $courierLabel", color = C.ivory, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     }
-                    if (scrambledLabel != null) Text("≋", color = C.dim, fontSize = 16.sp,
-                        modifier = Modifier.padding(horizontal = 6.dp).clearAndSetSemantics {
-                            contentDescription = scrambledLabel
-                        })
                     if (here) {
-                        Text(hereLabel, color = C.dim, fontSize = 12.sp)
+                        Text(hereLabel, color = C.dim, fontSize = 13.sp)
                         Icon(Icons.Default.Place, null, tint = C.dim,
                             modifier = Modifier.padding(start = 8.dp).size(18.dp))
                     } else {
-                        if (left > 0) Text(stringResource(R.string.booking_flagged, left), color = C.red, fontSize = 12.sp)
+                        if (left > 0) Text(stringResource(R.string.booking_flagged, left), color = C.red, fontSize = 13.sp)
                         else if (lockedUsa) Text(stringResource(R.string.picker_not_recommended)
-                            .uppercase(java.util.Locale.forLanguageTag(ui)), color = C.dim, fontSize = 12.sp)
+                            .uppercase(java.util.Locale.forLanguageTag(ui)), color = C.dim, fontSize = 13.sp)
                         if (!enabled) Icon(Icons.Default.Lock, null, tint = C.dim,
                             modifier = Modifier.padding(start = 8.dp).size(18.dp))
                     }
-                    if (passedLabel != null) Text(passedLabel, color = C.green, fontSize = 11.sp,
+                    if (passedLabel != null) Text(passedLabel, color = C.green, fontSize = 12.sp,
                         fontWeight = FontWeight.Bold, letterSpacing = 1.sp, modifier = Modifier.padding(start = 8.dp))
                 }
                 if (lockedUsa && !here && left <= 0 && showUsaNote) Text(stringResource(R.string.usa_si_note),
-                    color = C.dim, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp))
-                if (left > 0) Text(stringResource(R.string.booking_flagged_note), color = C.dim, fontSize = 12.sp,
+                    color = C.dim, fontSize = 13.sp, modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp))
+                if (left > 0) Text(stringResource(R.string.booking_flagged_note), color = C.dim, fontSize = 13.sp,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp))
             }
             item(key = "random") {
@@ -884,15 +905,16 @@ private class RollSlot(val label: String, val frames: List<String>) { val real g
                     Box(Modifier.fillMaxWidth().height(5.dp).background(C.red))
                     Column(Modifier.padding(18.dp)) {
                     val dim = C.inkDim
-                    Text(stringResource(R.string.booking_pass), color = dim, fontSize = 12.sp, letterSpacing = 2.sp)
+                    Text(stringResource(R.string.booking_pass), color = dim, fontSize = 13.sp, letterSpacing = 2.sp)
                     Spacer(Modifier.height(10.dp))
-                    Text(stringResource(R.string.booking_from), color = dim, fontSize = 12.sp)
-                    // A homecoming flies back from the visited city; a visit leaves from the passport's home town.
+                    Text(stringResource(R.string.booking_from), color = dim, fontSize = 13.sp)
+                    // A homecoming flies back from the visited city; a visit leaves from the cover's fromCity (a chain's leg 2: airport A's
+                    // city), else the main city of the departure country (the last passed airport's when it is in that country).
                     val from = if (g.story.kind == TripKind.HOMECOMING) "${g.story.city}, ${coverNation(g.story.from, ui)}"
-                        else "${departureCity(s.from, g.career.snapshot)}, ${coverNation(s.from, ui)}"
+                        else "${s.fromCity.ifBlank { departureCity(s.from, g.career.snapshot) }}, ${coverNation(s.from, ui)}"
                     Text(coverIsolate(from, ui), color = C.ink, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(10.dp))
-                    Text(stringResource(R.string.booking_to), color = dim, fontSize = 12.sp)
+                    Text(stringResource(R.string.booking_to), color = dim, fontSize = 13.sp)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Flag(g.country, Modifier.size(width = 33.dp, height = 22.dp))
                         Spacer(Modifier.width(10.dp))
@@ -901,16 +923,16 @@ private class RollSlot(val label: String, val frames: List<String>) { val real g
                     }
                     Spacer(Modifier.height(10.dp))
                     DottedRule(C.ink.copy(alpha = 0.4f))
-                    Text(coverIsolate(g.airport.uiName(ui), ui), color = dim, fontSize = 14.sp, modifier = Modifier.padding(top = 8.dp))
-                    if (paid && !hotel) Text(paidBy, color = dim, fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp))
+                    Text(coverIsolate(g.airport.uiName(ui), ui), color = dim, fontSize = 15.sp, modifier = Modifier.padding(top = 8.dp))
+                    if (paid && !hotel) Text(paidBy, color = dim, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
                     if (hotel) {
                         Spacer(Modifier.height(14.dp))
-                        Text(stringResource(R.string.booking_hotel_res), color = dim, fontSize = 12.sp, letterSpacing = 2.sp)
+                        Text(stringResource(R.string.booking_hotel_res), color = dim, fontSize = 13.sp, letterSpacing = 2.sp)
                         Text(coverIsolate(solvane, ui), color = C.ink, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 6.dp))
-                        Text(pluralStringResource(R.plurals.booking_nights, s.days, s.days), color = dim, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp))
+                        Text(pluralStringResource(R.plurals.booking_nights, s.days, s.days), color = dim, fontSize = 15.sp, modifier = Modifier.padding(top = 4.dp))
                         Text(stringResource(R.string.booking_hotel_code, reservationCode(g.career.snapshot?.nextAttemptId ?: 0L)), color = C.ink,
-                            fontFamily = FontFamily.Monospace, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp))
-                        Text(paidBy, color = dim, fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp))
+                            fontFamily = FontFamily.Monospace, fontSize = 15.sp, modifier = Modifier.padding(top = 4.dp))
+                        Text(paidBy, color = dim, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
                     }
                     }
                 }
@@ -957,7 +979,7 @@ private val BOOKING_CYAN = C.cyan
             Column(Modifier.fillMaxWidth().clip(Square).background(Color(0xFF000614)).padding(14.dp)
                 .clearAndSetSemantics { if (logDone) { contentDescription = declined; liveRegion = LiveRegionMode.Polite } }) {
                 BookingLog(full, typed, animate && !logDone)
-                if (logDone) Text(declined, color = C.red, fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+                if (logDone) Text(declined, color = C.red, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
                 else Box(Modifier.fillMaxWidth().padding(top = 10.dp)) { androidx.compose.material3.LinearProgressIndicator(Modifier.fillMaxWidth(), color = BOOKING_CYAN) }
             }
         }
@@ -1001,7 +1023,7 @@ private val BOOKING_CYAN = C.cyan
                 translationY = bob.value.dp.toPx()
             }
         }, contentScale = ContentScale.Crop)
-        Text(caption, color = C.text, fontSize = 13.sp,
+        Text(caption, color = C.text, fontSize = 14.sp,
             modifier = Modifier.align(Alignment.BottomCenter).safeDrawingPadding().padding(24.dp)
                 .background(C.bg.copy(alpha = 0.8f), Square).padding(12.dp)
                 .semantics { liveRegion = LiveRegionMode.Polite })
@@ -1019,7 +1041,8 @@ private val BOOKING_CYAN = C.cyan
 @Composable private fun QueueContent(g: Game, q: QueueScene) {
     val ctx = LocalContext.current
     val ui = uiLang()
-    val text = remember(q.encounter, ui) { q.narration(ui) }
+    val whisper = q.whisper?.let { stringResource(R.string.queue_whisper, isolated(it)) }
+    val text = remember(q.encounter, ui, whisper) { q.narration(ui) + whisper?.let { (if (ui == "ja" || ui == "zh") "" else " ") + it }.orEmpty() }
     val labels = remember(q.encounter, ui) { q.labels(ui) }
     val fatherQueue = q.encounter.id == Encounters.FATHER
     val animate = Motion.allowed()
@@ -1118,7 +1141,7 @@ private val BOOKING_CYAN = C.cyan
 }
 
 /** The typed-out request log with a blinking cursor; reads [typed] here so only this small scope recomposes per character. */
-@Composable private fun BookingLog(full: String, typed: State<Int>, cursor: Boolean, size: Int = 13) {
+@Composable private fun BookingLog(full: String, typed: State<Int>, cursor: Boolean, size: Int = 14) {
     var blink by remember { mutableStateOf(true) }
     LaunchedEffect(cursor) { while (cursor) { delay(500); blink = !blink } }
     // One tick per line as it starts typing (not per character); silent when shown already complete.
@@ -1146,7 +1169,7 @@ private val BOOKING_CYAN = C.cyan
         for (i in 0..minOf(n, slots.size - 1)) {
             val lock = i < n
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp).then(if (lock) Modifier else Modifier.clearAndSetSemantics {})) {
-                Text(slots[i].label.uppercase(), color = C.dim, fontFamily = FontFamily.Monospace, fontSize = 11.sp, letterSpacing = 1.5.sp,
+                Text(slots[i].label.uppercase(), color = C.dim, fontFamily = FontFamily.Monospace, fontSize = 12.sp, letterSpacing = 1.5.sp,
                     modifier = Modifier.weight(0.38f).padding(top = 4.dp))
                 Text(if (lock) slots[i].real else frame.value, color = if (lock) C.text else C.dim, fontSize = 15.sp,
                     fontWeight = if (lock) FontWeight.Bold else FontWeight.Normal, modifier = Modifier.weight(0.62f))
@@ -1191,7 +1214,7 @@ private val BOOKING_CYAN = C.cyan
     Row(Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(Square).background(C.amber.copy(alpha = 0.14f))
         .border(1.dp, C.amber, Square).padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(if (pct == 0) Icons.Default.VolumeOff else Icons.Default.VolumeDown, null, tint = C.amber, modifier = Modifier.size(22.dp))
-        Text(stringResource(if (pct == 0) R.string.volume_off else R.string.volume_low), color = C.amber, fontSize = 13.sp,
+        Text(stringResource(if (pct == 0) R.string.volume_off else R.string.volume_low), color = C.amber, fontSize = 14.sp,
             modifier = Modifier.padding(start = 10.dp))
     }
 }
@@ -1432,7 +1455,7 @@ internal val PROLOGUE_FRAMES: List<List<PrologueTurn>> = listOf(
         .absolutePadding(left = if (onLeft) 21.dp else 14.dp, top = 10.dp,
             right = if (onLeft) 14.dp else 21.dp, bottom = 10.dp)) {
         Text(label.uppercase(java.util.Locale.forLanguageTag(uiLang())), color = if (man) Color(0xFF505B64) else if (valery) Color(0xFF9A4F36) else Color.White,
-            fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
+            fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
         Spacer(Modifier.height(4.dp))
         val style = TextStyle(color = ink, fontSize = 18.sp, lineHeight = 25.sp,
             fontStyle = if (valery) FontStyle.Normal else FontStyle.Italic)
@@ -1440,7 +1463,7 @@ internal val PROLOGUE_FRAMES: List<List<PrologueTurn>> = listOf(
             Text(fullText, style = style, modifier = Modifier.alpha(0f).clearAndSetSemantics { })
             Text(visibleText, style = style, modifier = Modifier.matchParentSize())
         }
-        if (subtitle != null) Text(subtitle, color = ink.copy(alpha = 0.7f), fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp))
+        if (subtitle != null) Text(subtitle, color = ink.copy(alpha = 0.7f), fontSize = 15.sp, modifier = Modifier.padding(top = 4.dp))
     }
 }
 
@@ -1875,7 +1898,7 @@ private val CREDITS_ART = listOf("prologue_1_square", "prologue_2b_smashed", "pr
             (if (trueEnding) CREDITS.dropLast(2) else CREDITS).forEach { (ar, br) -> // the true ending closes on its own thank-you
                 val a = if (ar != 0) stringResource(ar) else ""
                 val b = if (br == R.string.credits_blurb) stringResource(br, Language.shipped.size) else if (br != 0) stringResource(br) else ""
-                if (a.isNotEmpty()) Text(a, color = C.dim, fontSize = 13.sp, letterSpacing = 2.sp, textAlign = TextAlign.Center)
+                if (a.isNotEmpty()) Text(a, color = C.dim, fontSize = 14.sp, letterSpacing = 2.sp, textAlign = TextAlign.Center)
                 if (b.isNotEmpty()) Text(b, color = C.text, fontSize = if (a.isEmpty()) 16.sp else 18.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(bottom = 4.dp))
                 if (br == R.string.credits_music_artist) Text("theatomicsongbirds.com", color = Hud.cyan, fontSize = 15.sp,
                     textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
@@ -1889,7 +1912,7 @@ private val CREDITS_ART = listOf("prologue_1_square", "prologue_2b_smashed", "pr
                     Spacer(Modifier.height(28.dp))
                     Text(stringResource(R.string.credits_end_or_beginning), style = display(26, 1.0), lineHeight = 36.sp, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(36.dp))
-                    Text(stringResource(R.string.credits_more), color = C.dim, fontSize = 14.sp, textAlign = TextAlign.Center)
+                    Text(stringResource(R.string.credits_more), color = C.dim, fontSize = 15.sp, textAlign = TextAlign.Center)
                     Text("lampensoft.com", color = Hud.cyan, fontSize = 16.sp, textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
                         modifier = Modifier.padding(top = 4.dp).clickable { runCatching { uri.openUri("https://lampensoft.com") } })
                 }
@@ -1906,7 +1929,7 @@ private val CREDITS_ART = listOf("prologue_1_square", "prologue_2b_smashed", "pr
 
 @Composable private fun Feature(label: String, vararg icons: ImageVector) = Column(horizontalAlignment = Alignment.CenterHorizontally) {
     Row { icons.forEach { Icon(it, null, tint = C.dim, modifier = Modifier.size(20.dp)) } }
-    Text(label, color = C.dim, fontSize = 12.sp)
+    Text(label, color = C.dim, fontSize = 13.sp)
 }
 
 /** A filled-in template: [bold] are the ranges of [text] that came from arguments. */
@@ -1983,11 +2006,11 @@ private fun List<Bolded>.joined(): Bolded = fold(Bolded("", emptyList())) { acc,
                 Spacer(Modifier.width(14.dp))
                 Column {
                     Text(s.name, style = LocalTextStyle.current.copy(textDirection = TextDirection.Content), color = C.ink, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    if (s.latin != s.name) Text(s.latin, style = LocalTextStyle.current.copy(textDirection = TextDirection.Content), color = C.ink, fontSize = 14.sp)
+                    if (s.latin != s.name) Text(s.latin, style = LocalTextStyle.current.copy(textDirection = TextDirection.Content), color = C.ink, fontSize = 15.sp)
                     val dim = Color(0xFF6B6F78)
-                    Text(stringResource(R.string.cover_citizen, s.nationality.uiName(uiLang())), color = dim, fontSize = 13.sp)
-                    Text(stringResource(R.string.cover_passport_no, s.passportNo), color = dim, fontSize = 13.sp)
-                    Text(stringResource(R.string.cover_born, coverBirthDate(s.born, ui)), color = dim, fontSize = 13.sp)
+                    Text(stringResource(R.string.cover_citizen, s.nationality.uiName(uiLang())), color = dim, fontSize = 14.sp)
+                    Text(stringResource(R.string.cover_passport_no, s.passportNo), color = dim, fontSize = 14.sp)
+                    Text(stringResource(R.string.cover_born, coverBirthDate(s.born, ui)), color = dim, fontSize = 14.sp)
                 }
             }
             Spacer(Modifier.height(14.dp))
@@ -2008,41 +2031,23 @@ private fun List<Bolded>.joined(): Bolded = fold(Bolded("", emptyList())) { acc,
                 Spacer(Modifier.width(12.dp))
                 Text(if (g.training) stringResource(R.string.cover_tip_training)
                     else stringResource(R.string.cover_tip, g.destination.languageName(uiLang())),
-                    color = C.text, fontSize = 14.sp)
+                    color = C.text, fontSize = 15.sp)
             }
         }
         if (g.canChooseDifficulty) {
             Spacer(Modifier.height(12.dp))
             Panel {
                 Text(stringResource(R.string.difficulty_title, g.destination.languageName(uiLang())),
-                    color = C.dim, fontSize = 12.sp, letterSpacing = 1.sp)
+                    color = C.dim, fontSize = 13.sp, letterSpacing = 1.sp)
                 Spacer(Modifier.height(10.dp))
                 Chips(listOf(stringResource(R.string.difficulty_relaxed), stringResource(R.string.difficulty_standard),
                     stringResource(R.string.difficulty_alert), stringResource(R.string.difficulty_severe)),
                     g.difficulty, onSelect = g::chooseDifficulty)
-                Text(stringResource(R.string.difficulty_note), color = C.dim, fontSize = 12.sp,
+                Text(stringResource(R.string.difficulty_note), color = C.dim, fontSize = 13.sp,
                     modifier = Modifier.padding(top = 8.dp))
             }
         }
-        if (g.contractsUnlocked || g.coverContract != null) {
-            Spacer(Modifier.height(12.dp))
-            Panel {
-                val contract = g.coverContract
-                val choices = listOf(null) + Contract.entries
-                Text(stringResource(R.string.contract_title), color = C.dim, fontSize = 12.sp, letterSpacing = 1.sp)
-                Spacer(Modifier.height(10.dp))
-                Chips(listOf(stringResource(R.string.contract_none)) + Contract.entries.map { stringResource(it.nameRes) }, choices.indexOf(contract),
-                    enabled = g.canChooseContract) { g.chooseContract(choices[it]) }
-                contract?.let {
-                    Text(stringResource(when (it) {
-                        Contract.QUIET -> R.string.contract_quiet
-                        Contract.UNAIDED -> R.string.contract_unaided
-                        Contract.UNMENTIONED -> R.string.contract_unmentioned
-                        Contract.SAMPLES -> R.string.contract_samples
-                    }), color = C.dim, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
-                }
-            }
-        }
+        g.coverMission?.let { Spacer(Modifier.height(12.dp)); MissionCard(it, g.destination.lang, g.coverChainCancelled) }
         }
         if (scroll.canScrollForward) Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(24.dp)
             .background(Brush.verticalGradient(listOf(Color.Transparent, C.bg))))
@@ -2055,7 +2060,7 @@ private fun List<Bolded>.joined(): Bolded = fold(Bolded("", emptyList())) { acc,
             earsWait && g.earsNeedWhisper -> R.string.cover_no_speech_model; earsWait -> R.string.cover_speech_downloading; else -> R.string.cover_ready })
         if (earsWait && g.earsNeedWhisper) {
             Text(if (g.earsStuck) stringResource(R.string.cover_asr_not_responding) else stringResource(R.string.cover_no_recognition, g.destination.languageName(uiLang())),
-                color = C.dim, fontSize = 12.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp))
+                color = C.dim, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp))
             PrimaryButton(stringResource(R.string.cover_download_speech)) { g.fetchWhisper() }
         } else PrimaryButton(label, enabled = g.careerReady && ((g.ready && !earsWait) || g.loadError != null)) {
             when {
@@ -2065,7 +2070,7 @@ private fun List<Bolded>.joined(): Bolded = fold(Bolded("", emptyList())) { acc,
             }
         }
         if (g.earsReady == false && !g.earsNeedWhisper) Text(stringResource(R.string.cover_installing_recognition, g.destination.languageName(uiLang())),
-            color = C.dim, fontSize = 12.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+            color = C.dim, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
         CancelTrip(g)
     }
 }
@@ -2083,7 +2088,7 @@ private fun List<Bolded>.joined(): Bolded = fold(Bolded("", emptyList())) { acc,
         }
         Column {
             Text(text, style = LocalTextStyle.current.copy(textDirection = TextDirection.Content), color = if (tense) Color(0xFFFFD9D5) else Color.White, fontSize = 17.sp, fontWeight = FontWeight.Medium)
-            if (subtitle != null) Text(subtitle, style = LocalTextStyle.current.copy(textDirection = TextDirection.Content), color = if (tense) Color(0xFFE79A92) else C.dim, fontSize = 14.sp,
+            if (subtitle != null) Text(subtitle, style = LocalTextStyle.current.copy(textDirection = TextDirection.Content), color = if (tense) Color(0xFFE79A92) else C.dim, fontSize = 15.sp,
                 modifier = Modifier.padding(top = 4.dp))
         }
     }
@@ -2165,6 +2170,7 @@ private object Hud {
     if (g.firstCareerTraining) BackHandler { }
     val ctx = LocalContext.current
     var report by remember { mutableStateOf<SuggestionReport?>(null) }
+    var gaugeW by remember { mutableStateOf(0.dp) } // the suspicion gauge's measured width: the eye sits right of it
     val density = LocalDensity.current
     var headerTextBottomPx by remember { mutableFloatStateOf(0f) }
     val artTopPadding = if (headerTextBottomPx > 0f) Modifier.padding(top = with(density) { headerTextBottomPx.toDp() } + 4.dp)
@@ -2229,29 +2235,38 @@ private object Hud {
         0f to Color(0x99000A24), 0.12f to Color.Transparent, 0.45f to Color.Transparent, 1f to Color(0xE6000A24))))
 
     // Gauges ride the art's left and right edges.
-    if (g.machineView || g.room != null) Box(Modifier.fillMaxWidth().then(artTopPadding).aspectRatio(1f).padding(8.dp)) { MachineSuspicion(g) }
-    else if (g.mind.decision == null && referralGaugeVisible(g.act, false) && g.liveContract != Contract.UNAIDED)
-        ReferralGauge(g.mind, g.country.id, g.implantPerks, bluffReason = g.bluffReason,
+    if (g.machineView || g.room != null) Box(Modifier.fillMaxWidth().then(artTopPadding).aspectRatio(1f).padding(8.dp)) { MachineSuspicion(g) { gaugeW = it } }
+    else if (g.mind.decision == null && referralGaugeVisible(g.act, false))
+        ReferralGauge(g.mind, bluffReason = g.bluffReason,
             modifier = Modifier.fillMaxWidth().then(artTopPadding).aspectRatio(1f).padding(8.dp))
 
+    val inMachine = g.room != null || g.machineView
     Box(Modifier.fillMaxWidth().safeDrawingPadding().padding(vertical = 4.dp)) {
         Column(Modifier.align(Alignment.Center).onGloballyPositioned { headerTextBottomPx = it.boundsInRoot().bottom },
             horizontalAlignment = Alignment.CenterHorizontally) {
             if (!g.machineView && g.room == null) {
                 Text(stringResource(R.string.hud_passport_control), color = C.text, fontWeight = FontWeight.Medium)
-                if (!g.thalassianDesk) Text(stringResource(R.string.hud_speak_in, g.destination.languageName(uiLang()), g.unitName), color = C.dim, fontSize = 12.sp)
+                if (!g.thalassianDesk) Text(stringResource(R.string.hud_speak_in, g.destination.languageName(uiLang()), g.unitName), color = C.dim, fontSize = 13.sp)
+                // The first act-2 desk (no machine session yet): say once what the Interest gauge is for.
+                if (g.act == Act.FREE && !g.training && !g.storyMission && g.career.sessions == 0 && g.mind.decision == null)
+                    Text(stringResource(R.string.gauge_hint), color = C.dim, fontSize = 12.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 64.dp))
             } else {
                 Text(stringResource(R.string.hud_tn_assessment), color = Color(0xFFF2B8B2), fontWeight = FontWeight.Medium)
-            }
-            g.liveContract?.let {
-                Text(stringResource(R.string.contract_hud, stringResource(it.nameRes)), color = C.dim, fontSize = 12.sp)
             }
         }
         IconButton(g::abort, Modifier.align(Alignment.CenterEnd)) { Icon(Icons.Default.Close, stringResource(R.string.hud_leave), tint = C.dim) }
         val ctx = LocalContext.current
-        if (g.watching && g.activeFaceRun != null && ctx.checkSelfPermission(android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED)
+        if (!inMachine && g.watching && g.activeFaceRun != null && ctx.checkSelfPermission(android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED)
             OfficerEye(g, Modifier.align(Alignment.CenterStart).padding(start = 12.dp))
     }
+    // The test machine's screen gets a bigger self-view (owner 2026-10-20), overlaid on the art right of the suspicion gauge
+    // so the header and the panel math stay as they are; the verdict column sits at the art's right edge.
+    if (inMachine && g.watching && g.activeFaceRun != null && LocalContext.current.checkSelfPermission(android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED)
+        // 8dp art inset + gauge + 8dp gap; the verdict column (max 130dp) holds the other edge, so a narrow screen shrinks the eye.
+        (8.dp + gaugeW + 8.dp).let { start ->
+            OfficerEye(g, Modifier.then(artTopPadding).padding(start = start, top = 8.dp)
+                .width((maxWidth - start - 138.dp).coerceIn(40.dp, 96.dp)).aspectRatio(3f / 4f), big = true)
+        }
 
     // The panel hangs from the art's bottom edge (overlapping its lower 48dp, under the gauges) instead of sitting on the
     // screen bottom, so a short panel leaves no dead band under the portrait. The test's panel is longer (payload, long
@@ -2264,20 +2279,20 @@ private object Hud {
         g.tip?.let {
             Row(Modifier.fillMaxWidth().padding(bottom = 8.dp).clip(Square).background(Color(0xCC06303D))
                 .border(1.dp, Hud.cyan.copy(alpha = 0.7f), Square).padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(if (g.homeArrivalTraining) R.string.training_home_arrivals else if (g.departureTraining) R.string.training_departures else R.string.hud_training), color = Hud.cyan, fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(if (g.homeArrivalTraining) R.string.training_home_arrivals else if (g.departureTraining) R.string.training_departures else R.string.hud_training), color = Hud.cyan, fontSize = 12.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.width(10.dp))
-                Text(it, color = Color.White, fontSize = 13.sp)
+                Text(it, color = Color.White, fontSize = 14.sp)
             }
         }
-        if (g.booting) Text(stringResource(R.string.hud_online), color = Hud.cyan, fontSize = 11.sp, letterSpacing = 2.sp,
+        if (g.booting) Text(stringResource(R.string.hud_online), color = Hud.cyan, fontSize = 12.sp, letterSpacing = 2.sp,
             fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp).glitch(idleMs = 200L..700L, strength = 1.5f))
         g.implant?.let {
             Row(Modifier.fillMaxWidth().padding(bottom = 8.dp).clip(Square).background(Color(0xCC3A2A06))
                 .border(1.dp, Color(0xFFFFC14D), Square).padding(12.dp).glitch(idleMs = 3000L..6000L, strength = 0.5f),
                 verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.hud_implant), color = Color(0xFFFFC14D), fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.hud_implant), color = Color(0xFFFFC14D), fontSize = 12.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.width(10.dp))
-                Text(it, color = Color.White, fontSize = 13.sp)
+                Text(it, color = Color.White, fontSize = 14.sp)
             }
         }
         // The composure hold sits where the implant banner was (it clears it), next to the line being answered.
@@ -2293,8 +2308,8 @@ private object Hud {
             Column {
                 Text(stringResource(R.string.composure_cue), color = Hud.cyan, fontSize = 15.sp, fontWeight = FontWeight.Medium,
                     modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
-                if (g.storyMission) Text(stringResource(R.string.composure_teach), color = Color.White, fontSize = 12.sp)
-                if (g.composurePaused) Text(stringResource(R.string.composure_paused), color = C.dim, fontSize = 12.sp)
+                if (g.storyMission) Text(stringResource(R.string.composure_teach), color = Color.White, fontSize = 13.sp)
+                if (g.composurePaused) Text(stringResource(R.string.composure_paused), color = C.dim, fontSize = 13.sp)
             }
         }
         // Overload cues (blink twice) are instructions: a banner like the composure cue, never part of the title.
@@ -2310,10 +2325,10 @@ private object Hud {
                 Row(Modifier.padding(top = 10.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Visibility, null, tint = Hud.cyan, modifier = Modifier.size(15.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.hud_retinal_display), color = Hud.cyan, fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Medium)
-                    if (g.room != null && g.liveContract != Contract.UNAIDED) {
+                    Text(stringResource(R.string.hud_retinal_display), color = Hud.cyan, fontSize = 12.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Medium)
+                    if (g.room != null) {
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.hud_signal_dampened), color = C.red, fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold,
+                        Text(stringResource(R.string.hud_signal_dampened), color = C.red, fontSize = 12.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold,
                             modifier = Modifier.glitch(idleMs = 300L..1200L, strength = 2f))
                     }
                 }
@@ -2322,11 +2337,11 @@ private object Hud {
                     val firstRoom = g.career.snapshot?.machineSessions == 0 // the first machine session: say what the payload is for
                     Text(stringResource(R.string.room_payload, listOf(m.word(g.destination.lang), m.word(uiLang())).distinct().joinToString(" · ")),
                         style = LocalTextStyle.current.copy(textDirection = TextDirection.Content), color = Color(0xFFFFC14D),
-                        fontSize = 11.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = if (firstRoom) 2.dp else 6.dp))
-                    if (firstRoom) Text(stringResource(R.string.room_payload_hint), color = C.dim, fontSize = 11.sp, modifier = Modifier.padding(bottom = 6.dp))
+                        fontSize = 12.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = if (firstRoom) 2.dp else 6.dp))
+                    if (firstRoom) Text(stringResource(R.string.room_payload_hint), color = C.dim, fontSize = 12.sp, modifier = Modifier.padding(bottom = 6.dp))
                 }
-                if (g.bluffReason && referralGaugeVisible(g.act, g.room != null) && g.liveContract != Contract.UNAIDED)
-                    Text(stringResource(R.string.bluff_reason), color = Hud.cyan, fontSize = 11.sp)
+                if (g.bluffReason && referralGaugeVisible(g.act, g.room != null))
+                    Text(stringResource(R.string.bluff_reason), color = Hud.cyan, fontSize = 12.sp)
                 if (g.bluffArmed) {
                     Text(stringResource(R.string.bluff_cue), color = if (g.bluffHighlight) Color.White else Hud.cyan,
                         modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
@@ -2335,18 +2350,17 @@ private object Hud {
                 val displayHints = debugRetinalHints(fallback.ifEmpty { g.hints }, BuildConfig.DEBUG,
                     g.thalassianDesk, g.officerText)
                 if (fallback.isNotEmpty()) Text(stringResource(R.string.machine_fallback), color = Hud.cyan,
-                    fontSize = 12.sp, modifier = Modifier.padding(bottom = 6.dp))
-                if (g.liveContract == Contract.UNAIDED || displayHints.isEmpty() && !g.thalassianDesk) Text(stringResource(when {
-                    g.liveContract == Contract.UNAIDED -> R.string.hud_retinal_off
+                    fontSize = 13.sp, modifier = Modifier.padding(bottom = 6.dp))
+                if (displayHints.isEmpty() && !g.thalassianDesk) Text(stringResource(when {
                     g.room != null -> R.string.hud_signal_lost
                     g.hintsNone -> R.string.hud_no_suggestion
                     else -> R.string.hud_translating
-                }), color = Hud.soft, fontSize = 13.sp, modifier = Modifier.padding(bottom = 8.dp))
+                }), color = Hud.soft, fontSize = 14.sp, modifier = Modifier.padding(bottom = 8.dp))
                 val reportLabel = stringResource(R.string.report_title)
                 // An English reader gets a respelling where the model gives no reading (ru/uk/ja have their own).
                 val respellLang = g.destination.lang.takeIf { !g.thalassianDesk && it in respelledLanguages && uiLang() != it && subtitleLang(uiLang(), it) == "en" }
                 // One suggestion: screen space (owner).
-                if (g.liveContract != Contract.UNAIDED) displayHints.take(1).forEach { (target, given, english) ->
+                displayHints.take(1).forEach { (target, given, english) ->
                     val reading = given.ifEmpty { respellLang?.let { respell(target, it) } ?: "" }
                     val openReport = { report = SuggestionReport(Hint(target, reading, english), g.officerText, g.destination.lang) }
                     Row(Modifier.fillMaxWidth().padding(bottom = 6.dp).height(IntrinsicSize.Min)
@@ -2372,7 +2386,7 @@ private object Hud {
                                 if (english.isNotEmpty() && !g.subtitleRedundant) append("  ·  ")
                             }
                             if (!g.subtitleRedundant) append(english)
-                        }, style = LocalTextStyle.current.copy(textDirection = TextDirection.Content), color = Hud.soft, fontSize = 12.sp, maxLines = 2)
+                        }, style = LocalTextStyle.current.copy(textDirection = TextDirection.Content), color = Hud.soft, fontSize = 13.sp, maxLines = 2)
                         }
                     }
                 }
@@ -2381,13 +2395,13 @@ private object Hud {
                 Icon(Icons.Default.PhoneAndroid, stringResource(R.string.translator_phone), tint = Hud.soft, modifier = Modifier.size(14.dp))
                 Spacer(Modifier.width(4.dp))
                 Text(g.translatorSource, style = LocalTextStyle.current.copy(textDirection = TextDirection.Content),
-                    color = Hud.soft, fontSize = 12.sp, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic, modifier = Modifier.weight(1f))
+                    color = Hud.soft, fontSize = 13.sp, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic, modifier = Modifier.weight(1f))
             }
             if (g.heard.isNotEmpty()) Row(Modifier.padding(top = 2.dp)) {
-                Text(stringResource(R.string.hud_you, "").trimEnd(), color = Hud.soft, fontSize = 13.sp)
+                Text(stringResource(R.string.hud_you, "").trimEnd(), color = Hud.soft, fontSize = 14.sp)
                 Spacer(Modifier.width(4.dp))
                 Text(g.heard, style = LocalTextStyle.current.copy(textDirection = TextDirection.Content),
-                    color = Hud.soft, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    color = Hud.soft, fontSize = 14.sp, modifier = Modifier.weight(1f))
             }
         }
         Box(Modifier.fillMaxWidth()) {
@@ -2398,7 +2412,7 @@ private object Hud {
                     .clickable { g.handOverPassport() }.padding(horizontal = 12.dp, vertical = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Default.Book, stringResource(R.string.hud_hand_over_passport), tint = Hud.cyan)
-                    Text(stringResource(R.string.hud_passport), color = Hud.soft, fontSize = 11.sp)
+                    Text(stringResource(R.string.hud_passport), color = Hud.soft, fontSize = 12.sp)
                 }
             // The phone translator the officer pointed at: the phone's look (ivory on the card, not the implant's cyan).
             if (g.translatorShown) {
@@ -2410,9 +2424,9 @@ private object Hud {
                     .padding(horizontal = 12.dp, vertical = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Default.PhoneAndroid, null, tint = if (g.translatorOn) C.ivory else C.dim)
-                    Text(stringResource(R.string.translator_switch, left, TRANSLATOR_CREDITS), color = if (g.translatorOn) C.ivory else C.dim, fontSize = 11.sp)
+                    Text(stringResource(R.string.translator_switch, left, TRANSLATOR_CREDITS), color = if (g.translatorOn) C.ivory else C.dim, fontSize = 12.sp)
                 }
-                else Text(stringResource(R.string.translator_out), color = C.dim, fontSize = 11.sp, textAlign = TextAlign.Center,
+                else Text(stringResource(R.string.translator_out), color = C.dim, fontSize = 12.sp, textAlign = TextAlign.Center,
                     modifier = Modifier.align(Alignment.CenterEnd).widthIn(max = 120.dp).padding(end = 8.dp))
             }
         }
@@ -2472,11 +2486,11 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
                 // Reporting the officer's line itself, it is the text above already.
                 if (report.officer.isNotEmpty() && report.officer != report.hint.target) {
                     Spacer(Modifier.height(8.dp))
-                    Text(stringResource(R.string.report_officer_line), color = C.dim, fontSize = 12.sp)
+                    Text(stringResource(R.string.report_officer_line), color = C.dim, fontSize = 13.sp)
                     Text(report.officer.take(400), color = C.text, style = LocalTextStyle.current.copy(textDirection = TextDirection.Content))
                 }
                 Spacer(Modifier.height(8.dp))
-                Text(stringResource(R.string.report_only_this), color = C.dim, fontSize = 12.sp)
+                Text(stringResource(R.string.report_only_this), color = C.dim, fontSize = 13.sp)
                 Spacer(Modifier.height(12.dp))
                 Column(Modifier.selectableGroup()) {
                     reasons.forEachIndexed { index, label ->
@@ -2529,10 +2543,10 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
 }
 
 /** The officer's view of you: a small live self-view, ringed red when your face is out of sight. */
-@Composable private fun OfficerEye(g: Game, modifier: Modifier) {
+@Composable private fun OfficerEye(g: Game, modifier: Modifier, big: Boolean = false) {
     var seen by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) { while (true) { seen = g.faceWatch.seen; delay(250) } }
-    CameraFeed(g, modifier.size(46.dp).clip(Square).border(2.dp, if (seen) Hud.cyan else C.red, Square))
+    CameraFeed(g, (if (big) modifier else modifier.size(46.dp)).clip(Square).border(2.dp, if (seen) Hud.cyan else C.red, Square))
 }
 
 /** Front camera preview with face detection running on every frame (FaceWatch). */
@@ -2587,19 +2601,19 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
                 Meter(stringResource(R.string.camtest_right_eye), l.rightEye)
                 Text(stringResource(R.string.camtest_blinks, l.blinksPerMin), color = C.text, fontSize = 16.sp, modifier = Modifier.padding(top = 6.dp))
                 Text(stringResource(R.string.camtest_head, l.yaw, l.pitch), color = C.text, fontSize = 16.sp)
-                Text(stringResource(R.string.camtest_face_geometry, l.lips, l.brow), color = C.dim, fontSize = 13.sp)
+                Text(stringResource(R.string.camtest_face_geometry, l.lips, l.brow), color = C.dim, fontSize = 14.sp)
             }
             Text(stringResource(R.string.camtest_stats, l?.fps ?: 0, l?.frame ?: "—", l?.facePx ?: 0),
-                color = C.dim, fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp))
+                color = C.dim, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
         }
         Spacer(Modifier.height(10.dp))
         Panel {
-            Text(stringResource(R.string.profile_title), color = Hud.cyan, fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.profile_title), color = Hud.cyan, fontSize = 12.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
             when {
                 calibrating -> Text(stringResource(R.string.profile_calibrating), color = C.text)
                 !calibrated -> TextButton({ calibrating = true }) { Text(stringResource(R.string.profile_take_baseline), color = Hud.cyan) }
                 tells.isEmpty() -> Text(stringResource(R.string.profile_no_deviation), color = C.green)
-                else -> tells.forEach { (t, z) -> Text(stringResource(R.string.profile_tell, stringResource(t.label), z, stringResource(t.implant)), color = Color(0xFFFFC14D), fontSize = 14.sp) }
+                else -> tells.forEach { (t, z) -> Text(stringResource(R.string.profile_tell, stringResource(t.label), z, stringResource(t.implant)), color = Color(0xFFFFC14D), fontSize = 15.sp) }
             }
         }
     }
@@ -2613,8 +2627,9 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
 }
 
 /** Machine estimate and tracking are independent: touch play always retains the meter. */
-@Composable private fun MachineSuspicion(g: Game) {
+@Composable private fun MachineSuspicion(g: Game, onGaugeWidth: (Dp) -> Unit = {}) {
     val ctx = LocalContext.current
+    val density = LocalDensity.current
     val cameraAllowed = ctx.checkSelfPermission(android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED
     var value by remember { mutableStateOf(0.0) }
     var reason by remember { mutableStateOf(R.string.machine_reason_answer) }
@@ -2628,24 +2643,25 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
         }
     }
     Box(Modifier.fillMaxSize()) {
-        Column(Modifier.align(Alignment.TopStart).fillMaxHeight(0.55f).width(56.dp).vGaugeBacking(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(stringResource(R.string.machine_suspicion), color = C.text, fontSize = 10.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
-                lineHeight = 10.sp, modifier = Modifier.clearAndSetSemantics {})
+        Column(Modifier.align(Alignment.TopStart).fillMaxHeight(0.55f).vGaugeBacking().onGloballyPositioned { onGaugeWidth(with(density) { it.size.width.toDp() }) }, horizontalAlignment = Alignment.CenterHorizontally) {
             val release = stringResource(R.string.machine_release)
-            Row(Modifier.padding(top = 3.dp).weight(1f).semantics(mergeDescendants = true) { contentDescription = release }) {
-                Canvas(Modifier.width(12.dp).fillMaxHeight().semantics {
-                    progressBarRangeInfo = ProgressBarRangeInfo(value.toFloat(), 0f..100f)
-                }) { vBar((value / 100).toFloat(), androidx.compose.ui.graphics.lerp(Hud.cyan, C.red, (value / 100).toFloat()), 0.5f) }
+            val label = stringResource(R.string.machine_suspicion)
+            Row(Modifier.weight(1f).semantics(mergeDescendants = true) { contentDescription = release }) {
+                LabeledVBar(label, androidx.compose.ui.graphics.lerp(Hud.cyan, C.red, (value / 100).toFloat()), (value / 100).toFloat(), 0.5f,
+                    Modifier.fillMaxHeight(), semantics = Modifier.semantics {
+                        contentDescription = label
+                        progressBarRangeInfo = ProgressBarRangeInfo(value.toFloat(), 0f..100f)
+                    })
                 Box(Modifier.fillMaxHeight().padding(start = 4.dp)) {
-                    Text("50", color = Color.White, fontSize = 9.sp, modifier = Modifier.align(Alignment.Center).clearAndSetSemantics {})
+                    Text("50", color = Color.White, fontSize = 12.sp, modifier = Modifier.align(Alignment.Center).clearAndSetSemantics {})
                 }
             }
         }
         Column(Modifier.align(Alignment.TopEnd).widthIn(max = 130.dp).vGaugeBacking(), horizontalAlignment = Alignment.End) {
-            Text(stringResource(if (g.room == null) R.string.machine_preparing else reason), color = C.text, fontSize = 11.sp, lineHeight = 13.sp)
-            event?.takeIf { g.room != null }?.let { Text(stringResource(it), color = C.dim, fontSize = 11.sp, lineHeight = 13.sp) } // face/composure: never over the verdict
+            Text(stringResource(if (g.room == null) R.string.machine_preparing else reason), color = C.text, fontSize = 12.sp, lineHeight = 14.sp)
+            event?.takeIf { g.room != null }?.let { Text(stringResource(it), color = C.dim, fontSize = 12.sp, lineHeight = 14.sp) } // face/composure: never over the verdict
             Text(stringResource(if (!g.watching || !cameraAllowed) R.string.machine_face_off else if (tracking) R.string.machine_tracking else R.string.machine_no_signal),
-                color = C.dim, fontSize = 11.sp)
+                color = C.dim, fontSize = 12.sp)
         }
     }
 }
@@ -2654,13 +2670,13 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
 @Composable private fun MachineCues(g: Game) {
     Column(Modifier.fillMaxWidth().padding(bottom = 8.dp).clip(Square).background(Color(0xCC06303D))
         .border(1.dp, Hud.cyan.copy(alpha = 0.7f), Square).padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        if (g.overloadWarning) Text(stringResource(R.string.overload_warning), color = Hud.cyan, fontSize = 12.sp)
+        if (g.overloadWarning) Text(stringResource(R.string.overload_warning), color = Hud.cyan, fontSize = 13.sp)
         if (g.overloadCue) {
             Text(stringResource(R.string.overload_now), color = Hud.cyan,
                 modifier = Modifier.semantics { liveRegion = LiveRegionMode.Assertive })
             Text(if (g.overloadPips == 0) "○ ○" else if (g.overloadPips == 1) "● ○" else "● ●", color = Hud.cyan,
                 modifier = Modifier.clearAndSetSemantics { contentDescription = "${g.overloadPips} / 2" })
-            if (g.overloadPractice) Text(stringResource(R.string.overload_practice), color = C.text, fontSize = 12.sp)
+            if (g.overloadPractice) Text(stringResource(R.string.overload_practice), color = C.text, fontSize = 13.sp)
         }
         if (g.scannerInterrupted) Text(stringResource(R.string.overload_success), color = Hud.cyan)
     }
@@ -2703,7 +2719,7 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
             contentAlignment = Alignment.Center) {
             Icon(Icons.Default.Mic, null, tint = if (usable) C.ivory else C.dim, modifier = Modifier.size(40.dp))
         }
-        Text(label, color = C.dim, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
+        Text(label, color = C.dim, fontSize = 14.sp, modifier = Modifier.padding(top = 6.dp))
         if (micDenied) {
             val ctx = LocalContext.current
             OutlinedButton({
@@ -2757,28 +2773,24 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
                     Text(if (broken) pluralStringResource(R.plurals.result_broken_log, g.mind.tricks, displayUnit(g.officerId), g.mind.tricks)
                         else if (passed && g.tooClean) stringResource(R.string.result_too_clean)
                         else if (passed) pluralStringResource(R.plurals.result_passed_log, g.mind.turns, g.mind.turns) else stringResource(g.mind.verdict()),
-                        color = C.text, fontSize = 14.sp)
+                        color = C.text, fontSize = 15.sp)
                 }
                 // What tipped a refusal: the words heard and the cover fact they were checked against.
-                if (!passed) g.slipLines().forEach { Text(it, color = C.dim, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp)) }
+                if (!passed) g.slipLines().forEach { Text(it, color = C.dim, fontSize = 14.sp, modifier = Modifier.padding(top = 6.dp)) }
             }
             g.machineResult?.takeIf { g.resultInRoom && !g.restoredResult }?.let { record ->
                 val resources = LocalContext.current.resources
                 Panel {
-                    Text(stringResource(R.string.machine_debrief), color = C.dim, fontSize = 13.sp)
+                    Text(stringResource(R.string.machine_debrief), color = C.dim, fontSize = 14.sp)
                     Text(record.text { key, count -> resources.getQuantityString(key, count, count) },
-                        color = C.text, fontSize = 14.sp, modifier = Modifier.padding(top = 6.dp))
-                    if (passed) harvestLine(g)?.let { Text(it, color = C.dim, fontSize = 12.sp, letterSpacing = 1.5.sp, modifier = Modifier.padding(top = 6.dp)) }
+                        color = C.text, fontSize = 15.sp, modifier = Modifier.padding(top = 6.dp))
+                    if (passed) harvestLine(g)?.let { Text(it, color = C.dim, fontSize = 13.sp, letterSpacing = 1.5.sp, modifier = Modifier.padding(top = 6.dp)) }
                     if (passed && g.payloadPlanted) g.payload?.let { Text(stringResource(R.string.room_payload_planted, it.word(uiLang())),
-                        color = C.dim, fontSize = 12.sp, letterSpacing = 1.5.sp, modifier = Modifier.padding(top = 2.dp)) }
+                        color = C.dim, fontSize = 13.sp, letterSpacing = 1.5.sp, modifier = Modifier.padding(top = 2.dp)) }
                 }
             }
-            contractResult(g.careerState, g.careerSaving)?.let { (contract, done) ->
-                Text(stringResource(R.string.replay_mark_detail,
-                    stringResource(if (done) R.string.contract_complete else R.string.contract_missed),
-                    stringResource(contract.nameRes)), color = if (done) C.green else C.dim,
-                    textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 10.dp))
-            }
+            missionLine(g)?.let { (text, planted) -> Text(text, color = if (planted) C.green else C.dim,
+                textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) }
             CommittedMarks(g)
             g.behaviorDebrief()?.let { Spacer(Modifier.height(10.dp)); BehaviorPanel(it) }
             Spacer(Modifier.height(16.dp))
@@ -2795,12 +2807,12 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
 
 /** Cover and result: this mission isn't in the player's own (UI) language. Display only. */
 @Composable private fun ForeignTongueTag(modifier: Modifier = Modifier) = Text(stringResource(R.string.foreign_tongue_tag),
-    color = Color(0xFFFFC14D), fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold,
+    color = Color(0xFFFFC14D), fontSize = 12.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold,
     textAlign = TextAlign.Center, modifier = modifier.fillMaxWidth())
 
 @Composable private fun BehaviorPanel(text: String) = Panel {
-    Text(stringResource(R.string.profile_title), color = C.dim, fontSize = 13.sp, letterSpacing = 2.sp)
-    Text(text, color = C.text, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp))
+    Text(stringResource(R.string.profile_title), color = C.dim, fontSize = 14.sp, letterSpacing = 2.sp)
+    Text(text, color = C.text, fontSize = 15.sp, modifier = Modifier.padding(top = 4.dp))
 }
 
 /** Act-2 city encounter (a taxi over the pass result screen, a bar or hotel over the summary) (CityEncounters.kt): the machine's line, one held answer or Skip, the outcome. */
@@ -2863,6 +2875,7 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
                                 Modifier.align(AbsoluteAlignment.Right).widthIn(max = cardMax))
                             val rumour = if (c.kind == CityKind.BAR && ok) c.rumour?.let { CITY_RUMOURS[it] } else null
                             val rumourText = rumour?.let { stringResource(it.res) }
+                            val quoteText = c.quote?.takeIf { c.kind == CityKind.BAR && ok }?.let { stringResource(R.string.custom_rumour, isolated(it)) }
                             if (rumour != null && !rumour.tv) DialogueCard(PrologueSpeaker.STAFF, PrologueSide.LEFT, who, rumourText!!, rumourText,
                                 Modifier.align(AbsoluteAlignment.Left).widthIn(max = cardMax))
                             val outcome = stringResource(when (c.kind) {
@@ -2871,7 +2884,8 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
                                 CityKind.BAR -> if (ok) R.string.city_bar_ok else R.string.city_bar_no
                             })
                             // A served drink's outcome ("the bartender moves on") comes on its own after the pause, below.
-                            listOfNotNull(if (rumour?.tv == true) stringResource(R.string.city_bar_tv, rumourText!!) else null, if (served) null else outcome).forEach {
+                            listOfNotNull(if (rumour?.tv == true) stringResource(R.string.city_bar_tv, rumourText!!) else quoteText?.let { stringResource(R.string.city_bar_tv, it) },
+                                if (served) null else outcome).forEach {
                                 NarrationLine(it, it, Modifier.align(Alignment.CenterHorizontally).widthIn(max = narrMax))
                             }
                         }
@@ -2910,7 +2924,7 @@ private data class SuggestionReport(val hint: Hint, val officer: String, val lan
 /** A low-emphasis Continue (the bar's one button): small dim text, bottom centre, a 48 dp touch target. */
 @Composable private fun QuietContinue(onClick: () -> Unit) = Box(Modifier.fillMaxWidth().heightIn(min = 48.dp)
     .clickable(role = Role.Button, onClick = onClick), contentAlignment = Alignment.Center) {
-    Text(stringResource(R.string.continue_btn), color = C.dim, fontSize = 14.sp, letterSpacing = 2.sp, textAlign = TextAlign.Center)
+    Text(stringResource(R.string.continue_btn), color = C.dim, fontSize = 15.sp, letterSpacing = 2.sp, textAlign = TextAlign.Center)
 }
 
 /** A served drink stands in the foreground, on the front of the counter, close to the player (fractions of the art's height and width). The bartender art is ~8 px per cm at 1376 px tall (head ~148 px); the drink is drawn ×1.5 that. */
@@ -3011,8 +3025,8 @@ private const val DRINK_X_SERVED = 0.62f
         Row(Modifier.graphicsLayer { rotationZ = -3f }.border(1.5.dp, stamp, Square).padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.NoDrinks, null, tint = stamp, modifier = Modifier.size(20.dp))
             Column(Modifier.padding(start = 6.dp)) {
-                Text(BAR_SIGN[region].orEmpty(), color = stamp, fontFamily = FontFamily.Serif, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                if (foreign) Text(stringResource(R.string.city_no_alcohol), color = stamp, fontFamily = FontFamily.Serif, fontSize = 11.sp)
+                Text(BAR_SIGN[region].orEmpty(), color = stamp, fontFamily = FontFamily.Serif, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                if (foreign) Text(stringResource(R.string.city_no_alcohol), color = stamp, fontFamily = FontFamily.Serif, fontSize = 12.sp)
             }
         }
         Text(stringResource(R.string.city_menu_header), color = ink, fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold, fontSize = 15.sp,
@@ -3030,7 +3044,7 @@ private const val DRINK_X_SERVED = 0.62f
                     Box(Modifier.weight(1f).widthIn(min = 12.dp).height(1.dp).padding(horizontal = 4.dp).offset(y = (-4).dp).drawBehind {
                         drawLine(soft, Offset(0f, 0f), Offset(size.width, 0f), 1.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(1.dp.toPx(), 3.dp.toPx())))
                     })
-                    Text(gloss, color = soft, fontFamily = FontFamily.Serif, fontStyle = FontStyle.Italic, fontSize = 13.sp)
+                    Text(gloss, color = soft, fontFamily = FontFamily.Serif, fontStyle = FontStyle.Italic, fontSize = 14.sp)
                 }
             }
         }
@@ -3057,12 +3071,13 @@ private const val DRINK_X_SERVED = 0.62f
                 stringResource(R.string.machine_progress, cr.sessions, cr.points), stringResource(R.string.stat_cleared, cr.cleared), stringResource(R.string.summary_best_streak, cr.best),
                 cr.rooms.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.summary_rooms, it, it) },
                 cr.broken.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.stat_broken, it, it) }).joinToString(" · "))
+            missionLine(g)?.let { (text, planted) -> Stat(Icons.Default.Star, stringResource(R.string.mission_title), text, if (planted) C.green else C.text) }
         }
         Spacer(Modifier.height(16.dp))
         g.behaviorDebrief()?.let { BehaviorPanel(it); Spacer(Modifier.height(16.dp)) }
         Panel {
             Text("“${stringResource(m.verdict())}”", color = C.text, fontSize = 17.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-            g.slipLines().forEach { Text(it, color = C.dim, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 6.dp)) }
+            g.slipLines().forEach { Text(it, color = C.dim, fontSize = 14.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 6.dp)) }
         }
         Spacer(Modifier.weight(1f))
         PrimaryButton(stringResource(R.string.summary_new_mission), enabled = g.careerReady) { g.beginMission() }
@@ -3074,7 +3089,7 @@ private const val DRINK_X_SERVED = 0.62f
     Row(Modifier.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(icon, null, tint = C.text, modifier = Modifier.size(26.dp))
         Spacer(Modifier.width(18.dp))
-        Column { Text(label, color = C.dim, fontSize = 13.sp); Text(value, color = color, fontSize = 17.sp) }
+        Column { Text(label, color = C.dim, fontSize = 14.sp); Text(value, color = color, fontSize = 17.sp) }
     }
 
 @Composable private fun SettingsScreen(g: Game) = Box(Modifier.fillMaxSize().background(C.bg)) {
@@ -3087,21 +3102,21 @@ private const val DRINK_X_SERVED = 0.62f
             Spacer(Modifier.height(12.dp))
             Panel {
                 Text(stringResource(R.string.settings_voice_input), color = C.text, fontSize = 16.sp)
-                Text(stringResource(R.string.settings_on_device_speech), color = C.dim, fontSize = 12.sp)
+                Text(stringResource(R.string.settings_on_device_speech), color = C.dim, fontSize = 13.sp)
                 Spacer(Modifier.height(10.dp))
                 Choice(listOf(stringResource(R.string.settings_hold_to_speak), stringResource(R.string.settings_auto)), if (g.inputMode == InputMode.HOLD) 0 else 1) {
                     g.setInput(if (it == 0) InputMode.HOLD else InputMode.AUTO)
                 }
                 Text(stringResource(if (g.inputMode == InputMode.HOLD) R.string.settings_hold_help else R.string.settings_auto_help),
-                    color = C.dim, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
+                    color = C.dim, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp))
                 HorizontalDivider(Modifier.padding(vertical = 14.dp), color = C.line)
                 Row(Modifier.fillMaxWidth().clickable { g.screen = Screen.LANGUAGES }, verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Translate, null, tint = C.text); Spacer(Modifier.width(14.dp))
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(R.string.settings_languages), color = C.text, fontSize = 16.sp)
-                        Text(uiLang().let { ui -> Language.shipped.filter { it.code in g.languages }.joinToString { it.uiName(ui) } }.replaceFirstChar { it.titlecase() }, color = C.dim, fontSize = 12.sp)
+                        Text(uiLang().let { ui -> Language.shipped.filter { it.code in g.languages }.joinToString { it.uiName(ui) } }.replaceFirstChar { it.titlecase() }, color = C.dim, fontSize = 13.sp)
                         Language.shipped.filter { it.code in g.languages && g.slowLang(it.code) }.takeIf { it.isNotEmpty() }?.let { slow ->
-                            Text("${uiLang().let { ui -> slow.joinToString { it.uiName(ui) } }.replaceFirstChar { it.titlecase() }} · ${stringResource(R.string.lang_slow_tag)}", color = C.amber, fontSize = 12.sp)
+                            Text("${uiLang().let { ui -> slow.joinToString { it.uiName(ui) } }.replaceFirstChar { it.titlecase() }} · ${stringResource(R.string.lang_slow_tag)}", color = C.amber, fontSize = 13.sp)
                         }
                     }
                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = C.dim)
@@ -3111,7 +3126,7 @@ private const val DRINK_X_SERVED = 0.62f
                     Icon(Icons.Default.Book, null, tint = C.text); Spacer(Modifier.width(14.dp))
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(R.string.settings_passport), color = C.text, fontSize = 16.sp)
-                        Text(stringResource(R.string.settings_passport_help), color = C.dim, fontSize = 12.sp)
+                        Text(stringResource(R.string.settings_passport_help), color = C.dim, fontSize = 13.sp)
                     }
                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = C.dim)
                 }
@@ -3119,7 +3134,7 @@ private const val DRINK_X_SERVED = 0.62f
                 val lm = LocalContext.current.getSystemService(LocaleManager::class.java)
                 val uiCodes = listOf("") + Language.shipped.map { it.code }
                 Text(stringResource(R.string.settings_ui_language), color = C.text, fontSize = 16.sp)
-                Text(stringResource(R.string.settings_ui_language_help), color = C.dim, fontSize = 12.sp)
+                Text(stringResource(R.string.settings_ui_language_help), color = C.dim, fontSize = 13.sp)
                 Spacer(Modifier.height(10.dp))
                 Chips(listOf(stringResource(R.string.settings_system_default)) + Language.shipped.map { it.native },
                     uiCodes.indexOf(lm.applicationLocales.takeIf { !it.isEmpty }?.get(0)?.language ?: "").coerceAtLeast(0)) {
@@ -3148,7 +3163,7 @@ private const val DRINK_X_SERVED = 0.62f
                     Icon(Icons.Default.Visibility, null, tint = C.text); Spacer(Modifier.width(14.dp))
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(R.string.settings_camera), color = C.text, fontSize = 16.sp)
-                        Text(stringResource(R.string.settings_camera_help), color = C.dim, fontSize = 12.sp)
+                        Text(stringResource(R.string.settings_camera_help), color = C.dim, fontSize = 13.sp)
                     }
                     GameSwitch(g.cameraOn, g::setCamera)
                 }
@@ -3183,7 +3198,7 @@ private const val DRINK_X_SERVED = 0.62f
                     Icon(Icons.Default.Info, null, tint = C.text); Spacer(Modifier.width(14.dp))
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(R.string.settings_licenses), color = C.text, fontSize = 16.sp)
-                        Text(stringResource(R.string.genai_note), color = C.dim, fontSize = 12.sp)
+                        Text(stringResource(R.string.genai_note), color = C.dim, fontSize = 13.sp)
                     }
                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = C.dim)
                 }
@@ -3194,7 +3209,7 @@ private const val DRINK_X_SERVED = 0.62f
                     Icon(Icons.Default.BugReport, null, tint = C.text); Spacer(Modifier.width(14.dp))
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(R.string.settings_diagnostics), color = C.text, fontSize = 16.sp)
-                        Text(stringResource(R.string.settings_diagnostics_help), color = C.dim, fontSize = 12.sp)
+                        Text(stringResource(R.string.settings_diagnostics_help), color = C.dim, fontSize = 13.sp)
                     }
                     GameSwitch(g.diagnostics, g::toggleDiagnostics)
                 }
@@ -3223,9 +3238,9 @@ private const val DRINK_X_SERVED = 0.62f
                 About(Icons.Default.Place, pluralStringResource(R.plurals.about_destinations, Country.shipped.size, Country.shipped.size, Language.shipped.size))
                 About(Icons.Default.Person, stringResource(R.string.about_new_officer))
                 Spacer(Modifier.height(12.dp))
-                Text(stringResource(R.string.credits_blurb, Language.shipped.size), color = C.dim, fontSize = 13.sp)
+                Text(stringResource(R.string.credits_blurb, Language.shipped.size), color = C.dim, fontSize = 14.sp)
                 Spacer(Modifier.height(12.dp))
-                Text(stringResource(R.string.disclaimer_fiction), color = C.dim, fontSize = 13.sp)
+                Text(stringResource(R.string.disclaimer_fiction), color = C.dim, fontSize = 14.sp)
             }
             Spacer(Modifier.height(28.dp))
             Text(stringResource(R.string.settings_footer), style = display(20, 3.0).copy(color = C.line.copy(alpha = 1f), fontWeight = FontWeight.Medium),
@@ -3239,13 +3254,13 @@ private const val DRINK_X_SERVED = 0.62f
         options.forEachIndexed { i, o ->
             Box(Modifier.weight(1f).background(if (i == selected) C.ivory else Color.Transparent).clickable { onSelect(i) }
                 .padding(vertical = 10.dp), contentAlignment = Alignment.Center) {
-                Text(o, color = if (i == selected) C.navy else C.dim, fontSize = 14.sp)
+                Text(o, color = if (i == selected) C.navy else C.dim, fontSize = 15.sp)
             }
         }
     }
 
 @Composable private fun About(icon: ImageVector, text: String) = Row(Modifier.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-    Icon(icon, null, tint = C.dim, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(14.dp)); Text(text, color = C.text, fontSize = 14.sp)
+    Icon(icon, null, tint = C.dim, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(14.dp)); Text(text, color = C.text, fontSize = 15.sp)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -3255,7 +3270,7 @@ private const val DRINK_X_SERVED = 0.62f
             Box(Modifier.clip(Square).background(if (i == selected) C.ivory else Color.Transparent)
                 .border(1.dp, if (i == selected) C.ivory else C.line, Square)
                 .selectable(i == selected, enabled, Role.RadioButton) { onSelect(i) }.padding(horizontal = 14.dp, vertical = 8.dp)) {
-                Text(o, color = if (i == selected) C.navy else C.dim, fontSize = 14.sp)
+                Text(o, color = if (i == selected) C.navy else C.dim, fontSize = 15.sp)
             }
         }
     }
@@ -3275,7 +3290,7 @@ private const val DRINK_X_SERVED = 0.62f
             Text(stringResource(R.string.languages_title), style = display(24, 2.0))
         }
         Text(stringResource(if (firstRun) R.string.languages_first_run else R.string.languages_add),
-            color = C.dim, fontSize = 14.sp, modifier = Modifier.padding(vertical = 10.dp))
+            color = C.dim, fontSize = 15.sp, modifier = Modifier.padding(vertical = 10.dp))
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Language.shipped.forEach { l ->
                 val installed = l.code in g.languages
@@ -3286,18 +3301,18 @@ private const val DRINK_X_SERVED = 0.62f
                     .padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(l.native, color = C.text, fontSize = 17.sp)
-                        Text(airportCount(l.code).let { pluralStringResource(R.plurals.languages_destinations, it, l.uiName(uiLang()).replaceFirstChar { it.titlecase() }, it) }, color = C.dim, fontSize = 12.sp)
-                        if (g.slowLang(l.code)) Text(stringResource(R.string.lang_slow_tag), color = C.amber, fontSize = 12.sp)
+                        Text(airportCount(l.code).let { pluralStringResource(R.plurals.languages_destinations, it, l.uiName(uiLang()).replaceFirstChar { it.titlecase() }, it) }, color = C.dim, fontSize = 13.sp)
+                        if (g.slowLang(l.code)) Text(stringResource(R.string.lang_slow_tag), color = C.amber, fontSize = 13.sp)
                     }
-                    if (installed) Text(stringResource(R.string.languages_installed), color = C.green, fontSize = 13.sp)
+                    if (installed) Text(stringResource(R.string.languages_installed), color = C.green, fontSize = 14.sp)
                     else Checkbox(on, { picked = if (on) picked - l.code else picked + l.code })
                 }
             }
         }
         Spacer(Modifier.height(12.dp))
-        Text(if (adding.isEmpty()) stringResource(R.string.languages_nothing_new) else g.downloadNote(adding), color = C.dim, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp))
+        Text(if (adding.isEmpty()) stringResource(R.string.languages_nothing_new) else g.downloadNote(adding), color = C.dim, fontSize = 14.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp))
         gap?.let { Text(if (it.lang != null) stringResource(R.string.languages_need_home, Language.of(it.lang).uiName(uiLang())) else stringResource(R.string.languages_need_more),
-            color = C.amber, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)) }
+            color = C.amber, fontSize = 14.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)) }
         PrimaryButton(stringResource(if (firstRun) R.string.languages_download else R.string.languages_add_btn), enabled = adding.isNotEmpty() && !(firstRun && gap != null)) { g.install(adding) }
     }
 }
@@ -3323,7 +3338,7 @@ private const val DRINK_X_SERVED = 0.62f
     }
     Gutter {
         Text(stringResource(R.string.setup_input_title), style = display(24, 2.0))
-        Text(stringResource(R.string.setup_input_note), color = C.dim, fontSize = 14.sp, modifier = Modifier.padding(vertical = 10.dp))
+        Text(stringResource(R.string.setup_input_note), color = C.dim, fontSize = 15.sp, modifier = Modifier.padding(vertical = 10.dp))
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             listOf(InputMode.AUTO to (R.string.setup_input_auto to R.string.settings_auto_help),
                 InputMode.HOLD to (R.string.settings_hold_to_speak to R.string.settings_hold_help)).forEach { (m, text) ->
@@ -3334,19 +3349,19 @@ private const val DRINK_X_SERVED = 0.62f
                     .padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(text.first), color = C.text, fontSize = 17.sp)
-                        Text(stringResource(text.second), color = C.dim, fontSize = 12.sp)
+                        Text(stringResource(text.second), color = C.dim, fontSize = 13.sp)
                     }
                     RadioButton(on, null)
                 }
             }
             Spacer(Modifier.height(16.dp))
             Text(stringResource(R.string.passport_face_title), color = C.text, fontSize = 17.sp)
-            Text(stringResource(R.string.passport_face_body), color = C.dim, fontSize = 12.sp)
+            Text(stringResource(R.string.passport_face_body), color = C.dim, fontSize = 13.sp)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.passport_face_switch), color = C.text, modifier = Modifier.weight(1f))
                 GameSwitch(g.cameraOn, g::setCamera)
             }
-            Text(stringResource(R.string.setup_face_disclosure), color = C.dim, fontSize = 12.sp)
+            Text(stringResource(R.string.setup_face_disclosure), color = C.dim, fontSize = 13.sp)
         }
         Spacer(Modifier.height(12.dp))
         PrimaryButton(stringResource(R.string.continue_btn)) {
@@ -3391,10 +3406,10 @@ private fun flagOf(n: Nationality) = n.iso.map { Character.toChars(0x1F1E6 + (it
         Column(Modifier.weight(0.62f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Flag(flagOf(id.nationality), Modifier.size(width = 24.dp, height = 16.dp)); Spacer(Modifier.width(8.dp))
-                Text(id.nationality.uiName(uiLang()).uppercase(java.util.Locale.forLanguageTag(uiLang())), color = C.ink, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                Text(id.nationality.uiName(uiLang()).uppercase(java.util.Locale.forLanguageTag(uiLang())), color = C.ink, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             }
             Box(Modifier.fillMaxWidth().padding(top = 2.dp)) {
-                Text(id.passportNo, color = C.ink, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+                Text(id.passportNo, color = C.ink, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
                 // Match-parent overlay preserves the number line's height. Canvas has no content description.
                 Box(Modifier.matchParentSize(), contentAlignment = Alignment.CenterEnd) {
                     Canvas(Modifier.size(22.dp, 14.dp).clearAndSetSemantics {}) {
@@ -3410,10 +3425,10 @@ private fun flagOf(n: Nationality) = n.iso.map { Character.toChars(0x1F1E6 + (it
                 }
             }
             Text(id.name, color = C.ink, fontSize = 19.sp, fontWeight = FontWeight.Bold, lineHeight = 22.sp, modifier = Modifier.padding(top = 6.dp))
-            if (id.latin != id.name) Text(id.latin, color = C.ink, fontSize = 13.sp)
+            if (id.latin != id.name) Text(id.latin, color = C.ink, fontSize = 14.sp)
             @Composable fun field(label: Int, value: String) = Column(Modifier.padding(top = 5.dp)) {
-                Text(stringResource(label), color = C.ink.copy(alpha = 0.6f), fontSize = 11.sp)
-                Text(value, color = C.ink, fontSize = 13.sp, lineHeight = 15.sp)
+                Text(stringResource(label), color = C.ink.copy(alpha = 0.6f), fontSize = 12.sp)
+                Text(value, color = C.ink, fontSize = 14.sp, lineHeight = 16.sp)
             }
             field(R.string.identity_born, id.born); field(R.string.identity_home, id.home)
         }
@@ -3471,7 +3486,7 @@ private fun Modifier.passportGuilloche(): Modifier = drawWithCache {
 @Composable private fun ReduceMotionRow(g: Game, modifier: Modifier = Modifier) = Row(modifier, verticalAlignment = Alignment.CenterVertically) {
     Column(Modifier.weight(1f)) {
         Text(stringResource(R.string.settings_reduce_motion), color = C.text, fontSize = 16.sp)
-        Text(stringResource(R.string.settings_reduce_motion_help), color = C.dim, fontSize = 12.sp)
+        Text(stringResource(R.string.settings_reduce_motion_help), color = C.dim, fontSize = 13.sp)
     }
     GameSwitch(Motion.reduce, g::toggleReduceMotion)
 }
@@ -3491,9 +3506,9 @@ private fun Modifier.passportGuilloche(): Modifier = drawWithCache {
             if (onBack != null) IconButton(onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = C.text) }
             Text(stringResource(R.string.identity_title), style = display(24, 2.0))
         }
-        Text(stringResource(R.string.identity_note), color = C.dim, fontSize = 14.sp, modifier = Modifier.padding(vertical = 10.dp))
-        Text(stringResource(R.string.report_note), color = C.dim, fontSize = 12.sp, modifier = Modifier.padding(bottom = 6.dp))
-        Text(stringResource(R.string.motion_warning), color = C.dim, fontSize = 12.sp, modifier = Modifier.padding(bottom = 6.dp))
+        Text(stringResource(R.string.identity_note), color = C.dim, fontSize = 15.sp, modifier = Modifier.padding(vertical = 10.dp))
+        Text(stringResource(R.string.report_note), color = C.dim, fontSize = 13.sp, modifier = Modifier.padding(bottom = 6.dp))
+        Text(stringResource(R.string.motion_warning), color = C.dim, fontSize = 13.sp, modifier = Modifier.padding(bottom = 6.dp))
         ReduceMotionRow(g, Modifier.padding(bottom = 10.dp))
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             Text(stringResource(R.string.identity_nationality), color = C.text, fontSize = 16.sp)
@@ -3539,7 +3554,7 @@ private fun Modifier.passportGuilloche(): Modifier = drawWithCache {
             }
         }
         Spacer(Modifier.height(12.dp))
-        if (rolled == null) Text(stringResource(if (nation == null || gender == null) R.string.identity_pick_gender else R.string.identity_roll_first), color = C.dim, fontSize = 13.sp,
+        if (rolled == null) Text(stringResource(if (nation == null || gender == null) R.string.identity_pick_gender else R.string.identity_roll_first), color = C.dim, fontSize = 14.sp,
             modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp), textAlign = TextAlign.Center)
         PrimaryButton(stringResource(R.string.identity_confirm), enabled = rolled != null) { rolled?.let(onConfirm) }
     }
@@ -3583,8 +3598,8 @@ private fun openInternetPanel(ctx: android.content.Context) {
         verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text(stringResource(if (offline) R.string.paranoid_offline else R.string.paranoid_mode),
-                color = if (offline) Hud.cyan else C.dim, fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
-            if (!offline) Text(stringResource(R.string.paranoid_hint), color = C.dim, fontSize = 12.sp)
+                color = if (offline) Hud.cyan else C.dim, fontSize = 12.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
+            if (!offline) Text(stringResource(R.string.paranoid_hint), color = C.dim, fontSize = 13.sp)
         }
         GameSwitch(offline, null)
     }
@@ -3595,7 +3610,7 @@ private fun openInternetPanel(ctx: android.content.Context) {
     val ctx = LocalContext.current
     if (remindOffline(g.playedOffline, rememberNet() == 2))
         TextButton({ openInternetPanel(ctx) }, Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.paranoid_still_on), color = Hud.cyan, fontSize = 13.sp, textAlign = TextAlign.Center)
+            Text(stringResource(R.string.paranoid_still_on), color = Hud.cyan, fontSize = 14.sp, textAlign = TextAlign.Center)
         }
 }
 
@@ -3617,7 +3632,7 @@ private fun openInternetPanel(ctx: android.content.Context) {
                         }
                     }
                     Spacer(Modifier.width(14.dp))
-                    Column { Text(st.title, color = C.text, fontSize = 16.sp); Text(st.note, color = C.dim, fontSize = 12.sp) }
+                    Column { Text(st.title, color = C.text, fontSize = 16.sp); Text(st.note, color = C.dim, fontSize = 13.sp) }
                 }
             }
         }
@@ -3632,13 +3647,13 @@ private fun openInternetPanel(ctx: android.content.Context) {
         }
         if (g.installing && net != 0) {
             Spacer(Modifier.height(12.dp))
-            Text(stringResource(if (net == 2) R.string.download_offline else R.string.download_metered), color = C.dim, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+            Text(stringResource(if (net == 2) R.string.download_offline else R.string.download_metered), color = C.dim, fontSize = 14.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         }
         if (g.voiceMissing.isNotEmpty()) {
             Spacer(Modifier.height(12.dp))
             Panel(border = C.red.copy(alpha = 0.6f)) {
                 Text(stringResource(R.string.download_no_voice, uiLang().let { ui -> g.voiceMissing.joinToString { Language.of(it).uiName(ui) } }),
-                    color = C.text, fontSize = 14.sp)
+                    color = C.text, fontSize = 15.sp)
                 TextButton({ ctx.startActivity(android.content.Intent(android.speech.tts.TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
                     .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) }) { Text(stringResource(R.string.download_install_voices), color = C.ivory) }
                 TextButton({ g.recheckVoices() }) { Text(stringResource(R.string.download_check_again), color = C.ivory) }
@@ -3660,7 +3675,7 @@ private fun openInternetPanel(ctx: android.content.Context) {
         Spacer(Modifier.height(24.dp))
         Panel(border = C.red.copy(alpha = 0.6f)) {
             Text(stringResource(R.string.unsupported_title), color = C.text, fontSize = 17.sp, fontWeight = FontWeight.Medium)
-            Text(g.supported ?: "", color = C.dim, fontSize = 14.sp, modifier = Modifier.padding(top = 8.dp))
+            Text(g.supported ?: "", color = C.dim, fontSize = 15.sp, modifier = Modifier.padding(top = 8.dp))
         }
         Spacer(Modifier.weight(1f))
     }
@@ -3714,19 +3729,19 @@ private val VOICE_LICENSES = listOf(
             if (file != null) {
                 val unavailable = stringResource(R.string.licenses_unavailable)
                 val text = remember(file) { runCatching { ctx.assets.open("licenses/$file").bufferedReader().readText() }.getOrDefault(unavailable) }
-                Text(text, color = C.text, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                Text(text, color = C.text, fontSize = 13.sp, fontFamily = FontFamily.Monospace)
             } else {
                 @Composable fun entry(name: String, license: String, copyright: String, text: String, link: String) = Panel(Modifier.padding(bottom = 10.dp)) {
                     Text(name, color = C.text, fontSize = 16.sp)
-                    Text(license, color = C.dim, fontSize = 12.sp)
-                    if (copyright.isNotEmpty()) Text(copyright, color = C.dim, fontSize = 12.sp)
+                    Text(license, color = C.dim, fontSize = 13.sp)
+                    if (copyright.isNotEmpty()) Text(copyright, color = C.dim, fontSize = 13.sp)
                     if (text.isNotEmpty()) TextButton({ open = text }) { Text(stringResource(R.string.licenses_full_text), color = Hud.cyan) }
-                    if (link.isNotEmpty()) TextButton({ uri.openUri(link) }) { Text(link, color = Hud.cyan, fontSize = 12.sp) }
+                    if (link.isNotEmpty()) TextButton({ uri.openUri(link) }) { Text(link, color = Hud.cyan, fontSize = 13.sp) }
                 }
                 entry("Borderline Fluent", "GPL-3.0. Copyright (C) 2026 Fluffy Pants Studio LLC.", "", "gpl-3.0.txt", "https://github.com/itsaryuk/borderline-fluent")
                 entry(stringResource(R.string.licenses_art), stringResource(R.string.licenses_art_rights),
                     stringResource(R.string.licenses_art_copyright), "", "")
-                Panel(Modifier.padding(bottom = 10.dp)) { Text(stringResource(R.string.genai_note), color = C.text, fontSize = 13.sp) }
+                Panel(Modifier.padding(bottom = 10.dp)) { Text(stringResource(R.string.genai_note), color = C.text, fontSize = 14.sp) }
                 LICENSES.forEach { entry(it[0], it[1], it[2], it[3], it[4]) }
                 entry(stringResource(R.string.licenses_mlkit_terms), "Google", "", "", "https://developers.google.com/ml-kit/genai-terms")
                 entry("Piper voices", stringResource(R.string.licenses_piper_note), "", "", "https://github.com/k2-fsa/sherpa-onnx/releases/tag/tts-models")
@@ -3775,11 +3790,61 @@ private val VOICE_LICENSES = listOf(
     }
 }
 
-private val Contract.nameRes get() = when (this) {
-    Contract.QUIET -> R.string.contract_quiet_name
-    Contract.UNAIDED -> R.string.contract_unaided_name
-    Contract.UNMENTIONED -> R.string.contract_unmentioned_name
-    Contract.SAMPLES -> R.string.contract_samples_name
+/** Free AI's bonus mission on the boarding pass: the motif in the officer's language, glossed in the UI language. */
+@Composable private fun MissionCard(m: Mission, lang: String, cancelled: Boolean = false) = Panel {
+    val ui = uiLang()
+    val motif = m.motif
+    Text(stringResource(R.string.mission_title), color = Color(0xFFFFC14D), fontSize = 13.sp, letterSpacing = 1.sp, fontWeight = FontWeight.Bold)
+    // Booked away from the chain Free AI asked for: no penalty, just this note above the trip's own mission.
+    if (cancelled) Text(stringResource(R.string.mission_chain_cancelled), color = C.dim, fontSize = 14.sp, modifier = Modifier.padding(top = 6.dp))
+    val chain = m.chain
+    // A chain: leg 1 shows both legs; leg 2's motif is in airport B's language.
+    if (chain != null && m.firstLeg) Text(stringResource(R.string.mission_chain_leg1, chainCity(chain.from, ui)),
+        style = LocalTextStyle.current.copy(textDirection = TextDirection.Content), color = C.text, fontSize = 15.sp, modifier = Modifier.padding(top = 8.dp))
+    val text = if (chain != null) chainLeg2(chain, ui)
+        else if (motif == null) stringResource(R.string.mission_custom) // plant your own
+        else stringResource(R.string.mission_plant, motif.word(lang).let { w -> motif.word(ui).takeIf { it != w }?.let { "$w ($it)" } ?: w })
+    Text(text, style = LocalTextStyle.current.copy(textDirection = TextDirection.Content),
+        color = C.text, fontSize = 15.sp, modifier = Modifier.padding(top = 8.dp))
+    Text(stringResource(motif?.exampleRes ?: R.string.mission_custom_example), color = C.dim, fontSize = 14.sp, fontStyle = FontStyle.Italic, modifier = Modifier.padding(top = 6.dp))
+}
+
+private val Motif.exampleRes get() = when (this) {
+    Motif.HOUSEPLANT -> R.string.mission_example_houseplant
+    Motif.SUBMARINE -> R.string.mission_example_submarine
+    Motif.MOON -> R.string.mission_example_moon
+    Motif.TORTOISE -> R.string.mission_example_tortoise
+    Motif.UMBRELLA -> R.string.mission_example_umbrella
+    Motif.TEASPOON -> R.string.mission_example_teaspoon
+    Motif.LIGHTHOUSE -> R.string.mission_example_lighthouse
+    Motif.ACCORDION -> R.string.mission_example_accordion
+    Motif.SNOWMAN -> R.string.mission_example_snowman
+    Motif.TRAFFIC_CONE -> R.string.mission_example_traffic_cone
+    Motif.PIANO -> R.string.mission_example_piano
+    Motif.CLOUD -> R.string.mission_example_cloud
+    Motif.SOCK -> R.string.mission_example_sock
+    Motif.CLOCK -> R.string.mission_example_clock
+}
+
+/** The run's bonus line from the acknowledged receipt ([missionResult]): planted, skipped (never a failure), a chain's leg 1 through, or the chain cancelled. */
+@Composable private fun missionLine(g: Game): Pair<String, Boolean>? = missionResult(g.careerState, g.careerSaving)?.let { (m, outcome) ->
+    val ui = uiLang()
+    when (outcome) {
+        MissionOutcome.PLANTED -> stringResource(R.string.mission_planted) to true
+        MissionOutcome.SKIPPED -> stringResource(R.string.mission_skipped) to false
+        MissionOutcome.LEG_DONE -> m.chain!!.let { stringResource(R.string.mission_chain_done, chainCity(it.from, ui), chainCity(it.to, ui)) } to true
+        MissionOutcome.CHAIN_CANCELLED -> stringResource(R.string.mission_chain_cancelled) to false
+    }
+}
+
+/** A chain airport's city in [ui] ("Dublin", "Дублин"); the IATA code for an airport without one. */
+internal fun chainCity(airportId: String, ui: String) = AIRPORT_CITY[airportId]?.let { cityIn(it, ui) ?: it } ?: airportId.uppercase()
+
+/** Leg 2's instruction: fly A → B and plant the motif, said in B's language and glossed in [ui]. */
+@Composable private fun chainLeg2(c: Chain, ui: String): String {
+    val lang = c.toAirport?.lang ?: ui
+    val word = c.motif.word(lang).let { w -> c.motif.word(ui).takeIf { it != w }?.let { "$w ($it)" } ?: w }
+    return stringResource(R.string.mission_chain_leg2, chainCity(c.from, ui), chainCity(c.to, ui), word)
 }
 
 @Composable private fun CommittedMarks(g: Game) {
@@ -3791,8 +3856,6 @@ private val Contract.nameRes get() = when (this) {
             "sabotage" -> stringResource(R.string.album_sabotage)
             "unit" -> stringResource(R.string.replay_mark_detail, stringResource(R.string.album_sabotage),
                 stringResource(R.string.album_unit, coverIsolate(displayUnit(mark.officerId ?: continue), uiLang())))
-            "contract" -> stringResource(R.string.replay_mark_detail, stringResource(R.string.contract_title),
-                stringResource(markContract(mark)?.nameRes ?: continue))
             else -> continue // Preserve unknown evidence without inventing a label for future content.
         }
         Text(stringResource(R.string.replay_new_mark, label), color = C.green, textAlign = TextAlign.Center,
@@ -4022,3 +4085,6 @@ internal fun upgradeArt(upgrade: Int, step: Int): String =
         }
     }
 }
+
+/** A player's quoted line (plant your own) as a bidi island: an Arabic line in an English frame, or the reverse, keeps the frame's order. */
+private fun isolated(quote: String): String = android.text.BidiFormatter.getInstance().unicodeWrap(quote)

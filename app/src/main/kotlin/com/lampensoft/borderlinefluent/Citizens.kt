@@ -199,12 +199,17 @@ data class Backstory(
     /** The queue scene before the desk (PRD §6b), not part of the cover; its fact only once chosen and asked. */
     val encounter: QueueEncounter? = null,
     val homeArrivalTraining: Boolean = false,
+    /** An ARRIVAL's departure city in [from] (Latin; an airport chain's leg 2), "" when only the country is known. */
+    val fromCity: String = "",
 ) {
     /** Home town and real nationality; avoid repeating an identical town/country name. */
     val homeLine get() = if (home == nationality.name) home else "$home, ${nationality.name}"
 
     /** "Toronto", or "Toronto / Торонто" for a [lang] that writes it differently. */
     fun cityLine(lang: String = this.lang) = city + (cityIn(city, lang)?.let { " / $it" } ?: "")
+
+    /** Where an arrival flies in from: "Dublin / Дублин, Ireland" with a departure city, else the country. */
+    fun fromLine(lang: String = this.lang) = if (fromCity.isBlank()) from else fromCity + (cityIn(fromCity, lang)?.let { " / $it" } ?: "") + ", $from"
 
     /** The queue choice the desk will ask about, else null. */
     val askedEncounter get() = encounter?.takeIf { it.asked }?.chosen
@@ -252,7 +257,8 @@ data class Backstory(
         FactId.STAY -> "Staying at: $stayed, in ${cityLine(lang)}"
         FactId.HOST -> "Invited or hosted by: $host"
         FactId.HOME -> "Home (where they live): $homeLine"
-        FactId.FROM -> "Flying in from: $from"
+        // A chain's leg 2: the city or the country is the right answer, another departure is a lie.
+        FactId.FROM -> "Flying in from: " + if (fromCity.isBlank()) from else "${fromLine(lang)} (the city $fromCity is in $from)"
         FactId.ENCOUNTER -> encounterLine()
         else -> error("Retired cover fact: $id")
     }
@@ -265,7 +271,7 @@ data class Backstory(
     private fun cardText(lang: String) = if (kind == TripKind.ARRIVAL) """
         Name: $name${if (latin != name) " ($latin)" else ""}, ${genderWord(gender)} (citizen of ${withArticle(nationality.name)}, passport $passportNo, born $born)
         Lives in: $homeLine
-        Visiting: ${country.nation} (${cityLine(lang)}) for $days days, flying in from $from
+        Visiting: ${country.nation} (${cityLine(lang)}) for $days days, flying in from ${fromLine(lang)}
         Purpose of the visit: $purpose
         ${if (hasHost) "Invited or hosted by: $host" else ""}
         Staying at: $stayed
@@ -317,7 +323,7 @@ data class Backstory(
         const val YEAR = 2035
 
         /** The player's [identity] on one rolled [Itinerary] to [destination]. Without one (tests, tools): a citizen of the destination. */
-        fun random(r: Random, destination: Destination, identity: Identity? = null, departure: String? = null): Backstory {
+        fun random(r: Random, destination: Destination, identity: Identity? = null, departure: String? = null, departureCity: String? = null): Backstory {
             val country = destination.country
             val id = identity ?: run {
                 val gender = if (r.nextBoolean()) Gender.WOMAN else Gender.MAN
@@ -328,7 +334,7 @@ data class Backstory(
             }
             // The sample face follows the name list: a binary choice only for the picture and the names.
             val photo = id.photo ?: people.filter { it.female == (id.nameList == NameList.FEMALE) }.random(r)
-            return of(id, photo, Itinerary.roll(r, destination, id, departure), destination)
+            return of(id, photo, Itinerary.roll(r, destination, id, departure, departureCity), destination)
         }
 
         fun of(id: Identity, photo: Person, t: Itinerary, destination: Destination) = Backstory(
@@ -336,7 +342,7 @@ data class Backstory(
             passportNo = id.passportNo, born = id.born, home = id.home, job = id.job,
             from = t.from ?: id.nationality.name, city = t.city, purpose = t.purpose, days = t.days, stayed = t.hotel,
             travelledWith = t.travelledWith, met = t.met, waiting = t.waiting, stamps = t.stamps, lang = destination.lang,
-            nationality = id.nationality, kind = t.kind, host = t.host,
+            nationality = id.nationality, kind = t.kind, host = t.host, fromCity = t.fromCity.orEmpty(),
         )
     }
 }

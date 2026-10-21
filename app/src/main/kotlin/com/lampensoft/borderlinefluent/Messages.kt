@@ -1,7 +1,10 @@
 package com.lampensoft.borderlinefluent
 
-/** A story text message: [sender] and [text] are string resources; [country] (an id) fills the text's %1$s with its UI name. */
-data class StoryMessage(val id: String, val sender: Int, val text: Int, val country: String? = null, val at: Long? = null)
+/**
+ * A story text message: [sender] and [text] are string resources; [country] (an id) fills the text's %1$s with its UI name,
+ * or [quote] (a stored plant-your-own line, [CustomPlant.message]) fills it verbatim.
+ */
+data class StoryMessage(val id: String, val sender: Int, val text: Int, val country: String? = null, val at: Long? = null, val quote: String? = null)
 
 /** A message, the progress that delivers it, and the country its text names (if any). */
 private class Entry(val id: String, val sender: Int, val text: (CareerSnapshot?) -> Int,
@@ -50,7 +53,7 @@ fun thalassiaTripOffered(s: CareerSnapshot?, stage: Act1Stage, read: Set<String>
 
 /** Delivered messages in catalog order (Valery first, then Marek's by level). */
 fun deliveredMessages(s: CareerSnapshot?, stage: Act1Stage): List<StoryMessage> =
-    catalog.filter { it.delivered(s, stage) }.map { StoryMessage(it.id, it.sender, it.text(s), it.country(s)) }
+    catalog.filter { it.delivered(s, stage) }.map { StoryMessage(it.id, it.sender, it.text(s), it.country(s)) } + listOfNotNull(CustomPlant.message(s))
 
 fun unreadMessages(delivered: List<StoryMessage>, read: Set<String>): List<StoryMessage> =
     delivered.filter { it.id !in read }

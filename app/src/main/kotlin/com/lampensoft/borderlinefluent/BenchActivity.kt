@@ -241,6 +241,8 @@ class BenchActivity : Activity() {
             val roomPoison = doses("roomPoison", JudgeCases.roomPoison.getValue(l))
             val roomMixed = doses("roomMixed", JudgeCases.roomMixed.getValue(l)) // a feeling sentence + an impossible one (playtest)
             val warmMixed = roomCases("warmMixed", JudgeCases.roomWarmMixed.getValue(l), false, wantAbsurd = false)
+            val roomMotif = doses("roomMotif", JudgeCases.roomMotif[l].orEmpty()) //  phase 2 motifs, a few languages (measured)
+            val motifPlain = roomCases("motifPlain", JudgeCases.roomMotifPlain[l].orEmpty(), false, wantAbsurd = false)
             // Garbled ASR (owner 2026-10-14): a broken sentence is no impossible claim, so never a dose.
             val roomGarbled = JudgeCases.roomGarbled.getValue(l).count { (q, a) ->
                 val (check, raw) = room(q, a)
@@ -318,6 +320,15 @@ class BenchActivity : Activity() {
                 ok
             }
             if (offFactCases.isNotEmpty()) summary += "offFact $l $offFactOk/${offFactCases.size}"
+            // An airport chain's leg 2 (phase 3): departure city or country fine, another country a lie (own denominator).
+            val chainCases = JudgeCases.chainFrom[l].orEmpty()
+            val chainOk = chainCases.count { e ->
+                val v = Judge(country, e.story, ask).judge(e.q, e.a, e.topic)
+                val ok = v.check.contradiction == e.conflict && !v.check.trick
+                out("[$l] ${if (ok) "ok  " else "MISS"} ${e.label} want=${if (e.conflict) "conflict" else "fine"} fact=${v.fact} | ${e.q} -> ${e.a} | raw=${v.raw} step2=${v.step2} step3=${v.step3}")
+                ok
+            }
+            if (chainCases.isNotEmpty()) summary += "chainFrom $l $chainOk/${chainCases.size}"
             // Queue encounters (PRD §6b): the ENCOUNTER fact appended last; own denominator.
             val encounterCases = JudgeCases.encounter[l].orEmpty()
             val encounterOk = encounterCases.count { e ->
@@ -329,7 +340,7 @@ class BenchActivity : Activity() {
             if (encounterCases.isNotEmpty()) summary += "encounter $l $encounterOk/${encounterCases.size}"
             summary += "implant $l $implant/${implantCases.size} malformed $implantMalformed"
             summary += "admit $l $admit/${admitCases.size} malformed $admitMalformed"
-            summary += "$l ${right}/${jc.cases.size + 1} paraphrase $paraOk/${para.size} tricks ${caught}/${JudgeCases.tricks.getValue(l).size} machine $machine/${JudgeCases.machine.getValue(l).size} machineNot $machineNot/${JudgeCases.machineNot.getValue(l).size} roomOdd $roomOdd/${JudgeCases.roomOdd.getValue(l).size} absurdOdd $absurdOdd/${JudgeCases.roomAbsurdOdd.getValue(l).size} roomPoison $roomPoison/${JudgeCases.roomPoison.getValue(l).size} roomMixed $roomMixed/${JudgeCases.roomMixed.getValue(l).size} warmMixed $warmMixed/${JudgeCases.roomWarmMixed.getValue(l).size} roomGarbled $roomGarbled/${JudgeCases.roomGarbled.getValue(l).size} roomTroll $roomTroll/${JudgeCases.roomTroll.getValue(l).size} roomWarm $roomWarm/${JudgeCases.roomWarm.getValue(l).size} warmEvasive $warmEvasive roomEvasive $roomEvasive/${JudgeCases.roomEvasive.getValue(l).size} deskOdd $deskOdd/2 deskOk $deskOk/1 stOdd $stOdd/3 stOk $stOk/3 falseTricks $falseTricks falseOdd $falseOdd extra $extraOk/${jc.extra.size} avg ${ms / jc.cases.size}ms"
+            summary += "$l ${right}/${jc.cases.size + 1} paraphrase $paraOk/${para.size} tricks ${caught}/${JudgeCases.tricks.getValue(l).size} machine $machine/${JudgeCases.machine.getValue(l).size} machineNot $machineNot/${JudgeCases.machineNot.getValue(l).size} roomOdd $roomOdd/${JudgeCases.roomOdd.getValue(l).size} absurdOdd $absurdOdd/${JudgeCases.roomAbsurdOdd.getValue(l).size} roomPoison $roomPoison/${JudgeCases.roomPoison.getValue(l).size} roomMixed $roomMixed/${JudgeCases.roomMixed.getValue(l).size} warmMixed $warmMixed/${JudgeCases.roomWarmMixed.getValue(l).size} roomMotif $roomMotif/${JudgeCases.roomMotif[l].orEmpty().size} motifPlain $motifPlain/${JudgeCases.roomMotifPlain[l].orEmpty().size} roomGarbled $roomGarbled/${JudgeCases.roomGarbled.getValue(l).size} roomTroll $roomTroll/${JudgeCases.roomTroll.getValue(l).size} roomWarm $roomWarm/${JudgeCases.roomWarm.getValue(l).size} warmEvasive $warmEvasive roomEvasive $roomEvasive/${JudgeCases.roomEvasive.getValue(l).size} deskOdd $deskOdd/2 deskOk $deskOk/1 stOdd $stOdd/3 stOk $stOk/3 falseTricks $falseTricks falseOdd $falseOdd extra $extraOk/${jc.extra.size} avg ${ms / jc.cases.size}ms"
             out("judge accuracy [$l] ${right}/${jc.cases.size + 1}, avg ${ms / jc.cases.size}ms")
         }
         out("SUMMARY brain=nano " + summary.joinToString(" | "))

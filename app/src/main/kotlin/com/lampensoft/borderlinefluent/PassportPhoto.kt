@@ -305,10 +305,10 @@ fun PassportScreen(faceWatch: FaceWatch, faceReading: Boolean, onReading: (Boole
 
         status?.let { Text(stringResource(it), color = if (message != null) Amber else Text1, fontSize = 15.sp, textAlign = TextAlign.Center) }
         if (d == null && cameraOn && c?.ok == true) {
-            if (c.eyesHint) Text(stringResource(R.string.passport_hint_eyes), color = Dim, fontSize = 13.sp)
-            if (c.smileHint) Text(stringResource(R.string.passport_hint_smile), color = Dim, fontSize = 13.sp)
+            if (c.eyesHint) Text(stringResource(R.string.passport_hint_eyes), color = Dim, fontSize = 14.sp)
+            if (c.smileHint) Text(stringResource(R.string.passport_hint_smile), color = Dim, fontSize = 14.sp)
         }
-        if (d != null && !sample) Text(stringResource(R.string.passport_unmirrored), color = Dim, fontSize = 12.sp)
+        if (d != null && !sample) Text(stringResource(R.string.passport_unmirrored), color = Dim, fontSize = 13.sp)
         if (noCamera) Text(stringResource(R.string.passport_no_camera), color = Amber, fontSize = 15.sp, textAlign = TextAlign.Center)
         Spacer(Modifier.height(6.dp))
 
@@ -350,14 +350,14 @@ fun PassportScreen(faceWatch: FaceWatch, faceReading: Boolean, onReading: (Boole
 
         // Face reading during interviews is its own choice, kept compact under the controls.
         Column(Modifier.fillMaxWidth().padding(vertical = 6.dp).clip(Square).background(Card).padding(horizontal = 12.dp, vertical = 8.dp)) {
+            Text(stringResource(R.string.passport_face_title), color = Text1, fontSize = 15.sp, fontWeight = FontWeight.Medium, modifier = Modifier.fillMaxWidth())
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.passport_face_title), color = Text1, fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
-                Text(stringResource(R.string.passport_face_switch), color = Text1, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 8.dp))
+                Text(stringResource(R.string.passport_face_switch), color = Text1, fontSize = 13.sp, modifier = Modifier.weight(1f).padding(end = 8.dp))
                 Switch(reading, { on -> reading = on; onReading(on); if (on && !granted()) askReading.launch(Manifest.permission.CAMERA) })
             }
-            Text(stringResource(R.string.passport_face_body), color = Dim, fontSize = 11.sp, lineHeight = 14.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
+            Text(stringResource(R.string.passport_face_body), color = Dim, fontSize = 12.sp, lineHeight = 14.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
         }
-        Text(stringResource(R.string.passport_disclosure), color = Dim, fontSize = 11.sp, lineHeight = 14.sp, modifier = Modifier.fillMaxWidth())
+        Text(stringResource(R.string.passport_disclosure), color = Dim, fontSize = 12.sp, lineHeight = 14.sp, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(8.dp))
     }
 }

@@ -16,7 +16,9 @@ enum class CityStep { INTRO, SPEAKING, READY, HEARING, CHECKING, DONE }
 /** The encounter on screen. [ride]: a repeat visit's short taxi ride (no question, no mic; [CityStep.INTRO] caption, then [CityStep.DONE] driving). [adequate]: null until judged; [rumour]: index into [CITY_RUMOURS], bar only; [intro]: caption variant (the encounter count); [country]: the destination's id (the taxi radio); [heard]: what the player said, once judged. */
 data class CityScene(val kind: CityKind, val lang: String, val step: CityStep = CityStep.INTRO,
                      val adequate: Boolean? = null, val rumour: Int? = null, val intro: Int = 0, val country: String = "",
-                     val drink: Drink? = null, val airport: String = "", val ride: Boolean = false, val heard: String = "")
+                     val drink: Drink? = null, val airport: String = "", val ride: Boolean = false, val heard: String = "",
+                     /** A plant-your-own line on the bar's TV instead of a rumour ([CustomPlant.barQuote]), quoted as said. */
+                     val quote: String? = null)
 
 /** The scene's region (art, menu, radio): the language code, English by country (Canada gets the US, any other English country the UK). */
 fun regionOf(lang: String, countryId: String): String = if (lang != "en") lang else when (countryId) {

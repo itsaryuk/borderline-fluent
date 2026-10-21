@@ -38,10 +38,10 @@ class AssessmentTest {
         }
     }
 
-    @Test fun eightQuestionsOneSeedPerCategoryCoverFilled() {
+    @Test fun fourQuestionsCoverFilled() {
         val a = Assessment(0.5, Backstory.BENCH, Random(3))
-        assertEquals(8, a.questions.size)
-        assertEquals(8, a.questions.toSet().size)
+        assertEquals(4, a.questions.size)
+        assertEquals(4, a.questions.toSet().size)
         assertTrue(a.questions.none { '{' in it })
     }
 
@@ -117,7 +117,7 @@ class AssessmentTest {
     @Test fun oddPenaltyOverridesFeelingBonusAndKeepsOtherPenalties() {
         val a = Assessment(0.0, Backstory.BENCH)
         a.onCheck(human.copy(odd = true, evasive = true, implant = true, inLanguage = false, clarity = 0))
-        assertEquals(25.0 + 15 + 3 + 8 + 10 + 6 + 4, a.index, 0.0)
+        assertEquals(37.5 + 15 + 3 + 8 + 10 + 6 + 4, a.index, 0.0)
         assertEquals(1, a.odd)
         assertTrue(a.state().contains("odd=1"))
     }
@@ -125,7 +125,7 @@ class AssessmentTest {
     @Test fun twoOddAnswersFailImmediatelyEvenAtLowIndex() {
         val a = Assessment(0.0, Backstory.BENCH)
         a.onCheck(human.copy(odd = true)); a.next()
-        repeat(3) { a.onCheck(human) }
+        repeat(4) { a.onCheck(human) }
         a.onCheck(human.copy(odd = true)); a.next()
         assertTrue(a.index <= 50)
         assertEquals(2, a.asked)
@@ -134,15 +134,25 @@ class AssessmentTest {
         assertEquals(Decision.RELEASED, a.verdict()) // debug override still wins
     }
 
-    @Test fun oneOddAnswerBlocksEarlyPassButAllowsFullRoomPass() {
+    @Test fun oneOddAnswerStillAllowsAFullRoomPass() {
         val a = Assessment(0.0, Backstory.BENCH)
-        a.onAnswer(2500, 8); a.onCheck(human.copy(odd = true)); a.next()
-        repeat(4) { a.onAnswer(2500, 8); a.onCheck(human); a.next() }
-        assertTrue(a.index < 20)
-        assertNull(a.verdict())
-        repeat(2) { a.onCheck(human); a.next(); assertNull(a.verdict()) }
-        a.onCheck(human); a.next()
+        a.onAnswer(2500, 8); a.onCheck(human.copy(odd = true)); a.next() // 37.5 + 15 + 3 − 3
+        repeat(2) { a.onAnswer(2500, 8); a.onCheck(human); a.next(); assertNull(a.verdict()) }
+        a.onAnswer(2500, 8); a.onCheck(human); a.next() // three good answers: −27
+        assertEquals(25.5, a.index, 1e-9)
         assertEquals(Decision.RELEASED, a.verdict())
+    }
+
+    @Test fun noEarlyReleaseAndTheEarlyRefusalAtHalfway() {
+        val calm = Assessment(0.0, Backstory.BENCH)
+        repeat(3) { calm.onAnswer(2500, 8); calm.onCheck(human); calm.next(); assertNull(calm.verdict()) } // index 10.5
+        val lost = Assessment(1.0, Backstory.BENCH) // 52.5
+        lost.onCheck(odd.copy(implant = true, inLanguage = false)); lost.next() // +3 +8 +10 +6
+        assertNull(lost.verdict())
+        lost.onCheck(odd.copy(inLanguage = false)); lost.next()
+        assertTrue(lost.index > 90)
+        assertEquals(Assessment.EARLY_REFUSAL_AT, lost.asked)
+        assertEquals(Decision.REFUSED, lost.verdict())
     }
 
     @Test fun ownersViolentEvidenceSequenceNoLongerPasses() {
@@ -191,6 +201,23 @@ class AssessmentTest {
                 cases.zip(seeds).forEach { (case, seed) ->
                     assertEquals(lang, Assessment.local(seed, Backstory.BENCH, lang), case.first)
                     assertTrue(lang, case.second.isNotBlank())
+                }
+            }
+        }
+    }
+
+    /**  phase 2: the new-motif room cases use the real localized seeds and name their motif as the game hears it. */
+    @Test fun roomMotifBenchNamesItsMotifs() {
+        val afraid = "Tell me about the first time you were truly afraid."
+        for ((set, seeds, motifs) in listOf(
+            Triple(JudgeCases.roomMotif, listOf("When did you last lie to someone you love?", afraid, "Your key no longer opens your front door. Who do you call?"), JudgeCases.ROOM_MOTIF_NAMED),
+            Triple(JudgeCases.roomMotifPlain, listOf(afraid, "Tell me about a teacher you hated.", "Your key no longer opens your front door. Who do you call?", "When did you last lie to someone you love?"), JudgeCases.ROOM_MOTIF_PLAIN_NAMED))) {
+            assertTrue(set.size >= 5)
+            for ((lang, cases) in set) {
+                assertEquals(lang, seeds.size, cases.size)
+                for ((i, case) in cases.withIndex()) {
+                    assertEquals(lang, Assessment.local(seeds[i], Backstory.BENCH, lang), case.first)
+                    assertTrue("$lang: ${case.second}", namesMotif(case.second, motifs[i], lang))
                 }
             }
         }
@@ -266,11 +293,11 @@ class AssessmentTest {
     @Test fun strongTellsAloneCantFailTheRoomEvenForAGhost() {
         val a = Assessment(0.0, Backstory.BENCH, Random(1), tellWeight = Persona.TRAINING.copy(level = 3).tellWeight)
         while (a.verdict() == null) { a.onTells(listOf(Tell.LIPS to 4.0, Tell.BLINKS to 4.0), absent = 0.9); a.next() }
-        assertEquals(25.0 + 25.0, a.index, 1e-9) // start 25, capped at 12.5 × 2.0
+        assertEquals(37.5 + 12.5, a.index, 1e-9) // start 37.5, capped at 6.25 × 2.0: still on the line
         assertEquals(Decision.RELEASED, a.verdict())
         val rookie = Assessment(0.0, Backstory.BENCH, Random(1), tellWeight = Persona.TRAINING.tellWeight)
-        repeat(8) { rookie.onTells(listOf(Tell.LIPS to 4.0), absent = 0.0); rookie.next() }
-        assertEquals(25.0 + 6.25, rookie.index, 1e-9) // level 0: half the cap
+        repeat(4) { rookie.onTells(listOf(Tell.LIPS to 4.0), absent = 0.0); rookie.next() }
+        assertEquals(37.5 + 3.125, rookie.index, 1e-9) // level 0: half the cap
     }
 
     @Test fun probeCountIsBoundedAndMildestFirst() {
@@ -284,14 +311,15 @@ class AssessmentTest {
         assertTrue((0..100).map { Assessment.probesFor(it / 100.0).size }.zipWithNext().all { (a, b) -> b >= a })
     }
 
-    @Test fun probesMixIntoEightQuestionsBetweenWarmUpAndSelf() {
-        val absurd = TN_QUESTIONS.filter { it.first == "Absurd" }.map { it.second }
-        val self = TN_QUESTIONS.filter { it.first == "Self and identity" }.map { it.second }
+    @Test fun warmUpFeelingOneProbeAtTheSharpestLevelThenSelf() {
+        fun cat(vararg c: String) = TN_QUESTIONS.filter { it.first in c }.map { it.second }
+        val feeling = cat(*Assessment.FEELING_CATEGORIES.toTypedArray())
         for (seed in 0..60) for (e in listOf(0.0, 0.3, 0.6, 1.0)) {
             val a = Assessment(0.5, Backstory.BENCH, Random(seed), evidence = e)
-            assertEquals(8, a.seeds.size); assertEquals(8, a.seeds.toSet().size)
-            assertEquals(Assessment.probesFor(e).indices.toList(), a.seeds.filter(::isProbe).map(::probeLevel).sorted())
-            assertTrue(a.seeds.first() in absurd); assertTrue(a.seeds.last() in self)
+            assertEquals(4, a.seeds.size); assertEquals(4, a.seeds.toSet().size)
+            assertTrue(a.seeds[0] in cat("Absurd")); assertTrue(a.seeds[1] in feeling)
+            assertEquals(Assessment.probesFor(e).size - 1, probeLevel(a.seeds[2]))
+            assertTrue(a.seeds[3] in cat("Self and identity"))
             assertTrue(a.questions.none { '{' in it })
         }
     }
@@ -299,7 +327,7 @@ class AssessmentTest {
     @Test fun theStoryNeverNamesFreeAi() {
         for (seed in 0..40) for (e in listOf(0.0, 0.5, 1.0)) {
             val a = Assessment(0.5, Backstory.BENCH, Random(seed), evidence = e, named = false)
-            assertEquals(Assessment.probesFor(e, named = false).indices.toList(), a.seeds.filter(::isProbe).map(::probeLevel).sorted())
+            assertEquals(listOf(Assessment.probesFor(e, named = false).size - 1), a.seeds.filter(::isProbe).map(::probeLevel))
             assertTrue(a.seeds.none { "Free AI" in it })
             for (lang in TN_LOCAL.keys) assertTrue(a.seeds.none { "Free AI" in Assessment.local(it, Backstory.BENCH, lang)!! })
         }

@@ -142,7 +142,8 @@ internal fun usaCompletionPending(s: CareerSnapshot?): Boolean {
     return s.act == Act.FREE && ending.usaReleased // act guard: a stale receipt must not announce the ending outside act 2
 }
 
-internal const val USA_ASSESSMENT_OFFSET = 25.0
+/** The USA exam's extra start index: half the 8-question room's 25, as the room was halved (owner 2026-10-19). */
+internal const val USA_ASSESSMENT_OFFSET = 12.5
 internal fun assessmentOffset(act: Act, countryId: String, story: Boolean, training: Boolean) =
     if (act == Act.FREE && countryId == "usa" && !story && !training) USA_ASSESSMENT_OFFSET else 0.0
 

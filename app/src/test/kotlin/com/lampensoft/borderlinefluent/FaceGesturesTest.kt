@@ -65,11 +65,11 @@ class FaceGesturesTest {
     @Test fun penaltiesShareBothQuestionAndRoomBudgets() {
         val a = Assessment(0.0, Backstory.BENCH)
         repeat(10) { a.onLookAway(); a.onTells(listOf(Tell.LIPS to 4.0), .9) }
-        assertEquals(29.0, a.index, 0.0)
+        assertEquals(41.5, a.index, 0.0) // 4 a question
         a.next(); a.onTells(listOf(Tell.LIPS to 4.0), .9); a.onLookAway()
-        assertEquals(33.0, a.index, 0.0)
+        assertEquals(43.75, a.index, 0.0) // the room's 6.25
         repeat(8) { a.next(); a.onLookAway(); a.onTells(listOf(Tell.LIPS to 4.0), .9) }
-        assertEquals(37.5, a.index, 0.0)
+        assertEquals(43.75, a.index, 0.0)
     }
     @Test fun reaskedProbeKeepsItsPassiveBudget() {
         val a = Assessment(0.0, Backstory.BENCH)

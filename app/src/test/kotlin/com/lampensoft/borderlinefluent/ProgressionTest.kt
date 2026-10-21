@@ -284,7 +284,8 @@ class ProgressionTest {
     }
 
     @Test fun progressionAndAttemptFreezeRoundTrip() {
-        val a = attempt().copy(preparation = preparation(), nationalityLanguages = setOf("de", "fr"), upgradesHeld = 2, progressEligible = true)
+        val a = attempt().copy(preparation = preparation(), nationalityLanguages = setOf("de", "fr"), upgradesHeld = 2, progressEligible = true,
+            mission = Mission(MissionKind.PLANT, Motif.MOON))
         val s = pending(a).copy(act = Act.FREE, trainedLanguages = setOf("es", "pt"), machineSessions = 3, progressPoints = 5, upgradesGranted = 1,
             cutscenesSeen = setOf(1), lastPassedCountry = "fr", flagged = mapOf("de" to 2))
         assertEquals(s, (CareerJson.decode(CareerJson.encode(s)) as CareerRead.Ready).snapshot)

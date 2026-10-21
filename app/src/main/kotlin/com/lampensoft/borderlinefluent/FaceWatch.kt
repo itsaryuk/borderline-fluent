@@ -30,6 +30,9 @@ class FaceWatch {
     private val samples = ArrayDeque<Sample>()
     private val frameTimes = ArrayDeque<Long>()
     @Volatile private var frameSize = ""
+    /** Debug builds only: the hand-gesture spike (logs, no gameplay), fed the desk's frames with the last face box. */
+    @Volatile private var hands: HandProbe? = null
+    @Volatile private var faceBox: android.graphics.Rect? = null
 
     /** For the HUD: is a face in view right now. */
     @Volatile var seen = false; private set
@@ -79,6 +82,7 @@ class FaceWatch {
         frameTimes.addLast(t); while (t - frameTimes.first() > 1000) frameTimes.removeFirst()
         while (samples.isNotEmpty() && t - samples.first().t > 120_000) samples.removeFirst()
         seen = face != null
+        if (hands != null) faceBox = face?.boundingBox
         val blinks = Profiler.blinksPerMin(samples.filter { it.t >= t - 60_000 }).toInt()
         if (face == null) {
             retain(Sample(t, false))
@@ -116,6 +120,7 @@ class FaceWatch {
         drained = {
             runCatching { detector.close() }
             if (passportClient.isInitialized()) runCatching { passportClient.value.close() }
+            hands?.close()
             worker.shutdown()
         })
 
@@ -144,11 +149,12 @@ class FaceWatch {
     }
 
     @SuppressLint("UnsafeOptInUsageError")
-    internal fun analysis(token: Long): ImageAnalysis = ImageAnalysis.Builder()
+    internal fun analysis(token: Long, context: android.content.Context): ImageAnalysis = ImageAnalysis.Builder()
         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
         .setResolutionSelector(ResolutionSelector.Builder().setResolutionStrategy(
             ResolutionStrategy(ANALYSIS, ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER)).build())
         .build().also { a ->
+            if (BuildConfig.DEBUG && hands == null) hands = HandProbe.load(context)
             interviewAnalyzer = a
             a.setAnalyzer(worker) { proxy ->
                 // Thermal cap (~15 fps) for 20-minute sessions. A frame is closed only after its detection, so at the
@@ -162,6 +168,8 @@ class FaceWatch {
                 val image = try { proxy.image?.let { InputImage.fromMediaImage(it, rotation) } }
                     catch (_: Exception) { null }
                 frameSize = "${proxy.width}×${proxy.height}"
+                hands?.let { probe -> if (session.desk(token)) probe.offer(proxy, faceBox?.let { b ->
+                    HandGestures.Box(b.left / w.toFloat(), b.top / h.toFloat(), b.right / w.toFloat(), b.bottom / h.toFloat()) }) }
                 session.frame(token, image, FaceSession.Frame(w, h, rotation, now()), proxy::close)
             }
         }

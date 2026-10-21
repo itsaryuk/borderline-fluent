@@ -23,7 +23,7 @@ class SmallTalkOddTest {
     @Test fun oddSmallTalkChangesSuspicionAndFaceWithoutAnswerBookkeeping() {
         val mind = OfficerMind(calm)
         mind.onSmallTalkOdd()
-        assertEquals(calm.suspicion + 0.12 + 0.12 * calm.strictness, mind.suspicion, 1e-9)
+        assertEquals(calm.suspicion + 0.06 + 0.06 * calm.strictness, mind.suspicion, 1e-9)
         assertEquals(calm.patience, mind.patience, 1e-9)
         assertEquals(1, mind.odd)
         assertEquals(0, mind.turns)
@@ -38,7 +38,7 @@ class SmallTalkOddTest {
     }
 
     @Test fun twoOddAnswersAtHighSuspicionEndInterview() {
-        val mind = OfficerMind(calm.copy(suspicion = 0.65))
+        val mind = OfficerMind(calm.copy(suspicion = 0.8))
         mind.onSmallTalkOdd()
         assertNull(mind.decision)
         mind.onSmallTalkOdd()
@@ -67,7 +67,7 @@ class SmallTalkOddTest {
     }
 
     @Test fun oddSmallTalkProvidesOnlyGroundsForHighSuspicion() {
-        val mind = OfficerMind(calm.copy(suspicion = 0.85))
+        val mind = OfficerMind(calm.copy(suspicion = 0.95))
         mind.onSmallTalkOdd()
         assertTrue(mind.suspicion >= 1.0)
         assertEquals(1, mind.odd)
